@@ -55,3 +55,14 @@ Supported hk commands are:
 
 See 'hk help <command>' for more information on a specific command.
 ```
+
+
+### Development
+
+```bash
+$ cd hk
+$ mate hk.go
+$ go run hk.go list
+$ go build
+$ ./hk list
+```
