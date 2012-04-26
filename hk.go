@@ -243,7 +243,7 @@ func main() {
 		cmd := os.Args[1]
 		switch cmd {
 		case "env":
-				env()
+			env()
 		case "get":
 			get()
 		case "help":
