@@ -131,6 +131,10 @@ func list() {
 	os.Exit(0)
 }
 
+func ps() {
+	os.Exit(0)
+}
+
 func versionHelp() {
 	fmt.Printf("Usage: hk version\n\n")
 	fmt.Printf("Show hk client version.\n")
@@ -191,17 +195,17 @@ func help() {
 		usage()
 	} else {
 		cmd := os.Args[2]
-	  if cmd == "env" {
+		switch cmd {
+	  case "env":
 		  envHelp()
-	  } else if cmd == "get" {
+	  case "get":
 			getHelp()
-		} else if cmd == "list" {
+		case "list":
 		  listHelp()
-		} else if cmd == "version" {
+		case "version":
 			versionHelp()
-		} else {
-			unrecCmd(cmd)
 		}
+		unrecCmd(cmd)
 	}
 }
 
@@ -210,18 +214,20 @@ func main() {
 		usage()
 	} else {
 		cmd := os.Args[1]
-		if cmd == "env" {
-			env()
-		} else if cmd == "get" {
+		switch cmd {
+		case "env":
+				env()
+		case "get":
 			get()
-		} else if cmd == "help" {
+		case "help":
 			help()
-		} else if cmd == "list" {
+		case "list":
 			list()
-		} else if cmd == "version" {
+		case "ps":
+			ps()
+		case "version":
 			version()
-		} else {
-			unrecCmd(cmd)
 		}
+		unrecCmd(cmd)
 	}
 }
