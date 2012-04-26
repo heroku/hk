@@ -44,6 +44,34 @@ func unrecCmd(cmd string) {
 	error(fmt.Sprintf("'%s' is not an hk command. See 'hk help'", cmd))
 }
 
+func envHelp() {
+	fmt.Printf("Usage: hk env -a <app>\n\n")
+	fmt.Printf("Show all config vars.")
+	os.Exit(0)
+}
+
+func env() {
+	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
+		error("Invalid usage. See hk help env")
+	}
+	appName := os.Args[3]
+	res := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	config := data.(map[string]interface{})
+	for k, v := range config {
+		fmt.Printf("%s=%v\n", k, v)
+	}
+	os.Exit(0)
+}
+
 func getHelp() {
 	fmt.Printf("Usage: hk get -a <app> <key>\n\n")
 	fmt.Printf("Get the value of a config var.\n")
@@ -163,7 +191,9 @@ func help() {
 		usage()
 	} else {
 		cmd := os.Args[2]
-	  if cmd == "get" {
+	  if cmd == "env" {
+		  envHelp()
+	  } else if cmd == "get" {
 			getHelp()
 		} else if cmd == "list" {
 		  listHelp()
@@ -180,10 +210,12 @@ func main() {
 		usage()
 	} else {
 		cmd := os.Args[1]
-		if cmd == "help" {
-			help()
+		if cmd == "env" {
+			env()
 		} else if cmd == "get" {
 			get()
+		} else if cmd == "help" {
+			help()
 		} else if cmd == "list" {
 			list()
 		} else if cmd == "version" {
