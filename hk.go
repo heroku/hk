@@ -8,6 +8,42 @@ import (
 	"os"
 )
 
+const (
+	VERSION = "0.0.1"
+)
+
+func apiReq(meth string, url string) (res *http.Response) {
+	client := &http.Client{}
+	req, err := http.NewRequest(meth, url, nil)
+	req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
+	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
+	req.Header.Add("Accept", "application/json")
+	res, err = client.Do(req)
+		if err != nil {
+		panic(err)
+	}
+	if (res.StatusCode == 401) {
+		error("Unauthorized")
+	}
+	if (res.StatusCode != 200) {
+		error("Unexpected error")
+	}
+	return res
+}
+
+func error(msg string) {
+	fmt.Fprintf(os.Stderr, "Error: %s.\n", msg)
+	os.Exit(1)
+}
+
+func unrecArg(arg string) {
+	error(fmt.Sprintf("Unrecognized argument '%s'", arg))
+}
+
+func unrecCmd(cmd string) {
+	error(fmt.Sprintf("'%s' is not an hk command. See 'hk help'", cmd))
+}
+
 func usage() {
 	fmt.Printf("Usage: hk <command> [-a <app>] [command-specific-options]\n\n")
 	fmt.Printf("Supported hk commands are:\n")
@@ -18,7 +54,7 @@ func usage() {
 	fmt.Printf("  create          Create an app\n")
 	fmt.Printf("  destroy         Destroy an app\n")
 	fmt.Printf("  env             List config vars\n")
-	fmt.Printf("  get             GEt config var\n")
+	fmt.Printf("  get             Get config var\n")
 	fmt.Printf("  help            Show this help\n")
 	fmt.Printf("  info            Show app info\n")
 	fmt.Printf("  list            List apps\n")
@@ -46,90 +82,114 @@ func usage() {
 	fmt.Printf("  unset           Unset config vars\n")
 	fmt.Printf("  version         Display version\n\n")
 	fmt.Printf("See 'hk help <command>' for more information on a specific command.\n")
+	os.Exit(0)
 }
 
-func help(args []string) {
-	if len(args) == 2 {
+func help() {
+	if len(os.Args) <= 2 {
 		usage()
-	} else if args[2] == "version" {
-		versionHelp()
-	} else if args[2] == "list" {
-		listHelp()
 	} else {
-		fmt.Fprintf(os.Stderr, "Error: '%s' is not an hk command. See 'hk help'.\n", args[2])
-	  os.Exit(1)
+		cmd := os.Args[2]
+	  if cmd == "get" {
+			getHelp()
+		} else if cmd == "list" {
+		  listHelp()
+		} else if cmd == "version" {
+			versionHelp()
+		} else {
+			unrecCmd(cmd)
+		}
 	}
+}
+
+func getHelp() {
+	fmt.Printf("Usage: hk get -a <app> <key>\n\n")
+	fmt.Printf("Get the value of a config var.\n")
+	os.Exit(0)
+}
+
+func get() {
+	if (len(os.Args) != 5) || (os.Args[2] != "-a") {
+		error("Invalid usage. See hk help get")
+	}
+	appName := os.Args[3]
+	key := os.Args[4]
+	res := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	config := data.(map[string]interface{})
+	value, found := config[key]
+	if !found {
+		error(fmt.Sprintf("No such key as '%s'", key))
+	}
+	fmt.Println(value)
+	os.Exit(0)
 }
 
 func listHelp() {
 	fmt.Printf("Usage: hk list\n\n")
 	fmt.Printf("List accessible apps.\n")
+	os.Exit(0)
 }
 
-func list(args []string) {
-	if len(args) == 2 {
-		client := &http.Client{}
-		req, err := http.NewRequest("GET", "https://api.heroku.com/apps", nil)
-		req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
-		req.Header.Add("User-Agent", "hk/0.0.1")
-		req.Header.Add("Accept", "application/json")
-		res, err := client.Do(req)
-			if err != nil {
-			panic(err)
-		}
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			panic(err)
-		}
-		var data interface{}
-		err = json.Unmarshal(body, &data)
-		if err != nil {
-			panic(err)
-		}
-		if (res.StatusCode == 401) {
-		  fmt.Fprintf(os.Stderr, "Error: Unauthorized.\n")
-		  os.Exit(1)
-		} else if (res.StatusCode != 200) {
-			fmt.Fprintf(os.Stderr, "Error: Internal Server Error.\n")
-			os.Exit(1)
-		} else {
-			apps := data.([]interface{})
-			for i := range apps {
-				app := apps[i].(map[string]interface{});
-		    fmt.Printf("%s\n", app["name"])
-		  }
-		}
-	} else {
-		fmt.Fprintf(os.Stderr, "Error: Unrecognized argument '%s'.\n", args[2])
+func list() {
+	if len(os.Args) != 2 {
+		unrecArg(os.Args[2])
 	}
+	res := apiReq("GET", "https://api.heroku.com/apps")
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	apps := data.([]interface{})
+	for i := range apps {
+		app := apps[i].(map[string]interface{});
+		fmt.Printf("%s\n", app["name"])
+	}
+	os.Exit(0)
 }
 
 func versionHelp() {
 	fmt.Printf("Usage: hk version\n\n")
 	fmt.Printf("Show hk client version.\n")
+	os.Exit(0)
 }
 
-func version(args []string) {
-	if len(args) == 2 {
-		fmt.Printf("0.0.1\n")
-	} else {
-		fmt.Fprintf(os.Stderr, "Error: Unrecognized argument '%s'.\n", args[2])
-		os.Exit(1)
-	}
+func version() {
+	if len(os.Args) != 2 {
+	  unrecArg(os.Args[2])
+  }
+	fmt.Printf("%s\n", VERSION)
+	os.Exit(0)
 }
 
 func main() {
-	args := os.Args;
-	if len(args) <= 1 {
+	if len(os.Args) <= 1 {
 		usage()
-	} else if args[1] == "help" {
-		help(args)
-	} else if args[1] == "list" {
-		list(args)
-	} else if args[1] == "version" {
-		version(args)
-  } else {
-	  fmt.Fprintf(os.Stderr, "Error: '%s' is not an hk command. See 'hk help'.\n", args[2])
-	  os.Exit(1)
+	} else {
+		cmd := os.Args[1]
+		if cmd == "help" {
+			help()
+		} else if cmd == "get" {
+			get()
+		} else if cmd == "list" {
+			list()
+		} else if cmd == "version" {
+			version()
+		} else {
+			unrecCmd(cmd)
+		}
 	}
 }
