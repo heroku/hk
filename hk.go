@@ -12,13 +12,13 @@ const (
 	VERSION = "0.0.1"
 )
 
-func apiReq(meth string, url string) (res *http.Response) {
+func apiReq(meth string, url string) (data interface{}) {
 	client := &http.Client{}
 	req, err := http.NewRequest(meth, url, nil)
 	req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
 	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
 	req.Header.Add("Accept", "application/json")
-	res, err = client.Do(req)
+	res, err := client.Do(req)
 		if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,15 @@ func apiReq(meth string, url string) (res *http.Response) {
 	if (res.StatusCode != 200) {
 		error("Unexpected error")
 	}
-	return res
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	return data
 }
 
 func error(msg string) {
@@ -55,16 +63,7 @@ func env() {
 		error("Invalid usage. See hk help env")
 	}
 	appName := os.Args[3]
-	res := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		panic(err)
-	}
+	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
 	config := data.(map[string]interface{})
 	for k, v := range config {
 		fmt.Printf("%s=%v\n", k, v)
@@ -84,16 +83,7 @@ func get() {
 	}
 	appName := os.Args[3]
 	key := os.Args[4]
-	res := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		panic(err)
-	}
+	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
 	config := data.(map[string]interface{})
 	value, found := config[key]
 	if !found {
@@ -113,16 +103,7 @@ func list() {
 	if len(os.Args) != 2 {
 		unrecArg(os.Args[2])
 	}
-	res := apiReq("GET", "https://api.heroku.com/apps")
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		panic(err)
-	}
+	data := apiReq("GET", "https://api.heroku.com/apps")
 	apps := data.([]interface{})
 	for i := range apps {
 		app := apps[i].(map[string]interface{})
@@ -142,16 +123,7 @@ func ps() {
 		error("Invalid usage. See hk help ps")
 	}
 	appName := os.Args[3]
-	res := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
-	var data interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		panic(err)
-	}
+	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
 	processes := data.([]interface{})
 	for i := range processes {
 		process := processes[i].(map[string]interface{})
