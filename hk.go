@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 )
 
@@ -29,8 +32,11 @@ func usage() {
 	fmt.Printf("  ps-psql         Open a psql database shell\n")
 	fmt.Printf("  pg-wait         Await a database\n")
 	fmt.Printf("  ps              List processes\n")
+	fmt.Printf("  release         Show release info\n")
+	fmt.Printf("  releases        List releases\n")
 	fmt.Printf("  rename          Rename an app\n")
 	fmt.Printf("  restart         Restart processes\n")
+	fmt.Printf("  rollback        Rollback to a previous release\n")
 	fmt.Printf("  run             Run a process\n")
 	fmt.Printf("  set             Set config var\n")
 	fmt.Printf("  scale           Scale processes\n")
@@ -62,7 +68,37 @@ func listHelp() {
 
 func list(args []string) {
 	if len(args) == 2 {
-		fmt.Printf("pulse-production\npulse-staging\n")
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", "https://api.heroku.com/apps", nil)
+		req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
+		req.Header.Add("User-Agent", "hk/0.0.1")
+		req.Header.Add("Accept", "application/json")
+		res, err := client.Do(req)
+			if err != nil {
+			panic(err)
+		}
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			panic(err)
+		}
+		var data interface{}
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			panic(err)
+		}
+		if (res.StatusCode == 401) {
+		  fmt.Fprintf(os.Stderr, "Error: Unauthorized.\n")
+		  os.Exit(1)
+		} else if (res.StatusCode != 200) {
+			fmt.Fprintf(os.Stderr, "Error: Internal Server Error.\n")
+			os.Exit(1)
+		} else {
+			apps := data.([]interface{})
+			for i := range apps {
+				app := apps[i].(map[string]interface{});
+		    fmt.Printf("%s\n", app["name"])
+		  }
+		}
 	} else {
 		fmt.Fprintf(os.Stderr, "Error: Unrecognized argument '%s'.\n", args[2])
 	}
