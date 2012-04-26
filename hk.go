@@ -125,13 +125,38 @@ func list() {
 	}
 	apps := data.([]interface{})
 	for i := range apps {
-		app := apps[i].(map[string]interface{});
+		app := apps[i].(map[string]interface{})
 		fmt.Printf("%s\n", app["name"])
 	}
 	os.Exit(0)
 }
 
+func psHelp() {
+	fmt.Printf("Usage: hk ps -a <app>\n\n")
+	fmt.Printf("List apps processes.\n")
+	os.Exit(0)
+}
+
 func ps() {
+	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
+		error("Invalid usage. See hk help ps")
+	}
+	appName := os.Args[3]
+	res := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+	var data interface{}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		panic(err)
+	}
+	processes := data.([]interface{})
+	for i := range processes {
+		process := processes[i].(map[string]interface{})
+		fmt.Printf("%v\n", process)
+	}
 	os.Exit(0)
 }
 
@@ -202,6 +227,8 @@ func help() {
 			getHelp()
 		case "list":
 		  listHelp()
+	  case "ps":
+		  psHelp()
 		case "version":
 			versionHelp()
 		}
