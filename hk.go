@@ -12,7 +12,7 @@ const (
 	VERSION = "0.0.1"
 )
 
-func apiReq(meth string, url string) (data interface{}) {
+func apiReq(meth string, url string) interface{} {
 	client := &http.Client{}
 	req, err := http.NewRequest(meth, url, nil)
 	req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
@@ -32,6 +32,7 @@ func apiReq(meth string, url string) (data interface{}) {
 	if err != nil {
 		panic(err)
 	}
+	var data interface{}
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		panic(err)
