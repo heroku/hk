@@ -37,7 +37,11 @@ func apiReq(meth string, url string) interface{} {
 	if (res.StatusCode == 401) {
 		error("Unauthorized")
 	}
+	if (res.StatusCode == 403) {
+		error("Unauthorized")
+	}
 	if (res.StatusCode != 200) {
+		fmt.Printf("%v\n", res)
 		error("Unexpected error")
 	}
 	body, err := ioutil.ReadAll(res.Body)
