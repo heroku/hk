@@ -31,7 +31,7 @@ Supported hk commands are:
   addons          List add-ons
   addons-add      Add an add-on
   addons-open     Open an add-on page
-  addons-remove   Remove an add-on 
+  addons-remove   Remove an add-on
   create          Create an app
   destroy         Destroy an app
   env             List config vars
