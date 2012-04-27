@@ -134,6 +134,15 @@ func info() {
 	os.Exit(0)
 }
 
+func tokenHelp() {
+	cmdHelp("hk token", "Show API token")
+}
+
+func token() {
+	fmt.Println(os.Getenv("HEROKU_API_KEY"))
+	os.Exit(0)
+}
+
 func listHelp() {
 	cmdHelp("hk list", "List accessible apps")
 }
@@ -202,6 +211,8 @@ func help() {
 			getHelp()
 		case "info":
 			infoHelp()
+		case "token":
+			tokenHelp()
 		case "list":
 		  listHelp()
 	  case "ps":
@@ -270,6 +281,8 @@ func main() {
 			help()
 		case "info":
 			info()
+		case "token":
+			token()
 		case "list":
 			list()
 		case "ps":
