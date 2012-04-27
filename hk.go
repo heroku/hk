@@ -6,12 +6,24 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 )
 
 const (
 	VERSION = "0.0.1"
 )
 
+// sort interface-typed arrays by first-class functions
+type ByFn struct{
+	elems []interface{}
+	comp func(a, b interface{}) bool
+}
+func (c ByFn) Len() int { return len(c.elems)  }
+func (c ByFn) Less(i, j int) bool { return c.comp(c.elems[i], c.elems[j]) }
+func (c ByFn) Swap(i, j int) { c.elems[i], c.elems[j] = c.elems[j], c.elems[i] }
+
+
+// generic api requests
 func apiReq(meth string, url string) interface{} {
 	client := &http.Client{}
 	req, err := http.NewRequest(meth, url, nil)
@@ -40,6 +52,7 @@ func apiReq(meth string, url string) interface{} {
 	return data
 }
 
+// error formatting
 func error(msg string) {
 	fmt.Fprintf(os.Stderr, "Error: %s.\n", msg)
 	os.Exit(1)
@@ -53,6 +66,7 @@ func unrecCmd(cmd string) {
 	error(fmt.Sprintf("'%s' is not an hk command. See 'hk help'", cmd))
 }
 
+// commands
 func envHelp() {
 	fmt.Printf("Usage: hk env -a <app>\n\n")
 	fmt.Printf("Show all config vars.")
@@ -85,7 +99,7 @@ func get() {
 	appName := os.Args[3]
 	key := os.Args[4]
 	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
-	config := data.(map[string]interface{})
+	config := data.(map[string]string)
 	value, found := config[key]
 	if !found {
 		error(fmt.Sprintf("No such key as '%s'", key))
@@ -126,9 +140,16 @@ func ps() {
 	appName := os.Args[3]
 	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
 	processes := data.([]interface{})
+	sort.Sort(ByFn{
+		processes,
+		func(a, b interface{}) bool {
+			p1 := a.(map[string]interface{})["process"].(string)
+			p2 := b.(map[string]interface{})["process"].(string)
+		  return p1 < p2
+	  }})
 	for i := range processes {
 		process := processes[i].(map[string]interface{})
-		fmt.Printf("%v\n", process)
+		fmt.Printf("%v\n", process["process"])
 	}
 	os.Exit(0)
 }
@@ -147,6 +168,28 @@ func version() {
 	os.Exit(0)
 }
 
+func help() {
+	if len(os.Args) <= 2 {
+		usage()
+	} else {
+		cmd := os.Args[2]
+		switch cmd {
+	  case "env":
+		  envHelp()
+	  case "get":
+			getHelp()
+		case "list":
+		  listHelp()
+	  case "ps":
+		  psHelp()
+		case "version":
+			versionHelp()
+		}
+		unrecCmd(cmd)
+	}
+}
+
+// top-level usage
 func usage() {
 	fmt.Printf("Usage: hk <command> [-a <app>] [command-specific-options]\n\n")
 	fmt.Printf("Supported hk commands are:\n")
@@ -188,27 +231,7 @@ func usage() {
 	os.Exit(0)
 }
 
-func help() {
-	if len(os.Args) <= 2 {
-		usage()
-	} else {
-		cmd := os.Args[2]
-		switch cmd {
-	  case "env":
-		  envHelp()
-	  case "get":
-			getHelp()
-		case "list":
-		  listHelp()
-	  case "ps":
-		  psHelp()
-		case "version":
-			versionHelp()
-		}
-		unrecCmd(cmd)
-	}
-}
-
+// entry point
 func main() {
 	if len(os.Args) <= 1 {
 		usage()
