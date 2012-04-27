@@ -5,7 +5,7 @@ Fast Heroku client.
 
 ### Overview
 
-hk is a command line client to the Heroku runtime platform designed to be as fast as possible.
+hk is a command line client to the Heroku runtime platform, designed to be as fast as possible.
 
 
 ### Notice
