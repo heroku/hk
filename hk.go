@@ -84,7 +84,7 @@ func envHelp() {
 
 func env() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		error("Invalid usage. See hk help env")
+		error("Invalid usage. See 'hk help env'")
 	}
 	appName := os.Args[3]
 	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
@@ -101,13 +101,13 @@ func getHelp() {
 
 func get() {
 	if (len(os.Args) != 5) || (os.Args[2] != "-a") {
-		error("Invalid usage. See hk help get")
+		error("Invalid usage. See 'hk help get'")
 	}
 	appName := os.Args[3]
 	key := os.Args[4]
 	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
-	config := data.(map[string]string)
-	value, found := config[key]
+	config := data.(map[string]interface{})
+	value, found := config[key].(string)
 	if !found {
 		error(fmt.Sprintf("No such key as '%s'", key))
 	}
@@ -121,7 +121,7 @@ func infoHelp() {
 
 func info() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		error("Invalid usage. See hk help info")
+		error("Invalid usage. See 'hk help info'")
 	}
 	appName := os.Args[3]
 	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s", appName))
@@ -157,7 +157,7 @@ func psHelp() {
 
 func ps() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		error("Invalid usage. See hk help ps")
+		error("Invalid usage. See 'hk help ps'")
 	}
 	appName := os.Args[3]
 	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
