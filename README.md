@@ -71,3 +71,8 @@ $ go run hk.go list
 $ go build
 $ ./hk list
 ```
+
+
+### Design
+
+We maintain a view of many terminal interactions involving `hk` in [DESIGN.md](DESIGN.md) which you can check out to get a sense of the tool's style.
