@@ -3,6 +3,11 @@
 Fast Heroku client.
 
 
+## Notice
+
+It doesn't work yet, and doesn't implement all of the described commands.
+
+
 ### Overview
 
 hk is a command line client to the Heroku runtime platform designed to be as fast as possible.
