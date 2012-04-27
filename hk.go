@@ -147,9 +147,11 @@ func ps() {
 			p2 := b.(map[string]interface{})["process"].(string)
 		  return p1 < p2
 	  }})
+	fmt.Printf("Process           State       Command\n")
+	fmt.Printf("----------------  ----------  ------------------------\n")
 	for i := range processes {
 		process := processes[i].(map[string]interface{})
-		fmt.Printf("%v\n", process["process"])
+		fmt.Printf("%-16s  %-10s  %s\n", process["process"], process["state"], process["command"])
 	}
 	os.Exit(0)
 }
