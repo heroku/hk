@@ -3,7 +3,7 @@
 Fast Heroku client.
 
 
-## Notice
+### Notice
 
 It doesn't work yet, and doesn't implement all of the described commands.
 
