@@ -75,4 +75,4 @@ $ ./hk list
 
 ### Design
 
-We maintain a view of many terminal interactions involving `hk` in [DESIGN.md](DESIGN.md) which you can check out to get a sense of the tool's style.
+We maintain a view of many terminal interactions involving `hk` in [hk/DESIGN.md](DESIGN.md) which you can check out to get a sense of the tool's style.
