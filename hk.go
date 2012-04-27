@@ -66,11 +66,16 @@ func unrecCmd(cmd string) {
 	error(fmt.Sprintf("'%s' is not an hk command. See 'hk help'", cmd))
 }
 
+// info formatting
+func cmdHelp(usage string, desc string) {
+	fmt.Printf("Usage: %s\n\n", usage)
+	fmt.Printf("%s.\n", desc)
+	os.Exit(0)
+}
+
 // commands
 func envHelp() {
-	fmt.Printf("Usage: hk env -a <app>\n\n")
-	fmt.Printf("Show all config vars.")
-	os.Exit(0)
+	cmdHelp("hk env -a <app>", "Show all config vars")
 }
 
 func env() {
@@ -87,9 +92,7 @@ func env() {
 }
 
 func getHelp() {
-	fmt.Printf("Usage: hk get -a <app> <key>\n\n")
-	fmt.Printf("Get the value of a config var.\n")
-	os.Exit(0)
+	cmdHelp("hk get -a <app> <key>", "Get the value of a config var")
 }
 
 func get() {
@@ -109,9 +112,7 @@ func get() {
 }
 
 func listHelp() {
-	fmt.Printf("Usage: hk list\n\n")
-	fmt.Printf("List accessible apps.\n")
-	os.Exit(0)
+	cmdHelp("hk list", "List accessible apps")
 }
 
 func list() {
@@ -128,9 +129,7 @@ func list() {
 }
 
 func psHelp() {
-	fmt.Printf("Usage: hk ps -a <app>\n\n")
-	fmt.Printf("List apps processes.\n")
-	os.Exit(0)
+	cmdHelp("hk ps -a <app>", "List app processes")
 }
 
 func ps() {
@@ -157,9 +156,7 @@ func ps() {
 }
 
 func versionHelp() {
-	fmt.Printf("Usage: hk version\n\n")
-	fmt.Printf("Show hk client version.\n")
-	os.Exit(0)
+	cmdHelp("hk version", "Show hk client version")
 }
 
 func version() {
