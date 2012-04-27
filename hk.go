@@ -257,7 +257,6 @@ func usage() {
 	fmt.Printf("  run             Run a process\n")
 	fmt.Printf("  set             Set config var\n")
 	fmt.Printf("  scale           Scale processes\n")
-	fmt.Printf("  run             Run a process\n")
 	fmt.Printf("  stop            Stop a process\n")
 	fmt.Printf("  token           Show auth token\n")
 	fmt.Printf("  unset           Unset config vars\n")
