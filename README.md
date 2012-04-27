@@ -13,6 +13,31 @@ hk is a command line client to the Heroku runtime platform, designed to be as fa
 It doesn't work yet, and doesn't implement all of the described commands.
 
 
+### Motivation
+
+```bash
+$ time heroku version
+2.25.0
+real	0m1.376s
+
+$ time hk version
+0.0.1
+real	0m0.015s
+
+$ time heroku ps -a morning-snow-4357 > /dev/null
+real	0m2.057s
+
+$ time hk ps -a morning-snow-4357 > /dev/null
+real	0m0.763s
+
+$ time heroku list > /dev/null
+real	0m10.142s
+
+$ time hk list > /dev/null
+real    0m1.828s
+```
+
+
 ### Installation
 
 ```bash
