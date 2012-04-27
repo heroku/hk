@@ -42,7 +42,6 @@ Supported hk commands are:
   login           Log in
   logout          Log out
   logs            Show logs
-  open            Open app
   pg              List databases
   pg-info         Show database info
   pg-promote      Promote a database

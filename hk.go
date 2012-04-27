@@ -111,6 +111,25 @@ func get() {
 	os.Exit(0)
 }
 
+func infoHelp() {
+	cmdHelp("hk info -a <app>", "Show app info")
+}
+
+func info() {
+	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
+		error("Invalid usage. See hk help info")
+	}
+	appName := os.Args[3]
+	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s", appName))
+	info := data.(map[string]interface{})
+	fmt.Printf("Name:     %s\n", info["name"])
+	fmt.Printf("Owner:    %s\n", info["owner_email"])
+	fmt.Printf("Stack:    %s\n", info["stack"])
+	fmt.Printf("Git URL:  %s\n", info["git_url"])
+	fmt.Printf("Web URL:  %s\n", info["web_url"])
+	os.Exit(0)
+}
+
 func listHelp() {
 	cmdHelp("hk list", "List accessible apps")
 }
@@ -177,6 +196,8 @@ func help() {
 		  envHelp()
 	  case "get":
 			getHelp()
+		case "info":
+			infoHelp()
 		case "list":
 		  listHelp()
 	  case "ps":
@@ -243,6 +264,8 @@ func main() {
 			get()
 		case "help":
 			help()
+		case "info":
+			info()
 		case "list":
 			list()
 		case "ps":
