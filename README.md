@@ -41,7 +41,7 @@ real    0m1.828s
 ### Installation
 
 ```bash
-$ curl -s https://github.com/downloads/mmcgrana/hk/hk-release-darwin > /usr/local/bin/hk
+$ curl -s -L https://github.com/downloads/mmcgrana/hk/hk-release-darwin > /usr/local/bin/hk
 $ chmod +x /usr/local/bin/hk
 ```
 
