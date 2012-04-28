@@ -58,7 +58,7 @@ Error: 'wat' is not an hk command. See 'hk help'.
 
 ```bash
 $ hk list extra
-Error: Unrecognized argument 'extra'.
+Error: Unrecognized argument 'extra'. See 'hk help list'.
 ```
 
 ```bash

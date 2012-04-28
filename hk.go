@@ -62,8 +62,8 @@ func error(msg string) {
 	os.Exit(1)
 }
 
-func unrecArg(arg string) {
-	error(fmt.Sprintf("Unrecognized argument '%s'", arg))
+func unrecArg(arg, cmd string) {
+	error(fmt.Sprintf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd))
 }
 
 func unrecCmd(cmd string) {
@@ -149,7 +149,7 @@ func listHelp() {
 
 func list() {
 	if len(os.Args) != 2 {
-		unrecArg(os.Args[2])
+		unrecArg(os.Args[2], "list")
 	}
 	data := apiReq("GET", "https://api.heroku.com/apps")
 	apps := data.([]interface{})
@@ -193,7 +193,7 @@ func versionHelp() {
 
 func version() {
 	if len(os.Args) != 2 {
-	  unrecArg(os.Args[2])
+	  unrecArg(os.Args[2], "version")
   }
 	fmt.Printf("%s\n", VERSION)
 	os.Exit(0)
