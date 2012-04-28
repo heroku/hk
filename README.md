@@ -81,7 +81,6 @@ Supported hk commands are:
   run             Run a process
   set             Set config var
   scale           Scale processes
-  run             Run a process
   stop            Stop a process
   token           Show auth token
   unset           Unset config vars
