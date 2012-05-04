@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code.google.com/p/go-netrc/netrc"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -23,6 +24,15 @@ func (c ByFn) Len() int           { return len(c.elems) }
 func (c ByFn) Less(i, j int) bool { return c.comp(c.elems[i], c.elems[j]) }
 func (c ByFn) Swap(i, j int)      { c.elems[i], c.elems[j] = c.elems[j], c.elems[i] }
 
+func getCreds(machine string) (user, pass string) {
+	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", machine)
+	if err != nil {
+		panic(err)
+	}
+
+	return m.Login, m.Password
+}
+
 // generic api requests
 func apiReq(meth string, url string) interface{} {
 	client := &http.Client{}
@@ -31,7 +41,7 @@ func apiReq(meth string, url string) interface{} {
 		panic(err)
 	}
 
-	req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
+	req.SetBasicAuth(getCreds(req.Host))
 	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
 	req.Header.Add("Accept", "application/json")
 	res, err := client.Do(req)
@@ -138,12 +148,12 @@ func info() {
 	os.Exit(0)
 }
 
-func tokenHelp() {
-	cmdHelp("hk token", "Show API token")
+func credsHelp() {
+	cmdHelp("hk creds", "Show API credentials")
 }
 
-func token() {
-	fmt.Println(os.Getenv("HEROKU_API_KEY"))
+func creds() {
+	fmt.Println(getCreds("api.heroku.com"))
 	os.Exit(0)
 }
 
@@ -215,8 +225,8 @@ func help() {
 			getHelp()
 		case "info":
 			infoHelp()
-		case "token":
-			tokenHelp()
+		case "creds":
+			credsHelp()
 		case "list":
 			listHelp()
 		case "ps":
@@ -262,7 +272,7 @@ func usage() {
 	fmt.Printf("  set             Set config var\n")
 	fmt.Printf("  scale           Scale processes\n")
 	fmt.Printf("  stop            Stop a process\n")
-	fmt.Printf("  token           Show auth token\n")
+	fmt.Printf("  creds           Show auth creds\n")
 	fmt.Printf("  unset           Unset config vars\n")
 	fmt.Printf("  version         Display version\n\n")
 	fmt.Printf("See 'hk help <command>' for more information on a specific command.\n")
@@ -284,8 +294,8 @@ func main() {
 			help()
 		case "info":
 			info()
-		case "token":
-			token()
+		case "creds":
+			creds()
 		case "list":
 			list()
 		case "ps":
