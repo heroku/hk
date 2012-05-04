@@ -14,14 +14,14 @@ const (
 )
 
 // sort interface-typed arrays by first-class functions
-type ByFn struct{
+type ByFn struct {
 	elems []interface{}
-	comp func(a, b interface{}) bool
+	comp  func(a, b interface{}) bool
 }
-func (c ByFn) Len() int { return len(c.elems)  }
-func (c ByFn) Less(i, j int) bool { return c.comp(c.elems[i], c.elems[j]) }
-func (c ByFn) Swap(i, j int) { c.elems[i], c.elems[j] = c.elems[j], c.elems[i] }
 
+func (c ByFn) Len() int           { return len(c.elems) }
+func (c ByFn) Less(i, j int) bool { return c.comp(c.elems[i], c.elems[j]) }
+func (c ByFn) Swap(i, j int)      { c.elems[i], c.elems[j] = c.elems[j], c.elems[i] }
 
 // generic api requests
 func apiReq(meth string, url string) interface{} {
@@ -31,16 +31,16 @@ func apiReq(meth string, url string) interface{} {
 	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
 	req.Header.Add("Accept", "application/json")
 	res, err := client.Do(req)
-		if err != nil {
+	if err != nil {
 		panic(err)
 	}
-	if (res.StatusCode == 401) {
+	if res.StatusCode == 401 {
 		error("Unauthorized")
 	}
-	if (res.StatusCode == 403) {
+	if res.StatusCode == 403 {
 		error("Unauthorized")
 	}
-	if (res.StatusCode != 200) {
+	if res.StatusCode != 200 {
 		fmt.Printf("%v\n", res)
 		error("Unexpected error")
 	}
@@ -176,8 +176,8 @@ func ps() {
 		func(a, b interface{}) bool {
 			p1 := a.(map[string]interface{})["process"].(string)
 			p2 := b.(map[string]interface{})["process"].(string)
-		  return p1 < p2
-	  }})
+			return p1 < p2
+		}})
 	fmt.Printf("Process           State       Command\n")
 	fmt.Printf("----------------  ----------  ------------------------\n")
 	for i := range processes {
@@ -193,8 +193,8 @@ func versionHelp() {
 
 func version() {
 	if len(os.Args) != 2 {
-	  unrecArg(os.Args[2], "version")
-  }
+		unrecArg(os.Args[2], "version")
+	}
 	fmt.Printf("%s\n", VERSION)
 	os.Exit(0)
 }
@@ -205,18 +205,18 @@ func help() {
 	} else {
 		cmd := os.Args[2]
 		switch cmd {
-	  case "env":
-		  envHelp()
-	  case "get":
+		case "env":
+			envHelp()
+		case "get":
 			getHelp()
 		case "info":
 			infoHelp()
 		case "token":
 			tokenHelp()
 		case "list":
-		  listHelp()
-	  case "ps":
-		  psHelp()
+			listHelp()
+		case "ps":
+			psHelp()
 		case "version":
 			versionHelp()
 		}
