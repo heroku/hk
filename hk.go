@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	VERSION = "0.0.1"
+	Version = "0.0.1"
 )
 
 // sort interface-typed arrays by first-class functions
@@ -40,7 +40,7 @@ func apiReq(meth string, url string) interface{} {
 	}
 
 	req.SetBasicAuth(getCreds(req.Host))
-	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
+	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", Version))
 	req.Header.Add("Accept", "application/json")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -206,7 +206,7 @@ func version() {
 	if len(os.Args) != 2 {
 		unrecArg(os.Args[2], "version")
 	}
-	fmt.Printf("%s\n", VERSION)
+	fmt.Printf("%s\n", Version)
 	os.Exit(0)
 }
 
