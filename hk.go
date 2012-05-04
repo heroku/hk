@@ -72,7 +72,6 @@ func unrecCmd(cmd string) {
 func cmdHelp(usage string, desc string) {
 	fmt.Printf("Usage: %s\n\n", usage)
 	fmt.Printf("%s.\n", desc)
-	os.Exit(0)
 }
 
 // commands
@@ -90,7 +89,6 @@ func env() {
 	for k, v := range config {
 		fmt.Printf("%s=%s\n", k, v)
 	}
-	os.Exit(0)
 }
 
 func getHelp() {
@@ -110,7 +108,6 @@ func get() {
 		error(fmt.Sprintf("No such key as '%s'", key))
 	}
 	fmt.Println(value)
-	os.Exit(0)
 }
 
 func infoHelp() {
@@ -135,7 +132,6 @@ func info() {
 	fmt.Printf("Stack:    %s\n", info.Stack)
 	fmt.Printf("Git URL:  %s\n", info.GitURL)
 	fmt.Printf("Web URL:  %s\n", info.WebURL)
-	os.Exit(0)
 }
 
 func credsHelp() {
@@ -144,7 +140,6 @@ func credsHelp() {
 
 func creds() {
 	fmt.Println(getCreds("api.heroku.com"))
-	os.Exit(0)
 }
 
 func listHelp() {
@@ -160,7 +155,6 @@ func list() {
 	for _, app := range apps {
 		fmt.Printf("%s\n", app.Name)
 	}
-	os.Exit(0)
 }
 
 func psHelp() {
@@ -192,7 +186,6 @@ func ps() {
 	for _, proc := range procs {
 		fmt.Printf("%-16s  %-10s  %s\n", proc.Name, proc.State, proc.Command)
 	}
-	os.Exit(0)
 }
 
 func versionHelp() {
@@ -204,7 +197,6 @@ func version() {
 		unrecArg(os.Args[2], "version")
 	}
 	fmt.Printf("%s\n", Version)
-	os.Exit(0)
 }
 
 func help() {
@@ -227,8 +219,9 @@ func help() {
 			psHelp()
 		case "version":
 			versionHelp()
+		default:
+			unrecCmd(cmd)
 		}
-		unrecCmd(cmd)
 	}
 }
 
@@ -270,7 +263,6 @@ func usage() {
 	fmt.Printf("  unset           Unset config vars\n")
 	fmt.Printf("  version         Display version\n\n")
 	fmt.Printf("See 'hk help <command>' for more information on a specific command.\n")
-	os.Exit(0)
 }
 
 // entry point
@@ -296,7 +288,8 @@ func main() {
 			ps()
 		case "version":
 			version()
+		default:
+			unrecCmd(cmd)
 		}
-		unrecCmd(cmd)
 	}
 }
