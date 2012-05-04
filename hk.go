@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/go-netrc/netrc"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"sort"
@@ -58,15 +57,13 @@ func apiReq(meth string, url string) interface{} {
 		fmt.Printf("%v\n", res)
 		error("Unexpected error")
 	}
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		panic(err)
-	}
+
 	var data interface{}
-	err = json.Unmarshal(body, &data)
+	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
 		panic(err)
 	}
+
 	return data
 }
 
