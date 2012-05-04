@@ -34,7 +34,6 @@ func getCreds(machine string) (user, pass string) {
 
 // generic api requests
 func apiReq(meth string, url string) interface{} {
-	client := &http.Client{}
 	req, err := http.NewRequest(meth, url, nil)
 	if err != nil {
 		panic(err)
@@ -43,10 +42,11 @@ func apiReq(meth string, url string) interface{} {
 	req.SetBasicAuth(getCreds(req.Host))
 	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
 	req.Header.Add("Accept", "application/json")
-	res, err := client.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
+	defer res.Body.Close()
 	if res.StatusCode == 401 {
 		error("Unauthorized")
 	}
