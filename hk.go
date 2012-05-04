@@ -13,16 +13,6 @@ const (
 	Version = "0.0.1"
 )
 
-// sort interface-typed arrays by first-class functions
-type ByFn struct {
-	elems []interface{}
-	comp  func(a, b interface{}) bool
-}
-
-func (c ByFn) Len() int           { return len(c.elems) }
-func (c ByFn) Less(i, j int) bool { return c.comp(c.elems[i], c.elems[j]) }
-func (c ByFn) Swap(i, j int)      { c.elems[i], c.elems[j] = c.elems[j], c.elems[i] }
-
 func getCreds(machine string) (user, pass string) {
 	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", machine)
 	if err != nil {
@@ -33,7 +23,7 @@ func getCreds(machine string) (user, pass string) {
 }
 
 // generic api requests
-func apiReq(meth string, url string) interface{} {
+func apiReq(v interface{}, meth string, url string) {
 	req, err := http.NewRequest(meth, url, nil)
 	if err != nil {
 		panic(err)
@@ -58,13 +48,10 @@ func apiReq(meth string, url string) interface{} {
 		error("Unexpected error")
 	}
 
-	var data interface{}
-	err = json.NewDecoder(res.Body).Decode(&data)
+	err = json.NewDecoder(res.Body).Decode(v)
 	if err != nil {
 		panic(err)
 	}
-
-	return data
 }
 
 // error formatting
@@ -98,10 +85,10 @@ func env() {
 		error("Invalid usage. See 'hk help env'")
 	}
 	appName := os.Args[3]
-	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
-	config := data.(map[string]interface{})
+	var config map[string]string
+	apiReq(&config, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
 	for k, v := range config {
-		fmt.Printf("%s=%v\n", k, v)
+		fmt.Printf("%s=%s\n", k, v)
 	}
 	os.Exit(0)
 }
@@ -116,9 +103,9 @@ func get() {
 	}
 	appName := os.Args[3]
 	key := os.Args[4]
-	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
-	config := data.(map[string]interface{})
-	value, found := config[key].(string)
+	var config map[string]string
+	apiReq(&config, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
+	value, found := config[key]
 	if !found {
 		error(fmt.Sprintf("No such key as '%s'", key))
 	}
@@ -135,13 +122,19 @@ func info() {
 		error("Invalid usage. See 'hk help info'")
 	}
 	appName := os.Args[3]
-	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s", appName))
-	info := data.(map[string]interface{})
-	fmt.Printf("Name:     %s\n", info["name"])
-	fmt.Printf("Owner:    %s\n", info["owner_email"])
-	fmt.Printf("Stack:    %s\n", info["stack"])
-	fmt.Printf("Git URL:  %s\n", info["git_url"])
-	fmt.Printf("Web URL:  %s\n", info["web_url"])
+	var info struct {
+		Name   string
+		Owner  string `json:"owner_email"`
+		Stack  string
+		GitURL string `json:"git_url"`
+		WebURL string `json:"web_url"`
+	}
+	apiReq(&info, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s", appName))
+	fmt.Printf("Name:     %s\n", info.Name)
+	fmt.Printf("Owner:    %s\n", info.Owner)
+	fmt.Printf("Stack:    %s\n", info.Stack)
+	fmt.Printf("Git URL:  %s\n", info.GitURL)
+	fmt.Printf("Web URL:  %s\n", info.WebURL)
 	os.Exit(0)
 }
 
@@ -162,11 +155,10 @@ func list() {
 	if len(os.Args) != 2 {
 		unrecArg(os.Args[2], "list")
 	}
-	data := apiReq("GET", "https://api.heroku.com/apps")
-	apps := data.([]interface{})
-	for i := range apps {
-		app := apps[i].(map[string]interface{})
-		fmt.Printf("%s\n", app["name"])
+	var apps []struct{ Name string }
+	apiReq(&apps, "GET", "https://api.heroku.com/apps")
+	for _, app := range apps {
+		fmt.Printf("%s\n", app.Name)
 	}
 	os.Exit(0)
 }
@@ -175,25 +167,30 @@ func psHelp() {
 	cmdHelp("hk ps -a <app>", "List app processes")
 }
 
+type Proc struct {
+	Name    string `json:"process"`
+	State   string
+	Command string
+}
+
+type Procs []*Proc
+
+func (p Procs) Len() int           { return len(p) }
+func (p Procs) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p Procs) Less(i, j int) bool { return p[i].Name < p[j].Name }
+
 func ps() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
 		error("Invalid usage. See 'hk help ps'")
 	}
 	appName := os.Args[3]
-	data := apiReq("GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
-	processes := data.([]interface{})
-	sort.Sort(ByFn{
-		processes,
-		func(a, b interface{}) bool {
-			p1 := a.(map[string]interface{})["process"].(string)
-			p2 := b.(map[string]interface{})["process"].(string)
-			return p1 < p2
-		}})
+	var procs Procs
+	apiReq(&procs, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
+	sort.Sort(procs)
 	fmt.Printf("Process           State       Command\n")
 	fmt.Printf("----------------  ----------  ------------------------\n")
-	for i := range processes {
-		process := processes[i].(map[string]interface{})
-		fmt.Printf("%-16s  %-10s  %s\n", process["process"], process["state"], process["command"])
+	for _, proc := range procs {
+		fmt.Printf("%-16s  %-10s  %s\n", proc.Name, proc.State, proc.Command)
 	}
 	os.Exit(0)
 }
