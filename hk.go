@@ -5,16 +5,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
+	"strings"
 )
 
 const (
 	Version = "0.0.1"
 )
 
-func getCreds(machine string) (user, pass string) {
-	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", machine)
+var apiURL = "https://api.heroku.com"
+
+func getCreds(u *url.URL) (user, pass string) {
+	if u.User != nil {
+		pw, _ := u.User.Password()
+		return u.User.Username(), pw
+	}
+
+	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", u.Host)
 	if err != nil {
 		panic(err)
 	}
@@ -29,7 +38,7 @@ func apiReq(v interface{}, meth string, url string) {
 		panic(err)
 	}
 
-	req.SetBasicAuth(getCreds(req.Host))
+	req.SetBasicAuth(getCreds(req.URL))
 	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", Version))
 	req.Header.Add("Accept", "application/json")
 	res, err := http.DefaultClient.Do(req)
@@ -85,7 +94,7 @@ func env() {
 	}
 	appName := os.Args[3]
 	var config map[string]string
-	apiReq(&config, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
+	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", appName))
 	for k, v := range config {
 		fmt.Printf("%s=%s\n", k, v)
 	}
@@ -102,7 +111,7 @@ func get() {
 	appName := os.Args[3]
 	key := os.Args[4]
 	var config map[string]string
-	apiReq(&config, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s/config_vars", appName))
+	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", appName))
 	value, found := config[key]
 	if !found {
 		error(fmt.Sprintf("No such key as '%s'", key))
@@ -126,7 +135,7 @@ func info() {
 		GitURL string `json:"git_url"`
 		WebURL string `json:"web_url"`
 	}
-	apiReq(&info, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s", appName))
+	apiReq(&info, "GET", fmt.Sprintf(apiURL+"/apps/%s", appName))
 	fmt.Printf("Name:     %s\n", info.Name)
 	fmt.Printf("Owner:    %s\n", info.Owner)
 	fmt.Printf("Stack:    %s\n", info.Stack)
@@ -139,7 +148,11 @@ func credsHelp() {
 }
 
 func creds() {
-	fmt.Println(getCreds("api.heroku.com"))
+	u, err := url.Parse(apiURL)
+	if err != nil {
+		error(err.Error())
+	}
+	fmt.Println(getCreds(u))
 }
 
 func listHelp() {
@@ -151,7 +164,7 @@ func list() {
 		unrecArg(os.Args[2], "list")
 	}
 	var apps []struct{ Name string }
-	apiReq(&apps, "GET", "https://api.heroku.com/apps")
+	apiReq(&apps, "GET", apiURL+"/apps")
 	for _, app := range apps {
 		fmt.Printf("%s\n", app.Name)
 	}
@@ -179,7 +192,7 @@ func ps() {
 	}
 	appName := os.Args[3]
 	var procs Procs
-	apiReq(&procs, "GET", fmt.Sprintf("https://api.heroku.com/apps/%s/ps", appName))
+	apiReq(&procs, "GET", fmt.Sprintf(apiURL+"/apps/%s/ps", appName))
 	sort.Sort(procs)
 	fmt.Printf("Process           State       Command\n")
 	fmt.Printf("----------------  ----------  ------------------------\n")
@@ -267,6 +280,10 @@ func usage() {
 
 // entry point
 func main() {
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		apiURL = strings.TrimRight(s, "/")
+	}
+
 	if len(os.Args) <= 1 {
 		usage()
 	} else {
