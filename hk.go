@@ -27,6 +27,10 @@ func (c ByFn) Swap(i, j int)      { c.elems[i], c.elems[j] = c.elems[j], c.elems
 func apiReq(meth string, url string) interface{} {
 	client := &http.Client{}
 	req, err := http.NewRequest(meth, url, nil)
+	if err != nil {
+		panic(err)
+	}
+
 	req.SetBasicAuth("x", os.Getenv("HEROKU_API_KEY"))
 	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", VERSION))
 	req.Header.Add("Accept", "application/json")
