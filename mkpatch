@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Takes the current version at github.com/downloads/kr/hk
+# and makes a diff between that and the local hk binary.
+
+set -e
+
+eval $(go tool dist env)
+url=https://github.com/downloads/kr/hk/$GOOS-$GOARCH-hk.gz
+
+rawsha1() {
+	python -c 'from hashlib import sha1; import sys; sys.stdout.write(sha1(sys.stdin.read()).digest())'
+}
+
+hkdiff() {
+	old=$1
+	new=$2
+	printf hkDIFF01
+	rawsha1 <$old
+	rawsha1 <$new
+	bsdiff $old $new /tmp/hkdiff
+	rawsha1 </tmp/hkdiff
+	cat /tmp/hkdiff
+	rm /tmp/hkdiff
+}
+
+cp hk $GOOS-$GOARCH-hk
+gzip -9 $GOOS-$GOARCH-hk
+
+echo Fetching previous vers
+curl -Lo hk.old.gz $url
+gunzip hk.old.gz
+chmod +x hk.old
+oldver=$(./hk.old version)
+newver=$(./hk version)
+echo Patching hk $oldver to $newver
+if test $oldver = $newver
+then echo You forgot to update the version string. Bailing.; exit 1
+fi
+patch=$GOOS-$GOARCH-$oldver-next.hkdiff
+hkdiff hk.old hk >$patch
+rm hk.old

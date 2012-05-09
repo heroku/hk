@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"code.google.com/p/go-netrc/netrc"
 	"encoding/json"
 	"fmt"
@@ -15,7 +16,17 @@ const (
 	Version = "0.0.1"
 )
 
-var apiURL = "https://api.heroku.com"
+var (
+	apiURL = "https://api.heroku.com"
+	hkHome = os.Getenv("HOME") + "/.hk"
+)
+
+var stdin = bufio.NewReader(os.Stdin)
+
+var updater = Updater{
+	url: "https://github.com/downloads/kr/hk/",
+	dir: hkHome + "/update/",
+}
 
 func getCreds(u *url.URL) (user, pass string) {
 	if u.User != nil {
@@ -201,6 +212,18 @@ func ps() {
 	}
 }
 
+func fetchUpdateHelp() {
+	cmdHelp("hk fetch-update", "Download the latest hk client")
+}
+
+func fetchUpdate() {
+	if len(os.Args) != 2 {
+		unrecArg(os.Args[2], "fetch-update")
+	}
+
+	updater.fetchAndApply()
+}
+
 func versionHelp() {
 	cmdHelp("hk version", "Show hk client version")
 }
@@ -230,6 +253,8 @@ func help() {
 			listHelp()
 		case "ps":
 			psHelp()
+		case "fetch-update":
+			fetchUpdateHelp()
 		case "version":
 			versionHelp()
 		default:
@@ -303,10 +328,14 @@ func main() {
 			list()
 		case "ps":
 			ps()
+		case "fetch-update":
+			fetchUpdate()
 		case "version":
 			version()
 		default:
 			unrecCmd(cmd)
 		}
 	}
+
+	updater.run()
 }

@@ -94,12 +94,21 @@ See 'hk help <command>' for more information on a specific command.
 
 ```bash
 $ cd hk
+$ go get
 $ mate hk.go
-$ go run hk.go list
 $ go build
 $ ./hk list
 ```
 
+### Release
+
+```bash
+$ cd hk
+$ vim hk.go # edit Version
+$ go build
+$ ./mkpatch
+# put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
+```
 
 ### Design
 
