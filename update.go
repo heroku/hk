@@ -12,9 +12,9 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"time"
-	"path"
 )
 
 var magic = [8]byte{'h', 'k', 'D', 'I', 'F', 'F', '0', '1'}
@@ -117,7 +117,7 @@ func (u *Updater) askAndInstall() {
 	}
 
 	if bytes.HasPrefix(bytes.TrimSpace(line), []byte{'y'}) {
-		srcf, err := os.Open(u.dir+upnextPath)
+		srcf, err := os.Open(u.dir + upnextPath)
 		if err != nil {
 			error(err.Error())
 		}
@@ -144,7 +144,7 @@ func (u *Updater) askAndInstall() {
 			error(err.Error())
 		}
 
-		err = os.Remove(u.dir+upnextPath)
+		err = os.Remove(u.dir + upnextPath)
 		if err != nil {
 			error(err.Error())
 		}
