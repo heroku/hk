@@ -11,7 +11,7 @@ func envHelp() {
 
 func env() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		error("Invalid usage. See 'hk help env'")
+		errorf("Invalid usage. See 'hk help env'")
 	}
 	appName := os.Args[3]
 	var config map[string]string
@@ -27,7 +27,7 @@ func getHelp() {
 
 func get() {
 	if (len(os.Args) != 5) || (os.Args[2] != "-a") {
-		error("Invalid usage. See 'hk help get'")
+		errorf("Invalid usage. See 'hk help get'")
 	}
 	appName := os.Args[3]
 	key := os.Args[4]
@@ -35,7 +35,7 @@ func get() {
 	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", appName))
 	value, found := config[key]
 	if !found {
-		error(fmt.Sprintf("No such key as '%s'", key))
+		errorf("No such key as '%s'", key)
 	}
 	fmt.Println(value)
 }

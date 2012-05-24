@@ -12,7 +12,7 @@ func credsHelp() {
 func creds() {
 	u, err := url.Parse(apiURL)
 	if err != nil {
-		error(err.Error())
+		errorf("%v", err)
 	}
 	fmt.Println(getCreds(u))
 }

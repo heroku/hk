@@ -92,14 +92,14 @@ func apiReq(v interface{}, meth string, url string) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == 401 {
-		error("Unauthorized")
+		errorf("Unauthorized")
 	}
 	if res.StatusCode == 403 {
-		error("Unauthorized")
+		errorf("Unauthorized")
 	}
 	if res.StatusCode != 200 {
 		fmt.Printf("%v\n", res)
-		error("Unexpected error")
+		errorf("Unexpected error")
 	}
 
 	err = json.NewDecoder(res.Body).Decode(v)
@@ -108,15 +108,16 @@ func apiReq(v interface{}, meth string, url string) {
 	}
 }
 
-func error(msg string) {
-	fmt.Fprintf(os.Stderr, "Error: %s.\n", msg)
+func errorf(format string, a ...interface{}) {
+	fmt.Fprintf(os.Stderr, "Error: "+format, a...)
+	fmt.Fprintln(os.Stderr)
 	os.Exit(1)
 }
 
 func unrecArg(arg, cmd string) {
-	error(fmt.Sprintf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd))
+	errorf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd)
 }
 
 func unrecCmd(cmd string) {
-	error(fmt.Sprintf("'%s' is not an hk command. See 'hk help'", cmd))
+	errorf("'%s' is not an hk command. See 'hk help'", cmd)
 }

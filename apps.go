@@ -11,7 +11,7 @@ func infoHelp() {
 
 func info() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		error("Invalid usage. See 'hk help info'")
+		errorf("Invalid usage. See 'hk help info'")
 	}
 	appName := os.Args[3]
 	var info struct {

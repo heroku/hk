@@ -24,7 +24,7 @@ func (p Procs) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
 func ps() {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		error("Invalid usage. See 'hk help ps'")
+		errorf("Invalid usage. See 'hk help ps'")
 	}
 	appName := os.Args[3]
 	var procs Procs
