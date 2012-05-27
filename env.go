@@ -14,7 +14,7 @@ var cmdEnv = &Command{
 
 func runEnv(cmd *Command, args []string) {
 	var config map[string]string
-	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", *flagApp))
+	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", app()))
 	for k, v := range config {
 		fmt.Printf("%s=%s\n", k, v)
 	}
@@ -32,7 +32,7 @@ func runGet(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help get'")
 	}
 	var config map[string]string
-	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", *flagApp))
+	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", app()))
 	value, found := config[args[0]]
 	if !found {
 		log.Fatalf("No such key as '%s'", args[0])

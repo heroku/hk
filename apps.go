@@ -19,7 +19,7 @@ func runInfo(cmd *Command, args []string) {
 		GitURL string `json:"git_url"`
 		WebURL string `json:"web_url"`
 	}
-	apiReq(&info, "GET", fmt.Sprintf(apiURL+"/apps/%s", *flagApp))
+	apiReq(&info, "GET", fmt.Sprintf(apiURL+"/apps/%s", app()))
 	fmt.Printf("Name:     %s\n", info.Name)
 	fmt.Printf("Owner:    %s\n", info.Owner)
 	fmt.Printf("Stack:    %s\n", info.Stack)

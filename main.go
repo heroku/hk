@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -136,4 +137,31 @@ func apiReq(v interface{}, meth string, url string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func app() string {
+	if *flagApp != "" {
+		return *flagApp
+	}
+	out, err := exec.Command("git", "remote", "show", "-n", "heroku").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	s := string(out)
+	const sign = "Fetch URL: "
+	i := strings.Index(s, sign)
+	if i < 0 {
+		log.Fatal("could not find git remote named 'heroku'")
+	}
+	s = s[i+len(sign):]
+	i = strings.Index(s, "\n")
+	if i >= 0 {
+		s = s[:i]
+	}
+	const pre = "git@heroku.com:"
+	const suf = ".git"
+	if !strings.HasPrefix(s, pre) || !strings.HasSuffix(s, suf) {
+		log.Fatal("could not find app name in heroku git remote")
+	}
+	return s[len(pre) : len(s)-len(suf)]
 }
