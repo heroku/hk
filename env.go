@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 var cmdEnv = &Command{
@@ -28,13 +29,13 @@ var cmdGet = &Command{
 
 func runGet(cmd *Command, args []string) {
 	if len(args) != 1 {
-		errorf("Invalid usage. See 'hk help get'")
+		log.Fatal("Invalid usage. See 'hk help get'")
 	}
 	var config map[string]string
 	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", *flagApp))
 	value, found := config[args[0]]
 	if !found {
-		errorf("No such key as '%s'", args[0])
+		log.Fatalf("No such key as '%s'", args[0])
 	}
 	fmt.Println(value)
 }

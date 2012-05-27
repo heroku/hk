@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -47,7 +48,7 @@ func runHelp(cmd *Command, args []string) {
 		return // not os.Exit(2); success
 	}
 	if len(args) != 1 {
-		errorf("too many arguments")
+		log.Fatal("too many arguments")
 	}
 
 	for _, cmd := range commands {

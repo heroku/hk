@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sort"
 )
@@ -25,7 +26,7 @@ func (p Procs) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
 func runPs(cmd *Command, args []string) {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		errorf("Invalid usage. See 'hk help ps'")
+		log.Fatal("Invalid usage. See 'hk help ps'")
 	}
 	appName := os.Args[3]
 	var procs Procs

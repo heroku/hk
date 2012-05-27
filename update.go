@@ -8,6 +8,7 @@ import (
 	"github.com/kr/binarydist"
 	"io"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -119,34 +120,34 @@ func (u *Updater) askAndInstall() {
 	if bytes.HasPrefix(bytes.TrimSpace(line), []byte{'y'}) {
 		srcf, err := os.Open(u.dir + upnextPath)
 		if err != nil {
-			errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		instDir := path.Dir(instPath)
 		dstf, err := os.OpenFile(instDir+"/.hk.part", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
 		if err != nil {
-			errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		_, err = io.Copy(dstf, srcf)
 		if err != nil {
-			errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		srcf.Close()
 		err = dstf.Close()
 		if err != nil {
-			errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		err = os.Rename(instDir+"/.hk.part", instPath)
 		if err != nil {
-			errorf("%v", err)
+			log.Fatal(err)
 		}
 
 		err = os.Remove(u.dir + upnextPath)
 		if err != nil {
-			errorf("%v", err)
+			log.Fatal(err)
 		}
 	}
 }
@@ -171,23 +172,23 @@ func (u *Updater) bgFetch() {
 func (u *Updater) fetchAndApply() {
 	instPath, err := exec.LookPath("hk")
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	old, err := os.Open(instPath)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	plat := runtime.GOOS + "-" + runtime.GOARCH
 	resp, err := http.Get(u.url + plat + "-" + Version + "-next.hkdiff")
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		errorf("%s", resp.Status)
+		log.Fatal(resp.Status)
 	}
 
 	var header struct {
@@ -198,58 +199,58 @@ func (u *Updater) fetchAndApply() {
 	}
 	err = binary.Read(resp.Body, binary.BigEndian, &header)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	if header.Magic != magic {
-		errorf("format error in update file")
+		log.Fatal("format error in update file")
 	}
 
 	patch, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	if !sha1matches(header.OldHash, old) {
-		errorf("existing version hash match update")
+		log.Fatal("existing version hash match update")
 	}
 
 	if !sha1matches(header.DiffHash, bytes.NewReader(patch)) {
-		errorf("bad patch file")
+		log.Fatal("bad patch file")
 	}
 
 	_, err = old.Seek(0, 0)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	part := u.dir + upnextPath + ".part"
 	newPart, err := os.OpenFile(part, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	err = binarydist.Patch(old, newPart, bytes.NewReader(patch))
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	err = newPart.Close()
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 
 	newPart, err = os.Open(part)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 	if !sha1matches(header.NewHash, newPart) {
-		errorf("checksum mismatch after patch")
+		log.Fatal("checksum mismatch after patch")
 	}
 
 	err = os.Rename(part, u.dir+upnextPath)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 }
 

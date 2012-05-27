@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -68,6 +69,7 @@ func main() {
 		apiURL = strings.TrimRight(s, "/")
 	}
 
+	log.SetFlags(0)
 	flag.Usage = usage
 	flag.Parse()
 	args := flag.Args()
@@ -120,14 +122,14 @@ func apiReq(v interface{}, meth string, url string) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == 401 {
-		errorf("Unauthorized")
+		log.Fatal("Unauthorized")
 	}
 	if res.StatusCode == 403 {
-		errorf("Unauthorized")
+		log.Fatal("Unauthorized")
 	}
 	if res.StatusCode != 200 {
 		fmt.Printf("%v\n", res)
-		errorf("Unexpected error")
+		log.Fatal("Unexpected error")
 	}
 
 	err = json.NewDecoder(res.Body).Decode(v)
@@ -136,12 +138,6 @@ func apiReq(v interface{}, meth string, url string) {
 	}
 }
 
-func errorf(format string, a ...interface{}) {
-	fmt.Fprintf(os.Stderr, "Error: "+format, a...)
-	fmt.Fprintln(os.Stderr)
-	os.Exit(1)
-}
-
 func unrecArg(arg, cmd string) {
-	errorf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd)
+	log.Fatalf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd)
 }

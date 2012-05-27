@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 )
 
@@ -15,7 +16,7 @@ var cmdCreds = &Command{
 func runCreds(cmd *Command, args []string) {
 	u, err := url.Parse(apiURL)
 	if err != nil {
-		errorf("%v", err)
+		log.Fatal(err)
 	}
 	fmt.Println(getCreds(u))
 }
