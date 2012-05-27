@@ -114,7 +114,7 @@ func apiReq(v interface{}, meth string, url string) {
 	}
 
 	req.SetBasicAuth(getCreds(req.URL))
-	req.Header.Add("User-Agent", fmt.Sprintf("hk/%s", Version))
+	req.Header.Add("User-Agent", "hk/"+Version)
 	req.Header.Add("Accept", "application/json")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
