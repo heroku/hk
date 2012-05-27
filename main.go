@@ -142,6 +142,10 @@ func apiReq(v interface{}, meth, url string, data url.Values) {
 		log.Fatal("Unexpected error")
 	}
 
+	if msg := res.Header.Get("X-Heroku-Warning"); msg != "" {
+		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
+	}
+
 	err = json.NewDecoder(res.Body).Decode(v)
 	if err != nil {
 		panic(err)
