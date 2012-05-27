@@ -14,10 +14,6 @@ var cmdFetchUpdate = &Command{
 }
 
 func runFetchUpdate(cmd *Command, args []string) {
-	if len(os.Args) != 2 {
-		unrecArg(os.Args[2], "fetch-update")
-	}
-
 	updater.fetchAndApply()
 }
 

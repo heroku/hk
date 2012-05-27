@@ -137,7 +137,3 @@ func apiReq(v interface{}, meth string, url string) {
 		panic(err)
 	}
 }
-
-func unrecArg(arg, cmd string) {
-	log.Fatalf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd)
-}
