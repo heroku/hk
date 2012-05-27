@@ -105,7 +105,7 @@ func getCreds(u *url.URL) (user, pass string) {
 
 	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", u.Host)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	return m.Login, m.Password
@@ -118,7 +118,7 @@ func apiReq(v interface{}, meth, url string, data url.Values) {
 	}
 	req, err := http.NewRequest(meth, url, body)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	req.SetBasicAuth(getCreds(req.URL))
@@ -129,7 +129,7 @@ func apiReq(v interface{}, meth, url string, data url.Values) {
 	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode == 401 {
@@ -148,7 +148,7 @@ func apiReq(v interface{}, meth, url string, data url.Values) {
 
 	err = json.NewDecoder(res.Body).Decode(v)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
 
