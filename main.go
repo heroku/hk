@@ -142,8 +142,6 @@ func apiReq(v interface{}, meth, url, contentType string, body io.Reader) {
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
 	}
-	fmt.Fprintf(os.Stderr, "%#v\n", req)
-	fmt.Fprintf(os.Stderr, "%#v\n", req.URL)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
