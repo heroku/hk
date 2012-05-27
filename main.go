@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"code.google.com/p/go-netrc/netrc"
 	"encoding/json"
 	"flag"
@@ -56,6 +57,7 @@ var commands = []*Command{
 	cmdEnv,
 	cmdFetchUpdate,
 	cmdGet,
+	cmdSet,
 	cmdInfo,
 	cmdList,
 	cmdOpen,
@@ -111,11 +113,24 @@ func getCreds(u *url.URL) (user, pass string) {
 	return m.Login, m.Password
 }
 
-func apiReq(v interface{}, meth, url string, data url.Values) {
-	var body io.Reader
-	if data != nil {
-		body = strings.NewReader(data.Encode())
+func apiReqJson(v interface{}, meth, url string, data interface{}) {
+	body, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal(err)
 	}
+	apiReq(v, meth, url, "application/json", bytes.NewReader(body))
+}
+
+func apiReqForm(v interface{}, meth, url string, data url.Values) {
+	body := strings.NewReader(data.Encode())
+	apiReq(v, meth, url, "application/x-www-form-urlencoded", body)
+}
+
+func getApiReq(v interface{}, url string) {
+	apiReq(v, "GET", url, "", nil)
+}
+
+func apiReq(v interface{}, meth, url, contentType string, body io.Reader) {
 	req, err := http.NewRequest(meth, url, body)
 	if err != nil {
 		log.Fatal(err)
@@ -124,9 +139,11 @@ func apiReq(v interface{}, meth, url string, data url.Values) {
 	req.SetBasicAuth(getCreds(req.URL))
 	req.Header.Add("User-Agent", "hk/"+Version)
 	req.Header.Add("Accept", "application/json")
-	if data != nil {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
 	}
+	fmt.Fprintf(os.Stderr, "%#v\n", req)
+	fmt.Fprintf(os.Stderr, "%#v\n", req.URL)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
@@ -139,16 +156,18 @@ func apiReq(v interface{}, meth, url string, data url.Values) {
 		log.Fatal("Unauthorized")
 	}
 	if res.StatusCode/100 != 2 { // 200, 201, 202, etc
-		log.Fatal("Unexpected error")
+		log.Fatal("Unexpected error: ", res.Status)
 	}
 
 	if msg := res.Header.Get("X-Heroku-Warning"); msg != "" {
 		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
 	}
 
-	err = json.NewDecoder(res.Body).Decode(v)
-	if err != nil {
-		log.Fatal(err)
+	if v != nil {
+		err = json.NewDecoder(res.Body).Decode(v)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
