@@ -30,7 +30,7 @@ func runPs(cmd *Command, args []string) {
 	}
 	appName := os.Args[3]
 	var procs Procs
-	getApiReq(&procs, fmt.Sprintf(apiURL+"/apps/%s/ps", appName))
+	APIReq("GET", "/apps/"+appName+"/ps").Do(&procs)
 	sort.Sort(procs)
 	fmt.Printf("Process           State       Command\n")
 	fmt.Printf("----------------  ----------  ------------------------\n")

@@ -21,7 +21,7 @@ func runInfo(cmd *Command, args []string) {
 		GitURL string `json:"git_url"`
 		WebURL string `json:"web_url"`
 	}
-	getApiReq(&info, fmt.Sprintf(apiURL+"/apps/%s", app()))
+	APIReq("GET", "/apps/"+app()).Do(&info)
 	fmt.Printf("Name:     %s\n", info.Name)
 	fmt.Printf("Owner:    %s\n", info.Owner)
 	fmt.Printf("Stack:    %s\n", info.Stack)
@@ -54,7 +54,7 @@ var cmdList = &Command{
 
 func runList(cmd *Command, args []string) {
 	var apps []struct{ Name string }
-	getApiReq(&apps, apiURL+"/apps")
+	APIReq("GET", "/apps").Do(&apps)
 	for _, app := range apps {
 		fmt.Printf("%s\n", app.Name)
 	}
@@ -81,6 +81,8 @@ func runCreate(cmd *Command, args []string) {
 		v.Set("app[stack]", args[1])
 	}
 
-	apiReqForm(&info, "POST", apiURL+"/apps", v)
+	r := APIReq("POST", "/apps")
+	r.SetBodyForm(v)
+	r.Do(&info)
 	fmt.Println(info.Name)
 }
