@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
 )
 
 var cmdInfo = &Command{
@@ -25,6 +26,22 @@ func runInfo(cmd *Command, args []string) {
 	fmt.Printf("Stack:    %s\n", info.Stack)
 	fmt.Printf("Git URL:  %s\n", info.GitURL)
 	fmt.Printf("Web URL:  %s\n", info.WebURL)
+}
+
+var cmdOpen = &Command{
+	Run:   runOpen,
+	Usage: "open",
+	Short: "open app",
+	Long:  `Open opens the app in a web browser. (Assumes cedar.)`,
+}
+
+func runOpen(cmd *Command, args []string) {
+	u := "https://" + app() + ".herokuapp.com/"
+	command := "open"
+	if _, err := exec.LookPath("xdg-open"); err == nil {
+		command = "xdg-open"
+	}
+	exec.Command(command, u).Start()
 }
 
 var cmdList = &Command{

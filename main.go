@@ -56,6 +56,7 @@ var commands = []*Command{
 	cmdGet,
 	cmdInfo,
 	cmdList,
+	cmdOpen,
 	cmdPs,
 	cmdVersion,
 	cmdHelp,
