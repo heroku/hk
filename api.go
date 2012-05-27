@@ -1,16 +1,16 @@
 package main
 
 import (
-	"strings"
-	"os"
-	"fmt"
-	"net/http"
-	"encoding/json"
 	"bytes"
-	"net/url"
+	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 )
 
 type Request http.Request
