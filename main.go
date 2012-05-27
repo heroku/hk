@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -50,6 +51,7 @@ func (c *Command) Name() string {
 
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
+	cmdCreate,
 	cmdCreds,
 	cmdEnv,
 	cmdFetchUpdate,
@@ -109,8 +111,12 @@ func getCreds(u *url.URL) (user, pass string) {
 	return m.Login, m.Password
 }
 
-func apiReq(v interface{}, meth string, url string) {
-	req, err := http.NewRequest(meth, url, nil)
+func apiReq(v interface{}, meth, url string, data url.Values) {
+	var body io.Reader
+	if data != nil {
+		body = strings.NewReader(data.Encode())
+	}
+	req, err := http.NewRequest(meth, url, body)
 	if err != nil {
 		panic(err)
 	}
@@ -118,6 +124,9 @@ func apiReq(v interface{}, meth string, url string) {
 	req.SetBasicAuth(getCreds(req.URL))
 	req.Header.Add("User-Agent", "hk/"+Version)
 	req.Header.Add("Accept", "application/json")
+	if data != nil {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
@@ -129,8 +138,7 @@ func apiReq(v interface{}, meth string, url string) {
 	if res.StatusCode == 403 {
 		log.Fatal("Unauthorized")
 	}
-	if res.StatusCode != 200 {
-		fmt.Printf("%v\n", res)
+	if res.StatusCode/100 != 2 { // 200, 201, 202, etc
 		log.Fatal("Unexpected error")
 	}
 
