@@ -2,40 +2,39 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
-func envHelp() {
-	cmdHelp("hk env -a <app>", "Show all config vars")
+var cmdEnv = &Command{
+	Run:   runEnv,
+	Usage: "env",
+	Short: "list config vars",
+	Long:  `Show all config vars.`,
 }
 
-func env() {
-	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
-		errorf("Invalid usage. See 'hk help env'")
-	}
-	appName := os.Args[3]
+func runEnv(cmd *Command, args []string) {
 	var config map[string]string
-	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", appName))
+	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", *flagApp))
 	for k, v := range config {
 		fmt.Printf("%s=%s\n", k, v)
 	}
 }
 
-func getHelp() {
-	cmdHelp("hk get -a <app> <key>", "Get the value of a config var")
+var cmdGet = &Command{
+	Run:   runGet,
+	Usage: "get <var>",
+	Short: "get config var",
+	Long:  `Get the value of a config var.`,
 }
 
-func get() {
-	if (len(os.Args) != 5) || (os.Args[2] != "-a") {
+func runGet(cmd *Command, args []string) {
+	if len(args) != 1 {
 		errorf("Invalid usage. See 'hk help get'")
 	}
-	appName := os.Args[3]
-	key := os.Args[4]
 	var config map[string]string
-	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", appName))
-	value, found := config[key]
+	apiReq(&config, "GET", fmt.Sprintf(apiURL+"/apps/%s/config_vars", *flagApp))
+	value, found := config[args[0]]
 	if !found {
-		errorf("No such key as '%s'", key)
+		errorf("No such key as '%s'", args[0])
 	}
 	fmt.Println(value)
 }

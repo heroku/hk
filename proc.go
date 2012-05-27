@@ -6,23 +6,24 @@ import (
 	"sort"
 )
 
-func psHelp() {
-	cmdHelp("hk ps -a <app>", "List app processes")
+var cmdPs = &Command{
+	Run:   runPs,
+	Usage: "ps",
+	Short: "list processes",
+	Long:  `List app processes.`,
 }
 
-type Proc struct {
+type Procs []*struct {
 	Name    string `json:"process"`
 	State   string
 	Command string
 }
 
-type Procs []*Proc
-
 func (p Procs) Len() int           { return len(p) }
 func (p Procs) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p Procs) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
-func ps() {
+func runPs(cmd *Command, args []string) {
 	if (len(os.Args) != 4) || (os.Args[2] != "-a") {
 		errorf("Invalid usage. See 'hk help ps'")
 	}

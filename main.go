@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"code.google.com/p/go-netrc/netrc"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -27,40 +28,67 @@ var updater = Updater{
 	dir: hkHome + "/update/",
 }
 
+type Command struct {
+	// args does not include the command name
+	Run func(cmd *Command, args []string)
+
+	Usage string // first word is the command name
+	Short string // `hk help` output
+	Long  string // `hk help <cmd>` output
+}
+
+func (c *Command) Name() string {
+	name := c.Usage
+	i := strings.Index(name, " ")
+	if i >= 0 {
+		name = name[:i]
+	}
+	return name
+}
+
+// Running `hk help` will list commands in this order.
+var commands = []*Command{
+	cmdCreds,
+	cmdEnv,
+	cmdFetchUpdate,
+	cmdGet,
+	cmdInfo,
+	cmdList,
+	cmdPs,
+	cmdVersion,
+	cmdHelp,
+}
+
+var flagApp = flag.String("a", "", "app")
+
 func main() {
+	defer updater.run() // doesn't run if os.Exit is called
+
 	if s := os.Getenv("HEROKU_API_URL"); s != "" {
 		apiURL = strings.TrimRight(s, "/")
 	}
 
-	if len(os.Args) <= 1 {
+	flag.Usage = usage
+	flag.Parse()
+	args := flag.Args()
+	if len(args) < 1 {
 		usage()
-	} else {
-		cmd := os.Args[1]
-		switch cmd {
-		case "env":
-			env()
-		case "get":
-			get()
-		case "help":
-			help()
-		case "info":
-			info()
-		case "creds":
-			creds()
-		case "list":
-			list()
-		case "ps":
-			ps()
-		case "fetch-update":
-			fetchUpdate()
-		case "version":
-			version()
-		default:
-			unrecCmd(cmd)
+	}
+
+	name := args[0]
+	os.Args = args
+	flag.Parse()
+	args = flag.Args()
+
+	for _, cmd := range commands {
+		if cmd.Name() == name {
+			cmd.Run(cmd, args)
+			return
 		}
 	}
 
-	updater.run()
+	fmt.Fprintf(os.Stderr, "Unknown command: %s\n", name)
+	usage()
 }
 
 func getCreds(u *url.URL) (user, pass string) {
@@ -116,8 +144,4 @@ func errorf(format string, a ...interface{}) {
 
 func unrecArg(arg, cmd string) {
 	errorf("Unrecognized argument '%s'. See 'hk help %s'", arg, cmd)
-}
-
-func unrecCmd(cmd string) {
-	errorf("'%s' is not an hk command. See 'hk help'", cmd)
 }
