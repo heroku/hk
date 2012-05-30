@@ -95,7 +95,7 @@ See 'hk help <command>' for more information on a specific command.
 ```bash
 $ cd hk
 $ go get
-$ mate hk.go
+$ mate main.go
 $ go build
 $ ./hk list
 ```
@@ -104,7 +104,7 @@ $ ./hk list
 
 ```bash
 $ cd hk
-$ vim hk.go # edit Version
+$ vim main.go # edit Version
 $ go build
 $ ./mkpatch
 # put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
