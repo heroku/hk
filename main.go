@@ -49,6 +49,7 @@ func (c *Command) Name() string {
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
 	cmdCreate,
+	cmdDestroy,
 	cmdCreds,
 	cmdEnv,
 	cmdFetchUpdate,
@@ -128,10 +129,8 @@ func app() string {
 	if i >= 0 {
 		s = s[:i]
 	}
-	const pre = "git@heroku.com:"
-	const suf = ".git"
-	if !strings.HasPrefix(s, pre) || !strings.HasSuffix(s, suf) {
+	if !strings.HasPrefix(s, gitURLPre) || !strings.HasSuffix(s, gitURLSuf) {
 		log.Fatal("could not find app name in heroku git remote")
 	}
-	return s[len(pre) : len(s)-len(suf)]
+	return s[len(gitURLPre) : len(s)-len(gitURLSuf)]
 }

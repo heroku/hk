@@ -88,3 +88,17 @@ func runCreate(cmd *Command, args []string) {
 	exec.Command("git", "remote", "add", "heroku", info.GitURL).Run()
 	fmt.Println(info.Name)
 }
+
+var cmdDestroy = &Command{
+	Run:   runDestroy,
+	Usage: "destroy <name>",
+	Short: "destroy an app",
+	Long:  `Destroy destroys a heroku app.`,
+}
+
+func runDestroy(cmd *Command, args []string) {
+	APIReq("DELETE", "/apps/"+args[0]).Do(nil)
+	for _, remote := range gitRemotes(gitURL(args[0])) {
+		exec.Command("git", "remote", "rm", remote).Run()
+	}
+}
