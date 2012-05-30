@@ -69,8 +69,9 @@ var cmdCreate = &Command{
 
 func runCreate(cmd *Command, args []string) {
 	var info struct {
-		Name  string
-		Stack string
+		Name   string
+		Stack  string
+		GitURL string `json:"git_url"`
 	}
 
 	v := make(url.Values)
@@ -84,5 +85,6 @@ func runCreate(cmd *Command, args []string) {
 	r := APIReq("POST", "/apps")
 	r.SetBodyForm(v)
 	r.Do(&info)
+	exec.Command("git", "remote", "add", "heroku", info.GitURL).Run()
 	fmt.Println(info.Name)
 }
