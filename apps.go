@@ -75,11 +75,9 @@ func runCreate(cmd *Command, args []string) {
 	}
 
 	v := make(url.Values)
+	v.Set("app[stack]", "cedar")
 	if len(args) > 0 {
 		v.Set("app[name]", args[0])
-	}
-	if len(args) > 1 {
-		v.Set("app[stack]", args[1])
 	}
 
 	r := APIReq("POST", "/apps")
