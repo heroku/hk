@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime"
 	"strings"
 )
 
@@ -22,7 +23,7 @@ func APIReq(meth, path string) *Request {
 	}
 
 	req.SetBasicAuth(getCreds(req.URL))
-	req.Header.Add("User-Agent", "hk/"+Version)
+	req.Header.Add("User-Agent", "hk/"+Version+" ("+runtime.GOOS+"-"+runtime.GOARCH+")")
 	req.Header.Add("Accept", "application/json")
 	return (*Request)(req)
 }
