@@ -104,7 +104,7 @@ func getCreds(u *url.URL) (user, pass string) {
 
 	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", u.Host)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("netrc error (%s): %v", u.Host, err)
 	}
 
 	return m.Login, m.Password
