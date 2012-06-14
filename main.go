@@ -30,7 +30,8 @@ var updater = Updater{
 
 type Command struct {
 	// args does not include the command name
-	Run func(cmd *Command, args []string)
+	Run  func(cmd *Command, args []string)
+	Flag *flag.FlagSet
 
 	Usage string // first word is the command name
 	Short string // `hk help` output
@@ -66,37 +67,42 @@ var commands = []*Command{
 
 var (
 	flagApp = flag.String("a", "", "app")
-	flagTailf = flag.Bool("f", false, "stream tail")
 )
 
 func main() {
 	defer updater.run() // doesn't run if os.Exit is called
 
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		apiURL = strings.TrimRight(s, "/")
-	}
-
-	log.SetFlags(0)
 	flag.Usage = usage
 	flag.Parse()
+	log.SetFlags(0)
+
 	args := flag.Args()
 	if len(args) < 1 {
 		usage()
 	}
 
-	name := args[0]
-	os.Args = args
-	flag.Parse()
-	args = flag.Args()
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		apiURL = strings.TrimRight(s, "/")
+	}
 
 	for _, cmd := range commands {
-		if cmd.Name() == name {
+		if cmd.Name() == args[0] {
+			if cmd.Flag != nil {
+				cmd.Flag.Usage = usage
+				cmd.Flag.Parse(args[1:])
+				args = cmd.Flag.Args()
+			} else {
+				args = args[1:]
+				if len(args) > 0 {
+					usage()
+				}
+			}
 			cmd.Run(cmd, args)
 			return
 		}
 	}
 
-	fmt.Fprintf(os.Stderr, "Unknown command: %s\n", name)
+	fmt.Fprintf(os.Stderr, "Unknown command: %s\n", args[0])
 	usage()
 }
 

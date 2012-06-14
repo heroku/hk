@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,16 +14,25 @@ import (
 
 var cmdTail = &Command{
 	Run:   runTail,
-	Usage: "tail",
+	Usage: "tail [-f]",
 	Short: "tail log files",
 	Long:  `Tail tails log files.`,
+	Flag:  flag.NewFlagSet("hk tail", flag.ContinueOnError),
+}
+
+var (
+	tailStream bool
+)
+
+func init() {
+	cmdTail.Flag.BoolVar(&tailStream, "f", false, "do not stop when end of file is reached")
 }
 
 func runTail(cmd *Command, args []string) {
 	data := make(url.Values)
 	data.Add("logplex", "true")
 
-	if *flagTailf {
+	if tailStream {
 		data.Add("tail", "1")
 	}
 
