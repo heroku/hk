@@ -41,7 +41,7 @@ real    0m1.828s
 ### Installation
 
 ```bash
-$ curl -s -L https://github.com/downloads/mmcgrana/hk/hk-release-darwin > /usr/local/bin/hk
+$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk
 $ chmod +x /usr/local/bin/hk
 ```
 
