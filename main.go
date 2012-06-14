@@ -64,7 +64,10 @@ var commands = []*Command{
 	cmdHelp,
 }
 
-var flagApp = flag.String("a", "", "app")
+var (
+	flagApp = flag.String("a", "", "app")
+	flagTailf = flag.Bool("f", false, "stream tail")
+)
 
 func main() {
 	defer updater.run() // doesn't run if os.Exit is called

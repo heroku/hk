@@ -22,10 +22,8 @@ func runTail(cmd *Command, args []string) {
 	data := make(url.Values)
 	data.Add("logplex", "true")
 
-	for _, a := range args {
-		if a == "-f" {
-			data.Add("tail", "1")
-		}
+	if *flagTailf {
+		data.Add("tail", "1")
 	}
 
 	req, err := http.NewRequest("GET", apiURL+"/apps/"+app()+"/logs", strings.NewReader(data.Encode()))
