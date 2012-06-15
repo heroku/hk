@@ -93,9 +93,6 @@ func main() {
 				args = cmd.Flag.Args()
 			} else {
 				args = args[1:]
-				if len(args) > 0 {
-					usage()
-				}
 			}
 			cmd.Run(cmd, args)
 			return
