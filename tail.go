@@ -20,20 +20,18 @@ var cmdTail = &Command{
 	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
 }
 
-var (
-	tailStream bool
-)
+var follow bool
 
 func init() {
 	cmdTail.Flag.StringVar(&flagApp, "a", "", "app")
-	cmdTail.Flag.BoolVar(&tailStream, "f", false, "do not stop when end of file is reached")
+	cmdTail.Flag.BoolVar(&follow, "f", false, "do not stop when end of file is reached")
 }
 
 func runTail(cmd *Command, args []string) {
 	data := make(url.Values)
 	data.Add("logplex", "true")
 
-	if tailStream {
+	if follow {
 		data.Add("tail", "1")
 	}
 
