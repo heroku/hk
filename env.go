@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"strings"
@@ -8,9 +9,14 @@ import (
 
 var cmdEnv = &Command{
 	Run:   runEnv,
-	Usage: "env",
+	Usage: "env [-a APP]",
 	Short: "list config vars",
 	Long:  `Show all config vars.`,
+	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
+}
+
+func init() {
+	cmdEnv.Flag.StringVar(&flagApp, "a", "", "app")
 }
 
 func runEnv(cmd *Command, args []string) {

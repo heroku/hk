@@ -62,10 +62,6 @@ func runHelp(cmd *Command, args []string) {
 func printUsage() {
 	fmt.Printf("Usage: hk <command> [options] [arguments]\n\n")
 
-	fmt.Printf("Supported options are:\n\n")
-	fmt.Printf("  -a APP     name of the app to operate on\n")
-	fmt.Println()
-
 	fmt.Printf("Supported commands are:\n\n")
 	for _, cmd := range commands {
 		if cmd.Short != "" {

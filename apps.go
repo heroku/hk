@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/url"
 	"os/exec"
@@ -8,9 +9,14 @@ import (
 
 var cmdInfo = &Command{
 	Run:   runInfo,
-	Usage: "info",
+	Usage: "info [-a APP]",
 	Short: "show app info",
 	Long:  `Info shows general information about the current app.`,
+	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
+}
+
+func init() {
+	cmdInfo.Flag.StringVar(&flagApp, "a", "", "app")
 }
 
 func runInfo(cmd *Command, args []string) {

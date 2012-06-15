@@ -66,7 +66,7 @@ var commands = []*Command{
 }
 
 var (
-	flagApp = flag.String("a", "", "app")
+	flagApp string // convience var for commands that need it
 )
 
 func main() {
@@ -118,8 +118,8 @@ func getCreds(u *url.URL) (user, pass string) {
 }
 
 func app() string {
-	if *flagApp != "" {
-		return *flagApp
+	if flagApp != "" {
+		return flagApp
 	}
 	out, err := exec.Command("git", "remote", "show", "-n", "heroku").Output()
 	if err != nil {

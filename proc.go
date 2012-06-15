@@ -1,15 +1,21 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"sort"
 )
 
 var cmdPs = &Command{
 	Run:   runPs,
-	Usage: "ps",
+	Usage: "ps [-a APP]",
 	Short: "list processes",
 	Long:  `List app processes.`,
+	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
+}
+
+func init() {
+	cmdPs.Flag.StringVar(&flagApp, "a", "", "app")
 }
 
 type Procs []*struct {

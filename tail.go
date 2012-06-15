@@ -14,10 +14,10 @@ import (
 
 var cmdTail = &Command{
 	Run:   runTail,
-	Usage: "tail [-f]",
+	Usage: "tail [-a APP] [-f]",
 	Short: "tail log files",
 	Long:  `Tail tails log files.`,
-	Flag:  flag.NewFlagSet("hk tail", flag.ContinueOnError),
+	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
 }
 
 var (
@@ -25,6 +25,7 @@ var (
 )
 
 func init() {
+	cmdTail.Flag.StringVar(&flagApp, "a", "", "app")
 	cmdTail.Flag.BoolVar(&tailStream, "f", false, "do not stop when end of file is reached")
 }
 
