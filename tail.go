@@ -37,17 +37,9 @@ func runTail(cmd *Command, args []string) {
 		data.Add("tail", "1")
 	}
 
-	req, err := http.NewRequest("GET", apiURL+"/apps/"+app()+"/logs", strings.NewReader(data.Encode()))
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	req.SetBasicAuth(getCreds(req.URL))
-	req.Header.Add("User-Agent", "hk/"+Version)
-	req.Header.Add("Accept", "application/json")
-
-	resp := checkResp(http.DefaultClient.Do(req))
+	req := APIReq("GET", "/apps/"+app()+"/logs")
+	req.SetBodyForm(data)
+	resp := checkResp(http.DefaultClient.Do((*http.Request)(req)))
 
 	surl, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
