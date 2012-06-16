@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/url"
 	"os/exec"
@@ -12,7 +11,6 @@ var cmdInfo = &Command{
 	Usage: "info [-a APP]",
 	Short: "show app info",
 	Long:  `Info shows general information about the current app.`,
-	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
 }
 
 func init() {

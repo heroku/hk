@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"sort"
 )
@@ -11,7 +10,6 @@ var cmdPs = &Command{
 	Usage: "ps [-a APP]",
 	Short: "list processes",
 	Long:  `List app processes.`,
-	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
 }
 
 func init() {

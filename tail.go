@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,7 +14,6 @@ var cmdTail = &Command{
 	Usage: "tail [-a APP] [-f]",
 	Short: "tail log files",
 	Long:  `Tail tails log files.`,
-	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
 }
 
 var follow bool

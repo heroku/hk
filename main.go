@@ -31,7 +31,7 @@ var updater = Updater{
 type Command struct {
 	// args does not include the command name
 	Run  func(cmd *Command, args []string)
-	Flag *flag.FlagSet
+	Flag flag.FlagSet
 
 	Usage string // first word is the command name
 	Short string // `hk help` output
@@ -87,14 +87,9 @@ func main() {
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] {
-			if cmd.Flag != nil {
-				cmd.Flag.Usage = usage
-				cmd.Flag.Parse(args[1:])
-				args = cmd.Flag.Args()
-			} else {
-				args = args[1:]
-			}
-			cmd.Run(cmd, args)
+			cmd.Flag.Usage = usage
+			cmd.Flag.Parse(args[1:])
+			cmd.Run(cmd, cmd.Flag.Args())
 			return
 		}
 	}

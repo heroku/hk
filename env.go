@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"strings"
@@ -12,7 +11,6 @@ var cmdEnv = &Command{
 	Usage: "env [-a APP]",
 	Short: "list config vars",
 	Long:  `Show all config vars.`,
-	Flag:  flag.NewFlagSet("hk", flag.ContinueOnError),
 }
 
 func init() {
