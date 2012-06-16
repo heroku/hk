@@ -59,11 +59,21 @@ func (r *Request) SetBody(body io.Reader) {
 }
 
 func (r *Request) Do(v interface{}) {
-	res, err := http.DefaultClient.Do((*http.Request)(r))
+	res := checkResp(http.DefaultClient.Do((*http.Request)(r)))
+	defer res.Body.Close()
+
+	if v != nil {
+		err := json.NewDecoder(res.Body).Decode(v)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func checkResp(res *http.Response, err error) *http.Response {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer res.Body.Close()
 	if res.StatusCode == 401 {
 		log.Fatal("Unauthorized")
 	}
@@ -78,10 +88,5 @@ func (r *Request) Do(v interface{}) {
 		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
 	}
 
-	if v != nil {
-		err = json.NewDecoder(res.Body).Decode(v)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	return res
 }

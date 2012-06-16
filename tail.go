@@ -2,14 +2,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 )
 
 var cmdTail = &Command{
@@ -51,25 +49,4 @@ func runTail(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 	resp.Body.Close()
-}
-
-func checkResp(resp *http.Response, err error) *http.Response {
-	if err != nil {
-		log.Fatal(err)
-	}
-	if resp.StatusCode == 401 {
-		log.Fatal("Unauthorized")
-	}
-	if resp.StatusCode == 403 {
-		log.Fatal("Unauthorized")
-	}
-	if resp.StatusCode/100 != 2 { // 200, 201, 202, etc
-		log.Fatal("Unexpected error: ", resp.Status)
-	}
-
-	if msg := resp.Header.Get("X-Heroku-Warning"); msg != "" {
-		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
-	}
-
-	return resp
 }
