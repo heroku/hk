@@ -111,44 +111,43 @@ func (u *Updater) askAndInstall() {
 		return
 	}
 	fmt.Printf("\n\nUpdate hk %s has been downloaded.\n", string(bytes.TrimSpace(ver)))
-	fmt.Print("Install? (y/[n]) ")
-	line, isPrefix, err := stdin.ReadLine()
-	if err != nil || isPrefix {
+	fmt.Print("Install? ([y]/n) ")
+	line, _, err := stdin.ReadLine()
+	line = bytes.TrimSpace(line)
+	if err != nil || (len(line) > 0 && line[0] == 'n') {
 		return
 	}
 
-	if bytes.HasPrefix(bytes.TrimSpace(line), []byte{'y'}) {
-		srcf, err := os.Open(u.dir + upnextPath)
-		if err != nil {
-			log.Fatal(err)
-		}
+	srcf, err := os.Open(u.dir + upnextPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		instDir := path.Dir(instPath)
-		dstf, err := os.OpenFile(instDir+"/.hk.part", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
-		if err != nil {
-			log.Fatal(err)
-		}
+	instDir := path.Dir(instPath)
+	dstf, err := os.OpenFile(instDir+"/.hk.part", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		_, err = io.Copy(dstf, srcf)
-		if err != nil {
-			log.Fatal(err)
-		}
+	_, err = io.Copy(dstf, srcf)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		srcf.Close()
-		err = dstf.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
+	srcf.Close()
+	err = dstf.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		err = os.Rename(instDir+"/.hk.part", instPath)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err = os.Rename(instDir+"/.hk.part", instPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		err = os.Remove(u.dir + upnextPath)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err = os.Remove(u.dir + upnextPath)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
