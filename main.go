@@ -24,7 +24,7 @@ var (
 var stdin = bufio.NewReader(os.Stdin)
 
 var updater = Updater{
-	url: "https://github.com/downloads/kr/hk/",
+	url: "https://hk.heroku.com/",
 	dir: hkHome + "/update/",
 }
 
