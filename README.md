@@ -106,7 +106,7 @@ $ ./hk list
 $ cd hk
 $ vim main.go # edit Version
 $ go build
-$ ./mkpatch
+$ ./mkpatch oldver1 oldver2...
 # put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
 ```
 

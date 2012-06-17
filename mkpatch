@@ -6,7 +6,7 @@
 set -e
 
 eval $(go tool dist env)
-url=https://github.com/downloads/kr/hk/$GOOS-$GOARCH-hk.gz
+url=https://hk.heroku.com/$GOOS-$GOARCH
 
 rawsha1() {
 	python -c 'from hashlib import sha1; import sys; sys.stdout.write(sha1(sys.stdin.read()).digest())'
@@ -24,19 +24,26 @@ hkdiff() {
 	rm /tmp/hkdiff
 }
 
-cp hk $GOOS-$GOARCH-hk
-gzip -9 $GOOS-$GOARCH-hk
+mkpatchver() {
+	oldver=$1
+	echo Fetching $oldver
+	wget -qO- $url/$oldver/hk.gz|zcat >hk.old.$oldver
+	chmod +x hk.old.$oldver
+	echo Patching hk $oldver to $newver
+	patch=$GOOS-$GOARCH-$oldver-next.hkdiff
+	hkdiff hk.old.$oldver hk >$patch
+	rm hk.old.$oldver
+}
 
-echo Fetching previous vers
-curl -Lo hk.old.gz $url
-gunzip hk.old.gz
-chmod +x hk.old
-oldver=$(./hk.old version)
 newver=$(./hk version)
-echo Patching hk $oldver to $newver
-if test $oldver = $newver
-then echo You forgot to update the version string. Bailing.; exit 1
-fi
-patch=$GOOS-$GOARCH-$oldver-next.hkdiff
-hkdiff hk.old hk >$patch
-rm hk.old
+
+for v in $*
+do test $v = $newver &&  { echo new ver matches an old ver; exit 1; }
+done
+
+for v in $*
+do mkpatchver $v
+done
+
+cp hk $GOOS-$GOARCH-hk-$newver
+gzip -9 $GOOS-$GOARCH-hk-$newver
