@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 )
 
 var cmdFetchUpdate = &Command{
@@ -49,8 +48,7 @@ func runHelp(cmd *Command, args []string) {
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] {
-			fmt.Printf("Usage: hk %s\n\n", cmd.Usage)
-			fmt.Println(strings.TrimSpace(cmd.Long))
+			cmd.printUsage()
 			return
 		}
 	}

@@ -38,6 +38,11 @@ type Command struct {
 	Long  string // `hk help <cmd>` output
 }
 
+func (c *Command) printUsage() {
+	fmt.Printf("Usage: hk %s\n\n", c.Usage)
+	fmt.Println(strings.TrimSpace(c.Long))
+}
+
 func (c *Command) Name() string {
 	name := c.Usage
 	i := strings.Index(name, " ")
@@ -60,6 +65,7 @@ var commands = []*Command{
 	cmdList,
 	cmdOpen,
 	cmdPs,
+	cmdScale,
 	cmdTail,
 	cmdRun,
 	cmdVersion,
