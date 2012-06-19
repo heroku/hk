@@ -73,6 +73,7 @@ $ go build
 $ ./hk list
 ```
 
+
 ### Release
 
 ```bash
@@ -82,6 +83,7 @@ $ go build
 $ ./mkpatch oldver1 oldver2...
 # put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
 ```
+
 
 ### Design
 
