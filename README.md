@@ -2,11 +2,9 @@
 
 Fast Heroku client.
 
-
 ### Overview
 
 hk is a command line client to the Heroku runtime platform, designed to be as fast as possible.
-
 
 ### Motivation
 
@@ -34,11 +32,15 @@ We believe this is evidence that a first-class Heroku API trumps any particular 
 
 **Iterative Development**
 
-A release mechanism was create for hk in the beginning; the binary updates itself. This gives us confidence in iterative development of hk which we value highlybecause we can release as soon as new features are available.
+A release mechanism was created for hk in the beginning: The binary updates
+itself. This gives us confidence in iterative development, which we value
+highly because it gives us the ability to release very often knowing users will
+see the updates in a timely manor.
 
 **The power of Go**
 
-hk demostartaes the power of the Go language, runtime, systems access, and distribution story.
+hk demostartaes the power of the Go language, runtime, systems access, and
+distribution story which are all very appealing to Heroku.
 
 ### Installation
 
@@ -46,8 +48,6 @@ hk demostartaes the power of the Go language, runtime, systems access, and distr
 $ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk
 $ chmod +x /usr/local/bin/hk
 ```
-
-
 ### Usage
 
 ```bash
