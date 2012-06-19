@@ -32,10 +32,10 @@ We believe this is evidence that a first-class Heroku API trumps any particular 
 
 **Iterative Development**
 
-A release mechanism was created for hk in the beginning: The binary updates
+A release mechanism was created for hk in the beginning: the binary updates
 itself. This gives us confidence in iterative development, which we value
-highly because it gives us the ability to release very often knowing users will
-see the updates in a timely manor.
+highly, because it gives us the ability to release very often knowing users will
+see the updates in a timely manner.
 
 **The power of Go**
 
@@ -45,7 +45,7 @@ distribution story (a single, statically linked binary with no dependencies) whi
 **Unix**
 
 Heroku loves Unix. This client should reflect that. Commands are single,
-unhyphenated words that map to their unix ancestors names and flags where
+unhyphenated words that map to their unix ancestors’ names and flags where
 applicable.
 
 ### Installation
