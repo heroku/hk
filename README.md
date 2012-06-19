@@ -10,21 +10,19 @@ hk is a command line client to the Heroku runtime platform, designed to be as fa
 
 **Fast as a feature**
 
-```bash
-$ time heroku version
-2.27.3
-real	0m1.813s
+	$ time heroku version
+	2.27.3
+	real	0m1.813s
 
-$ time hk version
-0.4
-real	0m0.016s
+	$ time hk version
+	0.4
+	real	0m0.016s
 
-$ time heroku list > /dev/null
-real	0m8.826s
+	$ time heroku list > /dev/null
+	real	0m8.826s
 
-$ time hk list > /dev/null
-real  0m3.658s
-```
+	$ time hk list > /dev/null
+	real  0m3.658s
 
 **Focus on API**
 
@@ -44,55 +42,46 @@ distribution story which are all very appealing to Heroku.
 
 ### Installation
 
-```bash
-$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk
-$ chmod +x /usr/local/bin/hk
-```
+	$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk
+	$ chmod +x /usr/local/bin/hk
+
 ### Usage
 
-```bash
-$ hk help
-Usage: hk <command> [options] [arguments]
+	$ hk help
+	Usage: hk <command> [options] [arguments]
 
-Supported commands are:
+	Supported commands are:
 
-  create     create an app
-  destroy    destroy an app
-  creds      show auth creds
-  env        list config vars
-  get        get config var
-  set        set config var
-  info       show app info
-  list       list apps
-  open       open app
-  ps         list processes
-  scale      change dyno counts
-  tail       tail log files
-  run        run a process
-  version    show hk version
-  help       show help
+  	create     create an app
+  	destroy    destroy an app
+  	creds      show auth creds
+  	env        list config vars
+  	get        get config var
+  	set        set config var
+  	info       show app info
+  	list       list apps
+  	open       open app
+  	ps         list processes
+  	scale      change dyno counts
+  	tail       tail log files
+  	run        run a process
+  	version    show hk version
+  	help       show help
 
-See 'hk help [command]' for more information about a command.
-```
-
+	See 'hk help [command]' for more information about a command.
 
 ### Development
 
-```bash
-$ cd hk
-$ go get
-$ mate main.go
-$ go build
-$ ./hk list
-```
-
+	$ cd hk
+	$ go get
+	$ mate main.go
+	$ go build
+	$ ./hk list
 
 ### Release
 
-```bash
-$ cd hk
-$ vim main.go # edit Version
-$ go build
-$ ./mkpatch oldver1 oldver2...
-# put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
-```
+	$ cd hk
+	$ vim main.go # edit Version
+	$ go build
+	$ ./mkpatch oldver1 oldver2...
+	# put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
