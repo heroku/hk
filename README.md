@@ -12,24 +12,18 @@ hk is a command line client to the Heroku runtime platform, designed to be as fa
 
 ```bash
 $ time heroku version
-2.25.0
-real	0m1.376s
+2.27.3
+real	0m1.813s
 
 $ time hk version
-0.0.1
-real	0m0.015s
-
-$ time heroku ps -a morning-snow-4357 > /dev/null
-real	0m2.057s
-
-$ time hk ps -a morning-snow-4357 > /dev/null
-real	0m0.763s
+0.4
+real	0m0.016s
 
 $ time heroku list > /dev/null
-real	0m10.142s
+real	0m8.826s
 
 $ time hk list > /dev/null
-real    0m1.828s
+real  0m3.658s
 ```
 
 
