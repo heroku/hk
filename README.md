@@ -39,43 +39,27 @@ $ chmod +x /usr/local/bin/hk
 
 ```bash
 $ hk help
-Usage: hk <command> [-a <app>] [command-specific-options]
+Usage: hk <command> [options] [arguments]
 
-Supported hk commands are:
-  addons          List add-ons
-  addons-add      Add an add-on
-  addons-open     Open an add-on page
-  addons-remove   Remove an add-on
-  create          Create an app
-  destroy         Destroy an app
-  env             List config vars
-  get             Get config var
-  help            Show this help
-  info            Show app info
-  list            List apps
-  login           Log in
-  logout          Log out
-  logs            Show logs
-  pg              List databases
-  pg-info         Show database info
-  pg-promote      Promote a database
-  ps-psql         Open a psql database shell
-  pg-wait         Await a database
-  ps              List processes
-  release         Show release info
-  releases        List releases
-  rename          Rename an app
-  restart         Restart processes
-  rollback        Rollback to a previous release
-  run             Run a process
-  set             Set config var
-  scale           Scale processes
-  stop            Stop a process
-  token           Show auth token
-  unset           Unset config vars
-  version         Display version
+Supported commands are:
 
-See 'hk help <command>' for more information on a specific command.
+  create     create an app
+  destroy    destroy an app
+  creds      show auth creds
+  env        list config vars
+  get        get config var
+  set        set config var
+  info       show app info
+  list       list apps
+  open       open app
+  ps         list processes
+  scale      change dyno counts
+  tail       tail log files
+  run        run a process
+  version    show hk version
+  help       show help
+
+See 'hk help [command]' for more information about a command.
 ```
 
 
