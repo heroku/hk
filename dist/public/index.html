@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>hk</title>
+    <meta content='Heroku command-line tool.' name='description'>
+    <link href='https://nav.heroku.com/images/logos/favicon.ico' rel='icon' type='image/x-icon'>
+    <style>
+:root {
+	background: #1B1B24;
+	text-align: center;
+	color: #fff;
+}
+
+h1 {
+	font-family: Monaco, monospace;
+	font-size: 18px;
+	margin-top: 40px;
+}
+
+code {
+	font-family: Monaco, monospace;
+	font-size: 14px;
+	background: #111116;
+	display: block;
+	padding: 8px 22px;
+	line-height: 1.7em;
+	overflow: hidden;
+	color: #8487AF;
+	white-space: pre;
+	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02), 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+	-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02), 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02), 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+	text-align: left;
+	color: #8487AF;
+	-webkit-border-radius: 18px;
+	-moz-border-radius: 18px;
+	-ms-border-radius: 18px;
+	-o-border-radius: 18px;
+	border-radius: 18px;
+	margin-top: 40px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 550px;
+}
+
+a:link, a:visited, a:active {
+	color: #9782FF;
+	text-decoration: none;
+}
+    </style>
+  </head>
+  <body>
+
+<h1>hk</h1>
+
+<code>wget -qO- <a href=/hk.gz>https://hk.heroku.com/hk.gz</a> | zcat >/usr/local/bin/hk
+chmod +x /usr/local/bin/hk
+</code>
+
+</body>
+</html>
