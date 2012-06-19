@@ -45,7 +45,7 @@ distribution story (a single, statically linked binary with no dependencies) whi
 **Unix**
 
 Heroku loves Unix. This client should reflect that. Commands are single,
-unhyphenated words and map to their unix ancestors names and flags where
+unhyphenated words that map to their unix ancestors names and flags where
 applicable.
 
 ### Installation
