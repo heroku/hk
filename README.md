@@ -83,8 +83,3 @@ $ go build
 $ ./mkpatch oldver1 oldver2...
 # put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
 ```
-
-
-### Design
-
-We maintain a collections of `hk` terminal interactions in [DESIGN.md](hk/blob/master/DESIGN.md), from which you can get a sense of the tool's style.
