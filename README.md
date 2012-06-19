@@ -10,11 +10,15 @@ hk is a command line client to the Heroku runtime platform, designed to be as fa
 
 **Fast as a feature**
 
+	## version
+
 	$ time heroku version >/dev/null
 	real	0m1.813s
 
 	$ time hk version >/dev/null
 	real	0m0.016s
+
+	## list
 
 	$ time heroku list >/dev/null
 	real	0m8.826s
