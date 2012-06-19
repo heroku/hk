@@ -37,7 +37,7 @@ see the updates in a timely manor.
 
 **The power of Go**
 
-hk demostartaes the power of the Go language, runtime, systems access, and
+hk demonstrates the power of the Go language, runtime, systems access, and
 distribution story which are all very appealing to Heroku.
 
 ### Installation
