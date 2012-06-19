@@ -40,7 +40,13 @@ see the updates in a timely manor.
 **The power of Go**
 
 hk demonstrates the power of the Go language, runtime, systems access, and
-distribution story (a single, staticly linked binary with no dependecies) which are all very appealing to Heroku.
+distribution story (a single, statically linked binary with no dependencies) which are all very appealing to Heroku.
+
+**Unix**
+
+Heroku loves Unix. This client should reflect that. Commands are single,
+unhyphenated words and map to their unix ancestors names and flags where
+applicable.
 
 ### Installation
 
