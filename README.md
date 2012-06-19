@@ -38,7 +38,7 @@ see the updates in a timely manor.
 **The power of Go**
 
 hk demonstrates the power of the Go language, runtime, systems access, and
-distribution story which are all very appealing to Heroku.
+distribution story (a single, staticly linked binary with no dependecies) which are all very appealing to Heroku.
 
 ### Installation
 
