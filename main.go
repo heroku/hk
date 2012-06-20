@@ -123,23 +123,20 @@ func app() string {
 	if flagApp != "" {
 		return flagApp
 	}
-	out, err := exec.Command("git", "remote", "show", "-n", "heroku").Output()
+
+	b, err := exec.Command("git", "config", "remote.heroku.url").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := string(out)
-	const sign = "Fetch URL: "
-	i := strings.Index(s, sign)
-	if i < 0 {
-		log.Fatal("could not find git remote named 'heroku'")
-	}
-	s = s[i+len(sign):]
-	i = strings.Index(s, "\n")
-	if i >= 0 {
-		s = s[:i]
-	}
-	if !strings.HasPrefix(s, gitURLPre) || !strings.HasSuffix(s, gitURLSuf) {
+
+	out := strings.Trim(string(b), "\r\n ")
+
+	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
 		log.Fatal("could not find app name in heroku git remote")
 	}
-	return s[len(gitURLPre) : len(s)-len(gitURLSuf)]
+	
+	// Memoize for later use
+	flagApp = out[len(gitURLPre) : len(out)-len(gitURLSuf)]
+
+	return flagApp
 }
