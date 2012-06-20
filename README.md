@@ -53,6 +53,12 @@ applicable.
 	$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk
 	$ chmod +x /usr/local/bin/hk
 
+### netrc
+
+You'll need a line like this in $HOME/.netrc
+
+	machine api.heroku.com login <email> password <apitoken>
+
 ### Usage
 
 	$ hk help
