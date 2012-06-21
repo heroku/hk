@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 const (
@@ -129,6 +130,9 @@ func app() (string, error) {
 
 	b, err := exec.Command("git", "config", "remote.heroku.url").Output()
 	if err != nil {
+		if isNotFound(err) {
+			return "", fmt.Errorf("could not find git remote heroku")
+		}
 		return "", err
 	}
 
@@ -142,6 +146,15 @@ func app() (string, error) {
 	flagApp = out[len(gitURLPre) : len(out)-len(gitURLSuf)]
 
 	return flagApp, nil
+}
+
+func isNotFound(err error) bool {
+	if ee, ok := err.(*exec.ExitError); ok {
+		if ws, ok := ee.ProcessState.Sys().(syscall.WaitStatus); ok {
+			return ws.ExitStatus() == 1
+		}
+	}
+	return false
 }
 
 func mustApp() string {
