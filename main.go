@@ -79,11 +79,9 @@ var (
 func main() {
 	defer updater.run() // doesn't run if os.Exit is called
 
-	flag.Usage = usage
-	flag.Parse()
 	log.SetFlags(0)
 
-	args := flag.Args()
+	args := os.Args[1:]
 	if len(args) < 1 {
 		usage()
 	}
