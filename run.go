@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"io"
 	"log"
-	"net"
 	"net/url"
 	"os"
 	"os/exec"
@@ -61,16 +60,15 @@ func runRun(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 
-	cn, err := net.Dial("tcp", u.Host)
+	cn, err := tls.Dial("tcp", u.Host, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tcn := tls.Client(cn, nil)
-	defer tcn.Close()
+	defer cn.Close()
 
-	br := bufio.NewReader(tcn)
+	br := bufio.NewReader(cn)
 
-	_, err = io.WriteString(tcn, u.Path[1:]+"\r\n")
+	_, err = io.WriteString(cn, u.Path[1:]+"\r\n")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,18 +98,15 @@ func runRun(cmd *Command, args []string) {
 		os.Exit(1)
 	}()
 
-	done := make(chan error)
-	go func() {
-		_, err := io.Copy(os.Stdout, br)
-		done <- err
-	}()
-	go func() {
-		_, err := io.Copy(tcn, os.Stdin)
-		done <- err
-	}()
+	cp := func(a io.Writer, b io.Reader, errc chan<- error) {
+		_, err := io.Copy(a, b)
+		errc <- err
+	}
 
-	err = <-done
-	if err != nil {
+	errc := make(chan error)
+	go cp(os.Stdout, br, errc)
+	go cp(cn, os.Stdin, errc)
+	if err = <-errc; err != nil {
 		log.Fatal(err)
 	}
 
