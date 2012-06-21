@@ -99,7 +99,13 @@ func main() {
 		}
 	}
 
-	maybeExecPlugin(args)
+	path := findPlugin(args[0])
+	if path == "" {
+		fmt.Fprintf(os.Stderr, "Unknown command/plugin: %s\n", args[0])
+		usage()
+	}
+	err := execPlugin(path, args)
+	log.Fatal("exec error: ", err)
 }
 
 func getCreds(u *url.URL) (user, pass string) {
