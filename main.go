@@ -99,8 +99,7 @@ func main() {
 		}
 	}
 
-	fmt.Fprintf(os.Stderr, "Unknown command: %s\n", args[0])
-	usage()
+	maybeExecPlugin(args)
 }
 
 func getCreds(u *url.URL) (user, pass string) {
