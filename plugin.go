@@ -17,7 +17,7 @@ func execPlugin(path string, args []string) error {
 	hkuser, hkpass := getCreds(u)
 	hkapp, _ := app()
 	env := []string{
-		"HEROKU_API_URL="+apiURL,
+		"HEROKU_API_URL=" + apiURL,
 		"HKAPP=" + hkapp,
 		"HKUSER=" + hkuser,
 		"HKPASS=" + hkpass,
