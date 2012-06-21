@@ -102,7 +102,7 @@ var cmdDestroy = &Command{
 func runDestroy(cmd *Command, args []string) {
 	if len(args) != 1 {
 		cmd.printUsage()
-		os.Exit(1)
+		os.Exit(2)
 	}
 
 	APIReq("DELETE", "/apps/"+args[0]).Do(nil)
