@@ -25,6 +25,12 @@ func APIReq(meth, path string) *Request {
 	req.SetBasicAuth(getCreds(req.URL))
 	req.Header.Add("User-Agent", "hk/"+Version+" ("+runtime.GOOS+"-"+runtime.GOARCH+")")
 	req.Header.Add("Accept", "application/json")
+	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
+		i := strings.Index(h, ":")
+		if i >= 0 {
+			req.Header.Add(h[:i], strings.TrimSpace(h[i+1:]))
+		}
+	}
 	return (*Request)(req)
 }
 
