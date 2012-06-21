@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 var cmdFetchUpdate = &Command{
@@ -67,6 +68,27 @@ func printUsage() {
 		}
 	}
 	fmt.Println()
+
+	fmt.Printf("Installed plugins are:\n\n")
+	for _, path := range strings.Split(hkPath, ":") {
+		d, err := os.Open(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				continue
+			}
+			log.Fatal(err)
+		}
+		names, err := d.Readdirnames(-1)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, name := range names {
+			fmt.Printf("  %-8s\n", name)
+		}
+	}
+
+	fmt.Println()
+	
 
 	fmt.Printf("See 'hk help [command]' for more information about a command.\n")
 }

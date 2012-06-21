@@ -8,6 +8,17 @@ import (
 	"syscall"
 )
 
+var hkPath string
+
+func init() {
+	const defaultPluginPath = "/usr/local/lib/hk/plugin"
+	hkPath = os.Getenv("HKPATH")
+	if hkPath == "" {
+		hkPath = defaultPluginPath
+	}
+
+}
+
 func execPlugin(path string, args []string) error {
 	u, err := url.Parse(apiURL)
 	if err != nil {
@@ -39,15 +50,9 @@ func findPlugin(name string) (path string) {
 
 // NOTE: lookupPlugin is not threadsafe for anything needing the PATH env var.
 func lookupPlugin(name string) string {
-	const defaultPluginPath = "/usr/local/lib/hk/plugin"
-	hkpath := os.Getenv("HKPATH")
-	if hkpath == "" {
-		hkpath = defaultPluginPath
-	}
-
 	opath := os.Getenv("PATH")
 	defer os.Setenv("PATH", opath)
-	os.Setenv("PATH", hkpath)
+	os.Setenv("PATH", hkPath)
 
 	path, err := exec.LookPath(name)
 	if err != nil {
