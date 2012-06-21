@@ -117,24 +117,32 @@ func getCreds(u *url.URL) (user, pass string) {
 	return m.Login, m.Password
 }
 
-func app() string {
+func app() (string, error) {
 	if flagApp != "" {
-		return flagApp
+		return flagApp, nil
 	}
 
 	b, err := exec.Command("git", "config", "remote.heroku.url").Output()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	out := strings.Trim(string(b), "\r\n ")
 
 	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
-		log.Fatal("could not find app name in heroku git remote")
+		return "", fmt.Errorf("could not find app name in heroku git remote")
 	}
 
 	// Memoize for later use
 	flagApp = out[len(gitURLPre) : len(out)-len(gitURLSuf)]
 
-	return flagApp
+	return flagApp, nil
+}
+
+func mustApp() string {
+	name, err := app()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return name
 }

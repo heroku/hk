@@ -26,7 +26,7 @@ func runInfo(cmd *Command, args []string) {
 		GitURL string `json:"git_url"`
 		WebURL string `json:"web_url"`
 	}
-	APIReq("GET", "/apps/"+app()).Do(&info)
+	APIReq("GET", "/apps/"+mustApp()).Do(&info)
 	fmt.Printf("Name:     %s\n", info.Name)
 	fmt.Printf("Owner:    %s\n", info.Owner)
 	fmt.Printf("Stack:    %s\n", info.Stack)
@@ -42,7 +42,7 @@ var cmdOpen = &Command{
 }
 
 func runOpen(cmd *Command, args []string) {
-	u := "https://" + app() + ".herokuapp.com/"
+	u := "https://" + mustApp() + ".herokuapp.com/"
 	command := "open"
 	if _, err := exec.LookPath("xdg-open"); err == nil {
 		command = "xdg-open"

@@ -19,7 +19,7 @@ func init() {
 
 func runEnv(cmd *Command, args []string) {
 	var config map[string]string
-	APIReq("GET", "/apps/"+app()+"/config_vars").Do(&config)
+	APIReq("GET", "/apps/"+mustApp()+"/config_vars").Do(&config)
 	for k, v := range config {
 		fmt.Printf("%s=%s\n", k, v)
 	}
@@ -44,7 +44,7 @@ func runGet(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help get'")
 	}
 	var config map[string]string
-	APIReq("GET", "/apps/"+app()+"/config_vars").Do(&config)
+	APIReq("GET", "/apps/"+mustApp()+"/config_vars").Do(&config)
 	value, found := config[args[0]]
 	if !found {
 		log.Fatalf("No such key as '%s'", args[0])
@@ -74,7 +74,7 @@ func runSet(cmd *Command, args []string) {
 		}
 		config[arg[:i]] = arg[i+1:]
 	}
-	r := APIReq("PUT", "/apps/"+app()+"/config_vars")
+	r := APIReq("PUT", "/apps/"+mustApp()+"/config_vars")
 	r.SetBodyJson(config)
 	r.Do(nil)
 }

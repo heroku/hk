@@ -28,7 +28,7 @@ func (p Procs) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
 func runPs(cmd *Command, args []string) {
 	var procs Procs
-	APIReq("GET", "/apps/"+app()+"/ps").Do(&procs)
+	APIReq("GET", "/apps/"+mustApp()+"/ps").Do(&procs)
 	sort.Sort(procs)
 	fmt.Printf("Process           State       Command\n")
 	fmt.Printf("----------------  ----------  ------------------------\n")

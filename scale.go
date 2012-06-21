@@ -39,7 +39,7 @@ func runScale(cmd *Command, args []string) {
 	var wg sync.WaitGroup
 	for ps, n := range todo {
 		wg.Add(1)
-		go scale(app(), ps, n, &wg)
+		go scale(mustApp(), ps, n, &wg)
 	}
 	wg.Wait()
 }

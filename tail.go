@@ -31,7 +31,7 @@ func runTail(cmd *Command, args []string) {
 		data.Add("tail", "1")
 	}
 
-	req := APIReq("GET", "/apps/"+app()+"/logs")
+	req := APIReq("GET", "/apps/"+mustApp()+"/logs")
 	req.SetBodyForm(data)
 	resp := checkResp(http.DefaultClient.Do((*http.Request)(req)))
 

@@ -47,7 +47,7 @@ func runRun(cmd *Command, args []string) {
 		Url *string `json:"rendezvous_url,omitempty"`
 	}{}
 
-	r := APIReq("POST", "/apps/"+app()+"/ps")
+	r := APIReq("POST", "/apps/"+mustApp()+"/ps")
 	r.SetBodyForm(data)
 	r.Do(&resp)
 
