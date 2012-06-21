@@ -67,7 +67,7 @@ func runList(cmd *Command, args []string) {
 
 var cmdCreate = &Command{
 	Run:   runCreate,
-	Usage: "create [name]",
+	Usage: "create [APP]",
 	Short: "create an app",
 	Long:  `Create creates a new heroku app.`,
 }
@@ -94,7 +94,7 @@ func runCreate(cmd *Command, args []string) {
 
 var cmdDestroy = &Command{
 	Run:   runDestroy,
-	Usage: "destroy <name>",
+	Usage: "destroy <APP>",
 	Short: "destroy an app",
 	Long:  `Destroy destroys a heroku app.`,
 }
