@@ -87,9 +87,20 @@ func printUsage() {
 		}
 	}
 
-	fmt.Println()
-	
+	env := `
+Environment:
 
+  HEROKU_API_URL
+    The beginning of the URL hk will use to make api requests in the format:
+    https://[username]:[password]@<host>[:port]
+  
+    This will override .netrc if set.
+  
+  HKHEADERS
+    A \n seperated list of headers to add to all API requests.
+`
+
+	fmt.Println(env)
 	fmt.Printf("See 'hk help [command]' for more information about a command.\n")
 }
 
