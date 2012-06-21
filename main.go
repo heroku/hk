@@ -131,7 +131,8 @@ func app() (string, error) {
 	b, err := exec.Command("git", "config", "remote.heroku.url").Output()
 	if err != nil {
 		if isNotFound(err) {
-			return "", fmt.Errorf("could not find git remote heroku")
+			wdir, _ := os.Getwd()
+			return "", fmt.Errorf("could not find git remote heroku in %s", wdir)
 		}
 		return "", err
 	}
