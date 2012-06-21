@@ -15,9 +15,10 @@ func execPlugin(path string, args []string) error {
 	}
 
 	hkuser, hkpass := getCreds(u)
+	u.User = url.UserPassword(hkuser, hkpass)
 	hkapp, _ := app()
 	env := []string{
-		"HEROKU_API_URL=" + apiURL,
+		"HEROKU_API_URL=" + u.String(),
 		"HKAPP=" + hkapp,
 		"HKUSER=" + hkuser,
 		"HKPASS=" + hkpass,
