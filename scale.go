@@ -36,11 +36,10 @@ func runScale(cmd *Command, args []string) {
 		todo[arg[:i]] = arg[i+1:]
 	}
 
-	appName := app()
 	var wg sync.WaitGroup
 	for ps, n := range todo {
 		wg.Add(1)
-		go scale(appName, ps, n, &wg)
+		go scale(app(), ps, n, &wg)
 	}
 	wg.Wait()
 }
