@@ -90,11 +90,11 @@ Plugins are executables located in HKPATH or, if HKPATH does not exist, in /usr/
 
 hk will set these environment variables for a plugin:
 
-HEROKU_API_URL - The url containing the username, password, and host to the api endpoint.
-HKAPP - The app as determined by the git heroku remote, if available.
-HKUSER - The username from either HEROKU_API_URL or .netrc
-HKPASS - The password from either HEROKU_API_URL or .netrc
-HKHOST - The hostname for the API endpoint
+* HEROKU_API_URL - The url containing the username, password, and host to the api endpoint.
+* HKAPP - The app as determined by the git heroku remote, if available.
+* HKUSER - The username from either HEROKU_API_URL or .netrc
+* HKPASS - The password from either HEROKU_API_URL or .netrc
+* HKHOST - The hostname for the API endpoint
 
 ### Development
 
