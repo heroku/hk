@@ -132,7 +132,7 @@ func app() string {
 	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
 		log.Fatal("could not find app name in heroku git remote")
 	}
-	
+
 	// Memoize for later use
 	flagApp = out[len(gitURLPre) : len(out)-len(gitURLSuf)]
 
