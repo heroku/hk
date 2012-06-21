@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"os/exec"
 )
 
@@ -99,6 +100,11 @@ var cmdDestroy = &Command{
 }
 
 func runDestroy(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(1)
+	}
+
 	APIReq("DELETE", "/apps/"+args[0]).Do(nil)
 	for _, remote := range gitRemotes(gitURL(args[0])) {
 		exec.Command("git", "remote", "rm", remote).Run()
