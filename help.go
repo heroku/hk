@@ -124,7 +124,7 @@ func printUsage() {
 		}
 	}
 
-	usageTemplate.Execute(os.Stdout, struct{
+	usageTemplate.Execute(os.Stdout, struct {
 		Commands []*Command
 		Plugins  []string
 	}{
