@@ -5,7 +5,36 @@ import (
 	"log"
 	"os"
 	"strings"
+	"text/template"
 )
+
+var helpEnviron = &Command{
+	Usage: "environ",
+	Short: "environment variables used by hk",
+	Long: `
+Several environment variables affect hk's behavior.
+
+HEROKU_API_URL
+
+  The base URL hk will use to make api requests in the format:
+  https://[username][:password]@<host>[:port]
+
+  If username and password are present in the URL, they will
+  override .netrc.
+
+HKHEADERS
+
+  A NL-separated list of headers to add to each API request.
+
+HKPATH
+
+  A list of directories to search for plugins. This variable takes
+  the same form as the system PATH var. If unset, the value is
+  taken to be "/usr/local/lib/hk/plugin" on Unix.
+
+  See 'hk help plugins' for information about the plugin interface.
+`,
+}
 
 var cmdFetchUpdate = &Command{
 	Run:   runFetchUpdate,
@@ -58,18 +87,26 @@ func runHelp(cmd *Command, args []string) {
 	os.Exit(2)
 }
 
+var usageTemplate = template.Must(template.New("usage").Parse(`Usage: hk [command] [options] [arguments]
+
+Supported commands are:
+{{range .Commands}}{{if .Runnable}}{{if .ShowUsage}}
+  {{.Name | printf "%-8s"}} {{.Short}}{{end}}{{end}}{{end}}
+{{range .Plugins}}
+  {{. | printf "%-8s"}} (plugin){{end}}
+
+See 'hk help [command]' for more information about a command.
+
+Additional help topics:
+{{range .Commands}}{{if not .Runnable}}
+  {{.Name | printf "%-8s"}} {{.Short}}{{end}}{{end}}
+
+See 'hk help [topic]' for more information about that topic.
+
+`))
+
 func printUsage() {
-	fmt.Printf("Usage: hk <command> [options] [arguments]\n\n")
-
-	fmt.Printf("Supported commands are:\n\n")
-	for _, cmd := range commands {
-		if cmd.Short != "" {
-			fmt.Printf("  %-8s   %s\n", cmd.Name(), cmd.Short)
-		}
-	}
-	fmt.Println()
-
-	fmt.Printf("Installed plugins are:\n\n")
+	var plugins []string
 	for _, path := range strings.Split(hkPath, ":") {
 		d, err := os.Open(path)
 		if err != nil {
@@ -83,25 +120,17 @@ func printUsage() {
 			log.Fatal(err)
 		}
 		for _, name := range names {
-			fmt.Printf("  %-8s\n", name)
+			plugins = append(plugins, name)
 		}
 	}
 
-	env := `
-Environment:
-
-  HEROKU_API_URL
-    The beginning of the URL hk will use to make api requests in the format:
-    https://[username]:[password]@<host>[:port]
-  
-    This will override .netrc if set.
-  
-  HKHEADERS
-    A \n seperated list of headers to add to all API requests.
-`
-
-	fmt.Println(env)
-	fmt.Printf("See 'hk help [command]' for more information about a command.\n")
+	usageTemplate.Execute(os.Stdout, struct{
+		Commands []*Command
+		Plugins  []string
+	}{
+		commands,
+		plugins,
+	})
 }
 
 func usage() {

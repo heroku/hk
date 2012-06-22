@@ -40,7 +40,9 @@ type Command struct {
 }
 
 func (c *Command) printUsage() {
-	fmt.Printf("Usage: hk %s\n\n", c.Usage)
+	if c.Runnable() {
+		fmt.Printf("Usage: hk %s\n\n", c.Usage)
+	}
 	fmt.Println(strings.TrimSpace(c.Long))
 }
 
@@ -51,6 +53,14 @@ func (c *Command) Name() string {
 		name = name[:i]
 	}
 	return name
+}
+
+func (c *Command) Runnable() bool {
+	return c.Run != nil
+}
+
+func (c *Command) ShowUsage() bool {
+	return c.Short != ""
 }
 
 // Running `hk help` will list commands in this order.
@@ -71,6 +81,9 @@ var commands = []*Command{
 	cmdRun,
 	cmdVersion,
 	cmdHelp,
+
+	helpEnviron,
+	helpPlugins,
 }
 
 var (
@@ -92,7 +105,7 @@ func main() {
 	}
 
 	for _, cmd := range commands {
-		if cmd.Name() == args[0] {
+		if cmd.Name() == args[0] && cmd.Run != nil {
 			cmd.Flag.Usage = usage
 			cmd.Flag.Parse(args[1:])
 			cmd.Run(cmd, cmd.Flag.Args())
@@ -102,7 +115,7 @@ func main() {
 
 	path := findPlugin(args[0])
 	if path == "" {
-		fmt.Fprintf(os.Stderr, "Unknown command/plugin: %s\n", args[0])
+		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", args[0])
 		usage()
 	}
 	err := execPlugin(path, args)
