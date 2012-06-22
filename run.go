@@ -18,7 +18,7 @@ var (
 
 var cmdRun = &Command{
 	Run:   runRun,
-	Usage: "run [-a APP] UTILITY [ARG ...]",
+	Usage: "run [-a app] command [arguments]",
 	Short: "run a process",
 	Long:  `Run a process on Heroku`,
 }

@@ -7,7 +7,7 @@ import (
 
 var cmdPs = &Command{
 	Run:   runPs,
-	Usage: "ps [-a APP]",
+	Usage: "ps [-a app]",
 	Short: "list processes",
 	Long:  `List app processes.`,
 }

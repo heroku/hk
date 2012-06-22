@@ -12,7 +12,7 @@ import (
 
 var cmdTail = &Command{
 	Run:   runTail,
-	Usage: "tail [-a APP] [-f] [-n LINES] [-s SOURCE] [-p PROCESS]",
+	Usage: "tail [-a app] [-f] [-n lines] [-s source] [-p process]",
 	Short: "tail log files",
 	Long:  `Tail tails log files.`,
 }

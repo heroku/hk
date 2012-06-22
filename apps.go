@@ -9,7 +9,7 @@ import (
 
 var cmdInfo = &Command{
 	Run:   runInfo,
-	Usage: "info [-a APP]",
+	Usage: "info [-a app]",
 	Short: "show app info",
 	Long:  `Info shows general information about the current app.`,
 }
@@ -67,7 +67,7 @@ func runList(cmd *Command, args []string) {
 
 var cmdCreate = &Command{
 	Run:   runCreate,
-	Usage: "create [APP]",
+	Usage: "create [app]",
 	Short: "create an app",
 	Long:  `Create creates a new heroku app.`,
 }
@@ -94,7 +94,7 @@ func runCreate(cmd *Command, args []string) {
 
 var cmdDestroy = &Command{
 	Run:   runDestroy,
-	Usage: "destroy <APP>",
+	Usage: "destroy <app>",
 	Short: "destroy an app",
 	Long:  `Destroy destroys a heroku app.`,
 }
