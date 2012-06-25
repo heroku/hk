@@ -14,6 +14,12 @@ import (
 	"strings"
 )
 
+func init() {
+	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = true
+	}
+}
+
 type Request http.Request
 
 func APIReq(meth, path string) *Request {

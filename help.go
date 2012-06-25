@@ -22,6 +22,10 @@ HEROKU_API_URL
   If username and password are present in the URL, they will
   override .netrc.
 
+HEROKU_SSL_VERIFY
+
+  When set to disable, hk will insecurly skip SSL verification.
+
 HKHEADERS
 
   A NL-separated list of headers to add to each API request.
