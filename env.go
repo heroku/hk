@@ -14,7 +14,10 @@ var cmdEnv = &Command{
 }
 
 func init() {
-	cmdEnv.Flag.StringVar(&flagApp, "a", "", "app")
+	cmds := []*Command{cmdEnv, cmdGet, cmdSet}
+	for _, c := range cmds {
+		c.Flag.StringVar(&flagApp, "a", "", "app")
+	}
 }
 
 func runEnv(cmd *Command, args []string) {
