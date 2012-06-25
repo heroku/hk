@@ -98,14 +98,14 @@ func runRun(cmd *Command, args []string) {
 		}()
 	}
 
-	cp := func(a io.Writer, b io.Reader, errc chan<- error) {
+	errc := make(chan error)
+	cp := func(a io.Writer, b io.Reader) {
 		_, err := io.Copy(a, b)
 		errc <- err
 	}
 
-	errc := make(chan error)
-	go cp(os.Stdout, br, errc)
-	go cp(cn, os.Stdin, errc)
+	go cp(os.Stdout, br)
+	go cp(cn, os.Stdin)
 	if err = <-errc; err != nil {
 		log.Fatal(err)
 	}
