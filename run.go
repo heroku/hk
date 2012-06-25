@@ -31,8 +31,6 @@ func init() {
 func stty(args ...string) *exec.Cmd {
 	c := exec.Command("stty", args...)
 	c.Stdin = os.Stdin
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
 	return c
 }
 
@@ -83,20 +81,22 @@ func runRun(cmd *Command, args []string) {
 		}
 	}
 
-	err = stty("-icanon", "-echo").Run()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer stty("icanon", "echo").Run()
+	if isTerminal(os.Stdin) && isTerminal(os.Stdout) {
+		err = stty("-icanon", "-echo").Run()
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer stty("icanon", "echo").Run()
 
-	sig := make(chan os.Signal)
-	signal.Notify(sig)
-	go func() {
-		<-sig
-		// This will get called after the first os.Exit()
-		stty("icanon", "echo").Run()
-		os.Exit(1)
-	}()
+		sig := make(chan os.Signal)
+		signal.Notify(sig)
+		go func() {
+			<-sig
+			// This will get called after the first os.Exit()
+			stty("icanon", "echo").Run()
+			os.Exit(1)
+		}()
+	}
 
 	cp := func(a io.Writer, b io.Reader, errc chan<- error) {
 		_, err := io.Copy(a, b)
@@ -109,6 +109,4 @@ func runRun(cmd *Command, args []string) {
 	if err = <-errc; err != nil {
 		log.Fatal(err)
 	}
-
-	stty("icanon", "echo").Run()
 }
