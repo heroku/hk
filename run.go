@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"strings"
+	"syscall"
 )
 
 var (
@@ -89,12 +90,19 @@ func runRun(cmd *Command, args []string) {
 		defer stty("icanon", "echo").Run()
 
 		sig := make(chan os.Signal)
-		signal.Notify(sig)
+		signal.Notify(sig, os.Signal(syscall.SIGQUIT), os.Interrupt)
 		go func() {
-			<-sig
-			// This will get called after the first os.Exit()
-			stty("icanon", "echo").Run()
-			os.Exit(1)
+			defer stty("icanon", "echo").Run()
+			for sg := range sig {
+				switch sg {
+				case os.Interrupt:
+					cn.Write([]byte{3})
+				case os.Signal(syscall.SIGQUIT):
+					cn.Write([]byte{28})
+				default:
+					panic("not reached")
+				}
+			}
 		}()
 	}
 
