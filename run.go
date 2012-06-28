@@ -35,10 +35,23 @@ func stty(args ...string) *exec.Cmd {
 	return c
 }
 
+func tput(what string) string {
+	c := exec.Command("tput", what)
+	c.Stdin = os.Stdin
+	out, err := c.Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.TrimSpace(string(out))
+}
+
 func runRun(cmd *Command, args []string) {
 	data := make(url.Values)
 	if !detachedRun {
 		data.Add("attach", "true")
+		data.Add("ps_env[TERM]", os.Getenv("TERM"))
+		data.Add("ps_env[COLUMNS]", tput("cols"))
+		data.Add("ps_env[LINES]", tput("lines"))
 	}
 	data.Add("command", strings.Join(args, " "))
 
