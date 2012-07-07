@@ -37,7 +37,7 @@ func stty(args ...string) *exec.Cmd {
 
 func tput(what string) string {
 	c := exec.Command("tput", what)
-	c.Stdin = os.Stdin
+	c.Stderr = os.Stderr
 	out, err := c.Output()
 	if err != nil {
 		log.Fatal(err)
