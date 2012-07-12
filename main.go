@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	Version = "0.6"
+	Version = "0.2"
 )
 
 var (
@@ -92,17 +92,18 @@ var (
 )
 
 func main() {
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		apiURL = strings.TrimRight(s, "/")
+	}
+	if s := os.Getenv("HKURL"); s != "" {
+		updater.url = strings.TrimRight(s, "/") + "/"
+	}
 	defer updater.run() // doesn't run if os.Exit is called
-
 	log.SetFlags(0)
 
 	args := os.Args[1:]
 	if len(args) < 1 {
 		usage()
-	}
-
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		apiURL = strings.TrimRight(s, "/")
 	}
 
 	for _, cmd := range commands {

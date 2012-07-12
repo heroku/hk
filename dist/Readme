@@ -1,9 +1,0 @@
-web app for distributing hk binaries and updates.
-
-it logs a json message for each recognized update
-or download request.
-
-env vars:
-
-  CURVER     the current version string, e.g. 0.5
-  HTTPSONLY  if nonempty, reject non-https access and set HSTS

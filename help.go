@@ -17,10 +17,12 @@ Several environment variables affect hk's behavior.
 HEROKU_API_URL
 
   The base URL hk will use to make api requests in the format:
-  https://[username][:password]@<host>[:port]
+  https://[username][:password]@<host>[:port]/
 
   If username and password are present in the URL, they will
   override .netrc.
+
+  Its default value is https://api.heroku.com/
 
 HEROKU_SSL_VERIFY
 

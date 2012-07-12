@@ -1,1 +1,2 @@
-web: dist
+web: hkdist
+gen: hkdist gen

@@ -180,7 +180,8 @@ func (u *Updater) fetchAndApply() {
 	}
 
 	plat := runtime.GOOS + "-" + runtime.GOARCH
-	resp, err := http.Get(u.url + plat + "/" + Version + "/next.hkdiff")
+	name := "hk-" + Version + "-next-" + plat + ".hkdiff"
+	resp, err := http.Get(u.url + name)
 	if err != nil {
 		log.Fatal(err)
 	}
