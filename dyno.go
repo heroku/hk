@@ -11,16 +11,16 @@ import (
 var cmdPs = &Command{
 	Run:   runPs,
 	Usage: "ps [-a app]",
-	Short: "list processes",
-	Long:  `List app processes.`,
+	Short: "list running dynos",
+	Long:  `List app's running dynos.`,
 }
 
 var cmdRestart = &Command{
 	Run:   runRestart,
 	Usage: "restart [-a app] [type or name]",
-	Short: "restart processes",
+	Short: "restart dynos",
 	Long: `
-Restart all app processes, all processes of a specific type, or a single process.
+Restart all app dynos, all dynos of a specific type, or a single dyno.
 
 Examples:
 
