@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/url"
 	"sort"
+	"strings"
 )
 
 var cmdPs = &Command{
@@ -14,9 +17,17 @@ var cmdPs = &Command{
 
 var cmdRestart = &Command{
 	Run:   runRestart,
-	Usage: "restart [-a app]",
+	Usage: "restart [-a app] [type or name]",
 	Short: "restart processes",
-	Long:  `Restart app processes.`,
+	Long: `
+Restart all app processes, all processes of a specific type, or a single process.
+
+Examples:
+
+  $ hk restart
+  $ hk restart web
+  $ hk restart web.1
+`,
 }
 
 func init() {
@@ -48,5 +59,21 @@ func runPs(cmd *Command, args []string) {
 }
 
 func runRestart(cmd *Command, args []string) {
-	APIReq("POST", "/apps/"+mustApp()+"/ps/restart").Do(nil)
+	if len(args) > 1 {
+		log.Fatal("Invalid usage. See 'hk help restart'")
+	}
+
+	v := make(url.Values)
+
+	if len(args) == 1 {
+		if strings.Index(args[0], ".") > 0 {
+			v.Add("ps", args[0])
+		} else {
+			v.Add("type", args[0])
+		}
+	}
+
+	req := APIReq("POST", "/apps/"+mustApp()+"/ps/restart")
+	req.SetBodyForm(v)
+	req.Do(nil)
 }
