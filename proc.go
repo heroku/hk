@@ -12,8 +12,18 @@ var cmdPs = &Command{
 	Long:  `List app processes.`,
 }
 
+var cmdRestart = &Command{
+	Run:   runRestart,
+	Usage: "restart [-a app]",
+	Short: "restart processes",
+	Long:  `Restart app processes.`,
+}
+
 func init() {
-	cmdPs.Flag.StringVar(&flagApp, "a", "", "app")
+	cmds := []*Command{cmdPs, cmdRestart}
+	for _, c := range cmds {
+		c.Flag.StringVar(&flagApp, "a", "", "app")
+	}
 }
 
 type Procs []*struct {
@@ -35,4 +45,8 @@ func runPs(cmd *Command, args []string) {
 	for _, proc := range procs {
 		fmt.Printf("%-16s  %-10s  %s\n", proc.Name, proc.State, proc.Command)
 	}
+}
+
+func runRestart(cmd *Command, args []string) {
+	APIReq("POST", "/apps/"+mustApp()+"/ps/restart").Do(nil)
 }

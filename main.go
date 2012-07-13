@@ -77,6 +77,7 @@ var commands = []*Command{
 	cmdOpen,
 	cmdPs,
 	cmdScale,
+	cmdRestart,
 	cmdTail,
 	cmdRun,
 	cmdVersion,
