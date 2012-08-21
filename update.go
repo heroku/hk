@@ -63,8 +63,14 @@ func (u *Updater) run() {
 
 func (u *Updater) wantUpdate() bool {
 	wait := 24*time.Hour + time.Duration(rand.Int63n(int64(24*time.Hour)))
-	return nowUTC().After(readTimestamp(u.dir+upcktimePath)) &&
+	return u.enabled() &&
+		nowUTC().After(readTimestamp(u.dir+upcktimePath)) &&
 		writeTimestamp(u.dir+upcktimePath, wait)
+}
+
+func (u *Updater) enabled() bool {
+	_, err := os.Stat(hkHome+"/noupdate")
+	return err != nil
 }
 
 func (u *Updater) fetchAndApply() error {
