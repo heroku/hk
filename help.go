@@ -42,14 +42,16 @@ HKPATH
 `,
 }
 
-var cmdFetchUpdate = &Command{
-	Run:   runFetchUpdate,
-	Usage: "fetch-update",
-	Long:  `Downloads the next version of hk for later installation.`,
+var cmdUpdate = &Command{
+	Run:   runUpdate,
+	Usage: "update",
+	Long:  `Downloads and installs the next version of hk.`,
 }
 
-func runFetchUpdate(cmd *Command, args []string) {
-	updater.fetchAndApply()
+func runUpdate(cmd *Command, args []string) {
+	if err := updater.fetchAndApply(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 var cmdVersion = &Command{

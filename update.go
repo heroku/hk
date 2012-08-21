@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/binary"
-	"fmt"
 	"github.com/kr/binarydist"
 	"io"
 	"io/ioutil"
@@ -20,11 +19,7 @@ import (
 
 var magic = [8]byte{'h', 'k', 'D', 'I', 'F', 'F', '0', '1'}
 
-const (
-	upcktimePath  = "cktime"
-	upasktimePath = "asktime"
-	upnextPath    = "hk.next"
-)
+const upcktimePath = "cktime"
 
 func readTimestamp(path string) time.Time {
 	p, err := ioutil.ReadFile(path)
@@ -54,13 +49,6 @@ func nowUTC() time.Time {
 	return time.Now().UTC()
 }
 
-// isTerminal returns true if f is a terminal.
-func isTerminal(f *os.File) bool {
-	cmd := exec.Command("test", "-t", "0")
-	cmd.Stdin = f
-	return cmd.Run() == nil
-}
-
 type Updater struct {
 	url string
 	dir string
@@ -68,122 +56,33 @@ type Updater struct {
 
 func (u *Updater) run() {
 	os.MkdirAll(u.dir, 0777)
-	switch {
-	case u.wantInstall():
-		u.askAndInstall()
-	case u.wantDownload():
-		u.bgFetch()
+	if u.wantUpdate() {
+		exec.Command("hk", "update").Start()
 	}
 }
 
-func (u *Updater) wantInstall() bool {
-	s, err := os.Stat(u.dir + upnextPath)
-	if err != nil {
-		return false // no update has been downloaded, or some other error
-	}
-
-	if s.Mode()&os.ModeType != 0 { // not a regular file?
-		return false
-	}
-
-	return nowUTC().After(readTimestamp(u.dir + upasktimePath))
+func (u *Updater) wantUpdate() bool {
+	wait := 24*time.Hour + time.Duration(rand.Int63n(int64(24*time.Hour)))
+	return nowUTC().After(readTimestamp(u.dir+upcktimePath)) &&
+		writeTimestamp(u.dir+upcktimePath, wait)
 }
 
-func (u *Updater) askAndInstall() {
-	// Only try to ask if both stdin and stdout are ttys.
-	if !isTerminal(os.Stdin) || !isTerminal(os.Stdout) {
-		return
-	}
-
-	if !writeTimestamp(u.dir+upasktimePath, time.Hour) {
-		// If we can't update the timestamp, we won't be able to
-		// rate-limit our user prompt, so don't ask at all.
-		return
-	}
-
+func (u *Updater) fetchAndApply() error {
 	instPath, err := exec.LookPath("hk")
 	if err != nil {
-		return
-	}
-
-	ver, err := exec.Command(u.dir+upnextPath, "version").Output()
-	if err != nil {
-		return
-	}
-	fmt.Printf("\n\nUpdate hk %s has been downloaded.\n", string(bytes.TrimSpace(ver)))
-	fmt.Print("Install? ([y]/n) ")
-	line, _, err := stdin.ReadLine()
-	line = bytes.TrimSpace(line)
-	if err != nil || (len(line) > 0 && line[0] == 'n') {
-		return
-	}
-
-	srcf, err := os.Open(u.dir + upnextPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	instDir := path.Dir(instPath)
-	dstf, err := os.OpenFile(instDir+"/.hk.part", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = io.Copy(dstf, srcf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	srcf.Close()
-	err = dstf.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = os.Rename(instDir+"/.hk.part", instPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = os.Remove(u.dir + upnextPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func (u *Updater) wantDownload() bool {
-	if nowUTC().After(readTimestamp(u.dir + upcktimePath)) {
-		wait := 24*time.Hour + time.Duration(rand.Int63n(int64(24*time.Hour)))
-		if !writeTimestamp(u.dir+upcktimePath, wait) {
-			return false
-		}
-
-		_, err := os.Stat(u.dir + upnextPath)
-		return err != nil
-	}
-	return false
-}
-
-func (u *Updater) bgFetch() {
-	exec.Command("hk", "fetch-update").Start()
-}
-
-func (u *Updater) fetchAndApply() {
-	instPath, err := exec.LookPath("hk")
-	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	old, err := os.Open(instPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	plat := runtime.GOOS + "-" + runtime.GOARCH
 	name := "hk-" + Version + "-next-" + plat + ".hkdiff"
 	resp, err := http.Get(u.url + name)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer resp.Body.Close()
 
@@ -199,7 +98,7 @@ func (u *Updater) fetchAndApply() {
 	}
 	err = binary.Read(resp.Body, binary.BigEndian, &header)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if header.Magic != magic {
@@ -208,59 +107,56 @@ func (u *Updater) fetchAndApply() {
 
 	patch, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	if !sha1matches(header.OldHash, old) {
+	if readSha1(old) != header.OldHash {
 		log.Fatal("existing version hash match update")
 	}
 
-	if !sha1matches(header.DiffHash, bytes.NewReader(patch)) {
+	if readSha1(bytes.NewReader(patch)) != header.DiffHash {
 		log.Fatal("bad patch file")
 	}
 
 	_, err = old.Seek(0, 0)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	part := u.dir + upnextPath + ".part"
-	newPart, err := os.OpenFile(part, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
+	var buf bytes.Buffer
+	err = binarydist.Patch(old, &buf, bytes.NewReader(patch))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	err = binarydist.Patch(old, newPart, bytes.NewReader(patch))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = newPart.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	newPart, err = os.Open(part)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if !sha1matches(header.NewHash, newPart) {
+	if readSha1(bytes.NewReader(buf.Bytes())) != header.NewHash {
 		log.Fatal("checksum mismatch after patch")
 	}
 
-	err = os.Rename(part, u.dir+upnextPath)
+	part := path.Dir(instPath) + "/.hk.part"
+	dstf, err := os.OpenFile(part, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	defer os.Remove(part)
+
+	_, err = dstf.Write(buf.Bytes())
+	if err != nil {
+		return err
+	}
+
+	err = dstf.Close()
+	if err != nil {
+		return err
+	}
+
+	return os.Rename(part, instPath)
 }
 
-func sha1matches(h [sha1.Size]byte, r io.Reader) bool {
-	var n [sha1.Size]byte
+func readSha1(r io.Reader) (h [sha1.Size]byte) {
 	s := sha1.New()
-	_, err := io.Copy(s, r)
-	if err != nil {
-		return false
+	if _, err := io.Copy(s, r); err == nil {
+		s.Sum(h[:0])
 	}
-	s.Sum(n[:0])
-	return h == n
+	return h
 }

@@ -69,7 +69,7 @@ var commands = []*Command{
 	cmdDestroy,
 	cmdCreds,
 	cmdEnv,
-	cmdFetchUpdate,
+	cmdUpdate,
 	cmdGet,
 	cmdSet,
 	cmdInfo,

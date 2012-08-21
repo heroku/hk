@@ -131,3 +131,10 @@ func runRun(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 }
+
+// isTerminal returns true if f is a terminal.
+func isTerminal(f *os.File) bool {
+	cmd := exec.Command("test", "-t", "0")
+	cmd.Stdin = f
+	return cmd.Run() == nil
+}
