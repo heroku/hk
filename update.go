@@ -57,7 +57,13 @@ type Updater struct {
 func (u *Updater) run() {
 	os.MkdirAll(u.dir, 0777)
 	if u.wantUpdate() {
-		exec.Command("hk", "update").Start()
+		l := exec.Command("logger", "-thk")
+		c := exec.Command("hk", "update")
+		if w, err := l.StdinPipe(); err == nil && l.Start() == nil {
+			c.Stdout = w
+			c.Stderr = w
+		}
+		c.Start()
 	}
 }
 
@@ -117,7 +123,7 @@ func (u *Updater) fetchAndApply() error {
 	}
 
 	if readSha1(old) != header.OldHash {
-		log.Fatal("existing version hash match update")
+		log.Fatal("old hash mismatch")
 	}
 
 	if readSha1(bytes.NewReader(patch)) != header.DiffHash {
