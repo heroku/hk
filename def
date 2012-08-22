@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Publishes binary hk to the distribution app.
-# Does not make this version the default.
+# Makes binary hk the default version.
+# It must have been published already.
 
 set -e
 
@@ -11,5 +11,4 @@ fi
 
 eval $(go tool dist env)
 ver=$(./hk version)
-curl -nsT hk $HKURL/hk-$ver-$GOOS-$GOARCH
 curl -nd $ver $HKURL/hk-$GOOS-$GOARCH

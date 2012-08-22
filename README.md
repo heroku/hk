@@ -109,5 +109,5 @@ hk will set these environment variables for a plugin:
 	$ cd hk
 	$ vim main.go # edit Version
 	$ go build
-	$ ./mkpatch oldver1 oldver2...
-	# put OS-ARCH-hk.gz and OS-ARCH-VER-next.hkdiff online
+	$ ./pub # publish a release
+	$ ./def # make it the default
