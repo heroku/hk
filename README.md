@@ -109,5 +109,5 @@ hk will set these environment variables for a plugin:
 	$ cd hk
 	$ vim main.go # edit Version
 	$ go build
-	$ ./pub # publish a release
-	$ ./def # make it the default
+	$ ./pub # publish ./hk
+	$ ./def # make `./hk version` the default
