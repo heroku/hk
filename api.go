@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,7 +17,7 @@ import (
 
 func init() {
 	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig.InsecureSkipVerify = true
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 }
 
