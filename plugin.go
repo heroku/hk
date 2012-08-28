@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -53,6 +55,22 @@ HKAPP
 HKVERSION
 
   The version string of hk that executed the plugin.
+
+HKPLUGINMODE
+
+  Either unset or it takes the value "info". If set to info, the
+  plugin should print out a summary of itself in the following
+  format:
+
+    name version: short help
+
+    long help
+
+  Where name is the plugin's file name, version is the plugin's
+  version string, short help is a one-line help message at most 50 chars,
+  and long help is a complete help text including usage line, prose
+  description, and list of options. Plugins are encouraged to follow the
+  example set by built-in hk commands for the style of this documentation.
 `,
 }
 
@@ -110,4 +128,43 @@ func lookupPlugin(name string) string {
 		log.Fatal(err)
 	}
 	return path
+}
+
+type plugin string
+
+func (p plugin) Name() string {
+	return string(p)
+}
+
+func (p plugin) Short() string {
+	_, short, _ := pluginInfo(string(p))
+	return short
+}
+
+func pluginInfo(name string) (ver, short, long string) {
+	if os.Getenv("HKPLUGINMODE") == "info" {
+		return "", "[plugin exec loop]", "[plugin exec loop]\n"
+	}
+	var cmd exec.Cmd
+	cmd.Args = []string{name}
+	cmd.Path = lookupPlugin(name)
+	cmd.Env = append([]string{"HKPLUGINMODE=info"}, os.Environ()...)
+	buf, err := cmd.Output()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return "", "[unknown description]", "[unknown description]\n"
+	}
+	info := string(buf)
+	if !strings.HasPrefix(info, name+" ") {
+		return "", "[unknown description]", "[unknown description]\n"
+	}
+	info = info[len(name)+1:]
+	i := strings.Index(info, ": ")
+	ver, info = info[:i], info[i+2:]
+	i = strings.Index(info, "\n\n")
+	short, long = info[:i], info[i+2:]
+	if len(short) > 50 || strings.Contains(short, "\n") {
+		return "", "[unknown description]", "[unknown description]\n"
+	}
+	return ver, short, long
 }

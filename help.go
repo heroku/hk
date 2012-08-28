@@ -91,6 +91,12 @@ func runHelp(cmd *Command, args []string) {
 		}
 	}
 
+	if lookupPlugin(args[0]) != "" {
+		_, _, long := pluginInfo(string(args[0]))
+		fmt.Print(long)
+		return
+	}
+
 	fmt.Fprintf(os.Stderr, "Unknown help topic: %q. Run 'hk help'.\n", args[0])
 	os.Exit(2)
 }
@@ -101,7 +107,7 @@ Supported commands are:
 {{range .Commands}}{{if .Runnable}}{{if .ShowUsage}}
   {{.Name | printf "%-8s"}} {{.Short}}{{end}}{{end}}{{end}}
 {{range .Plugins}}
-  {{. | printf "%-8s"}} (plugin){{end}}
+  {{.Name | printf "%-8s"}} {{.Short}} (plugin){{end}}
 
 See 'hk help [command]' for more information about a command.
 
@@ -114,7 +120,7 @@ See 'hk help [topic]' for more information about that topic.
 `))
 
 func printUsage() {
-	var plugins []string
+	var plugins []plugin
 	for _, path := range strings.Split(hkPath, ":") {
 		d, err := os.Open(path)
 		if err != nil {
@@ -128,13 +134,13 @@ func printUsage() {
 			log.Fatal(err)
 		}
 		for _, name := range names {
-			plugins = append(plugins, name)
+			plugins = append(plugins, plugin(name))
 		}
 	}
 
 	usageTemplate.Execute(os.Stdout, struct {
 		Commands []*Command
-		Plugins  []string
+		Plugins  []plugin
 	}{
 		commands,
 		plugins,
