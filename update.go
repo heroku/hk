@@ -75,7 +75,7 @@ func (u *Updater) wantUpdate() bool {
 }
 
 func (u *Updater) enabled() bool {
-	_, err := os.Stat(hkHome+"/noupdate")
+	_, err := os.Stat(hkHome + "/noupdate")
 	return err != nil
 }
 
