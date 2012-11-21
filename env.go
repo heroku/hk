@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -23,8 +24,13 @@ func init() {
 func runEnv(cmd *Command, args []string) {
 	var config map[string]string
 	APIReq("GET", "/apps/"+mustApp()+"/config_vars").Do(&config)
-	for k, v := range config {
-		fmt.Printf("%s=%s\n", k, v)
+	var configKeys []string
+	for k := range config {
+		configKeys = append(configKeys, k)
+	}
+	sort.Strings(configKeys)
+	for _, k := range configKeys {
+		fmt.Printf("%s=%s\n", k, config[k])
 	}
 }
 
