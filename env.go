@@ -76,6 +76,9 @@ Example:
 }
 
 func runSet(cmd *Command, args []string) {
+	if len(args) < 1 {
+		log.Fatal("Invalid usage. See 'hk help set'")
+	}
 	config := make(map[string]string)
 	for _, arg := range args {
 		i := strings.Index(arg, "=")
