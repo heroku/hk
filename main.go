@@ -80,6 +80,7 @@ var commands = []*Command{
 	cmdRestart,
 	cmdTail,
 	cmdRun,
+	cmdUnset,
 	cmdVersion,
 	cmdHelp,
 

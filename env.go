@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"sort"
 	"strings"
 )
@@ -15,7 +16,7 @@ var cmdEnv = &Command{
 }
 
 func init() {
-	cmds := []*Command{cmdEnv, cmdGet, cmdSet}
+	cmds := []*Command{cmdEnv, cmdGet, cmdSet, cmdUnset}
 	for _, c := range cmds {
 		c.Flag.StringVar(&flagApp, "a", "", "app")
 	}
@@ -86,4 +87,27 @@ func runSet(cmd *Command, args []string) {
 	r := APIReq("PUT", "/apps/"+mustApp()+"/config_vars")
 	r.SetBodyJson(config)
 	r.Do(nil)
+}
+
+var cmdUnset = &Command{
+	Run:   runUnset,
+	Usage: "unset [-a app] <name> ...",
+	Short: "unset config var",
+	Long: `
+Unset a config var.
+
+Example:
+
+  $ hk unset BUILDPACK_URL
+`,
+}
+
+func runUnset(cmd *Command, args []string) {
+	if len(args) < 1 {
+		log.Fatal("Invalid usage. See 'hk help unset'")
+	}
+	for _, key := range args {
+		r := APIReq("DELETE", "/apps/"+mustApp()+"/config_vars/"+url.QueryEscape(key))
+		r.Do(nil)
+	}
 }
