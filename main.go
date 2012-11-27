@@ -72,6 +72,7 @@ var commands = []*Command{
 	cmdUpdate,
 	cmdGet,
 	cmdSet,
+	cmdUnset,
 	cmdInfo,
 	cmdList,
 	cmdOpen,
@@ -80,7 +81,6 @@ var commands = []*Command{
 	cmdRestart,
 	cmdTail,
 	cmdRun,
-	cmdUnset,
 	cmdVersion,
 	cmdHelp,
 
