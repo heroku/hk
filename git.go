@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"log"
 	"os/exec"
 )
 
@@ -18,7 +17,7 @@ func gitURL(app string) string {
 func gitRemotes(url string) (names []string) {
 	out, err := exec.Command("git", "remote", "-v").Output()
 	if err != nil {
-		log.Fatal(err)
+		return nil
 	}
 	for _, line := range bytes.Split(out, []byte{'\n'}) {
 		if i := bytes.IndexByte(line, '\t'); i >= 0 {
