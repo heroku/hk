@@ -107,7 +107,6 @@ func runUnset(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help unset'")
 	}
 	for _, key := range args {
-		r := APIReq("DELETE", "/apps/"+mustApp()+"/config_vars/"+url.QueryEscape(key))
-		r.Do(nil)
+		APIReq("DELETE", "/apps/"+mustApp()+"/config_vars/"+url.QueryEscape(key)).Do(nil)
 	}
 }
