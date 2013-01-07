@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 )
@@ -18,8 +19,9 @@ const (
 )
 
 var (
-	apiURL = "https://api.heroku.com"
-	hkHome = os.Getenv("HOME") + "/.hk"
+	apiURL    = "https://api.heroku.com"
+	hkHome    = filepath.Join(homePath, ".hk")
+	netrcPath = filepath.Join(os.Getenv("HOME"), ".netrc")
 )
 
 var stdin = bufio.NewReader(os.Stdin)
@@ -131,7 +133,7 @@ func getCreds(u *url.URL) (user, pass string) {
 		return u.User.Username(), pw
 	}
 
-	m, err := netrc.FindMachine(os.Getenv("HOME")+"/.netrc", u.Host)
+	m, err := netrc.FindMachine(netrcPath, u.Host)
 	if err != nil {
 		log.Fatalf("netrc error (%s): %v", u.Host, err)
 	}
