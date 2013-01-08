@@ -3,12 +3,13 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
+	"github.com/kr/hk/term"
 	"io"
 	"log"
 	"net/url"
 	"os"
-	"os/exec"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -29,29 +30,21 @@ func init() {
 	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
 }
 
-func stty(args ...string) *exec.Cmd {
-	c := exec.Command("stty", args...)
-	c.Stdin = os.Stdin
-	return c
-}
-
-func tput(what string) string {
-	c := exec.Command("tput", what)
-	c.Stderr = os.Stderr
-	out, err := c.Output()
+func runRun(cmd *Command, args []string) {
+	cols, err := term.Cols()
 	if err != nil {
 		log.Fatal(err)
 	}
-	return strings.TrimSpace(string(out))
-}
-
-func runRun(cmd *Command, args []string) {
+	lines, err := term.Lines()
+	if err != nil {
+		log.Fatal(err)
+	}
 	data := make(url.Values)
 	if !detachedRun {
 		data.Add("attach", "true")
 		data.Add("ps_env[TERM]", os.Getenv("TERM"))
-		data.Add("ps_env[COLUMNS]", tput("cols"))
-		data.Add("ps_env[LINES]", tput("lines"))
+		data.Add("ps_env[COLUMNS]", strconv.Itoa(cols))
+		data.Add("ps_env[LINES]", strconv.Itoa(lines))
 	}
 	data.Add("command", strings.Join(args, " "))
 
@@ -95,17 +88,17 @@ func runRun(cmd *Command, args []string) {
 		}
 	}
 
-	if isTerminal(os.Stdin) && isTerminal(os.Stdout) {
-		err = stty("-icanon", "-echo").Run()
+	if term.IsTerminal(os.Stdin) && term.IsTerminal(os.Stdout) {
+		err = term.MakeRaw(os.Stdin)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer stty("icanon", "echo").Run()
+		defer term.Restore(os.Stdin)
 
 		sig := make(chan os.Signal)
 		signal.Notify(sig, os.Signal(syscall.SIGQUIT), os.Interrupt)
 		go func() {
-			defer stty("icanon", "echo").Run()
+			defer term.Restore(os.Stdin)
 			for sg := range sig {
 				switch sg {
 				case os.Interrupt:
@@ -130,11 +123,4 @@ func runRun(cmd *Command, args []string) {
 	if err = <-errc; err != nil {
 		log.Fatal(err)
 	}
-}
-
-// isTerminal returns true if f is a terminal.
-func isTerminal(f *os.File) bool {
-	cmd := exec.Command("test", "-t", "0")
-	cmd.Stdin = f
-	return cmd.Run() == nil
 }
