@@ -2,58 +2,59 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha1"
-	"encoding/binary"
+	"crypto/sha256"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/kr/binarydist"
 	"io"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 	"time"
 )
 
-var (
-	magic = [8]byte{'h', 'k', 'D', 'I', 'F', 'F', '0', '1'}
+const (
+	upcktimePath = "cktime"
+	plat         = runtime.GOOS + "-" + runtime.GOARCH
 )
 
-const upcktimePath = "cktime"
-
-func readTimestamp(path string) time.Time {
-	p, err := ioutil.ReadFile(path)
-	if err != nil {
-		// if the file is missing, treat it as old
-		if os.IsNotExist(err) {
-			return time.Time{}
-		}
-
-		// for any other error, treat it as new
-		return nowUTC().Add(1000 * time.Hour)
-	}
-
-	t, err := time.Parse(time.RFC3339, string(p))
-	if err != nil {
-		return nowUTC().Add(1000 * time.Hour)
-	}
-	return t
-}
-
-func writeTimestamp(path string, d time.Duration) bool {
-	t := nowUTC().Add(d)
-	return ioutil.WriteFile(path, []byte(t.Format(time.RFC3339)), 0644) == nil
-}
-
-func nowUTC() time.Time {
-	return time.Now().UTC()
-}
-
+// Update protocol.
+//
+//   GET hk.heroku.com/hk-current-linux-amd64.json
+//
+//   200 ok
+//   {
+//       "Version": "2",
+//       "Sha256": "..." // base64
+//   }
+//
+// then
+//
+//   GET hkpatch.s3.amazonaws.com/hk-1-linux-amd64-to-2
+//
+//   200 ok
+//   [bsdiff data]
+//
+// or
+//
+//   GET hkdist.s3.amazonaws.com/hk-2-linux-amd64.gz
+//
+//   200 ok
+//   [gzipped executable data]
 type Updater struct {
-	url string
-	dir string
+	hkURL   string
+	binURL  string
+	diffURL string
+	dir     string
+	info    struct {
+		Version   string
+		CmdSha256 []byte
+	}
 }
 
 func (u *Updater) run() {
@@ -70,107 +71,126 @@ func (u *Updater) run() {
 }
 
 func (u *Updater) wantUpdate() bool {
-	wait := 24*time.Hour + time.Duration(rand.Int63n(int64(24*time.Hour)))
-	return u.enabled() &&
-		nowUTC().After(readTimestamp(u.dir+upcktimePath)) &&
-		writeTimestamp(u.dir+upcktimePath, wait)
+	path := u.dir + upcktimePath
+	if Version == "dev" || readTime(path).After(time.Now()) {
+		return false
+	}
+	wait := 24*time.Hour + randDuration(24*time.Hour)
+	return writeTime(path, time.Now().Add(wait))
 }
 
-func (u *Updater) enabled() bool {
-	_, err := os.Stat(hkHome + "/noupdate")
-	return err != nil
+func (u *Updater) update() error {
+	path, err := exec.LookPath("hk")
+	if err != nil {
+		return err
+	}
+	old, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	err = u.fetchInfo()
+	if err != nil {
+		return err
+	}
+	if u.info.Version == Version {
+		return nil
+	}
+	bin, err := u.fetchAndApplyPatch(old)
+	if err != nil {
+		bin, err = u.fetchBin()
+		if err != nil {
+			return err
+		}
+	}
+	h := sha256.New()
+	h.Write(bin)
+	if !bytes.Equal(h.Sum(nil), u.info.CmdSha256) {
+		return errors.New("new file hash mismatch after patch")
+	}
+	return install(old.Name(), bin)
 }
 
-func (u *Updater) fetchAndApply() error {
-	instPath, err := exec.LookPath("hk")
+func (u *Updater) fetchInfo() error {
+	r, err := fetch(u.hkURL + "hk-current-" + plat + ".json")
 	if err != nil {
 		return err
 	}
-
-	old, err := os.Open(instPath)
+	defer r.Close()
+	err = json.NewDecoder(r).Decode(&u.info)
 	if err != nil {
 		return err
 	}
+	if len(u.info.CmdSha256) != sha256.Size {
+		return errors.New("bad cmd hash in info")
+	}
+	return nil
+}
 
-	plat := runtime.GOOS + "-" + runtime.GOARCH
-	name := "hk-" + Version + "-next-" + plat + ".hkdiff"
-	resp, err := http.Get(u.url + name)
+func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
+	r, err := fetch(u.diffURL + slug(Version) + "-to-" + u.info.Version)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		log.Fatal(resp.Status)
-	}
-
-	var header struct {
-		Magic    [8]byte
-		OldHash  [sha1.Size]byte
-		NewHash  [sha1.Size]byte
-		DiffHash [sha1.Size]byte
-	}
-	err = binary.Read(resp.Body, binary.BigEndian, &header)
-	if err != nil {
-		return err
-	}
-
-	if header.Magic != magic {
-		log.Fatal("format error in update file")
-	}
-
-	patch, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	if readSha1(old) != header.OldHash {
-		log.Fatal("old hash mismatch")
-	}
-
-	if readSha1(bytes.NewReader(patch)) != header.DiffHash {
-		log.Fatal("bad patch file")
-	}
-
-	_, err = old.Seek(0, 0)
-	if err != nil {
-		return err
-	}
-
+	defer r.Close()
 	var buf bytes.Buffer
-	err = binarydist.Patch(old, &buf, bytes.NewReader(patch))
+	err = binarydist.Patch(old, &buf, r)
+	return buf.Bytes(), err
+}
+
+func (u *Updater) fetchBin() ([]byte, error) {
+	r, err := fetch(u.binURL + slug(u.info.Version) + ".gz")
 	if err != nil {
-		return err
+		return nil, err
 	}
+	defer r.Close()
+	return ioutil.ReadAll(r)
+}
 
-	if readSha1(bytes.NewReader(buf.Bytes())) != header.NewHash {
-		log.Fatal("checksum mismatch after patch")
-	}
-
-	part := path.Dir(instPath) + "/.hk.part"
-	dstf, err := os.OpenFile(part, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0777)
+func install(name string, p []byte) error {
+	part := filepath.Join(filepath.Dir(name), "hk.part")
+	err := ioutil.WriteFile(part, p, 0755)
 	if err != nil {
 		return err
 	}
 	defer os.Remove(part)
-
-	_, err = dstf.Write(buf.Bytes())
-	if err != nil {
-		return err
-	}
-
-	err = dstf.Close()
-	if err != nil {
-		return err
-	}
-
-	return os.Rename(part, instPath)
+	return os.Rename(part, name)
 }
 
-func readSha1(r io.Reader) (h [sha1.Size]byte) {
-	s := sha1.New()
-	if _, err := io.Copy(s, r); err == nil {
-		s.Sum(h[:0])
+// returns a random duration in [0,n).
+func randDuration(n time.Duration) time.Duration {
+	return time.Duration(rand.Int63n(int64(n)))
+}
+
+func slug(ver string) string {
+	return "hk-" + ver + "-" + plat
+}
+
+func fetch(url string) (io.ReadCloser, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
 	}
-	return h
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("bad http status from %s: %v", url, resp.Status)
+	}
+	return resp.Body, nil
+}
+
+func readTime(path string) time.Time {
+	p, err := ioutil.ReadFile(path)
+	if os.IsNotExist(err) {
+		return time.Time{}
+	}
+	if err != nil {
+		return time.Now().Add(1000 * time.Hour)
+	}
+	t, err := time.Parse(time.RFC3339, string(p))
+	if err != nil {
+		return time.Now().Add(1000 * time.Hour)
+	}
+	return t
+}
+
+func writeTime(path string, t time.Time) bool {
+	return ioutil.WriteFile(path, []byte(t.Format(time.RFC3339)), 0644) == nil
 }

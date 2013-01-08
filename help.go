@@ -45,11 +45,15 @@ HKPATH
 var cmdUpdate = &Command{
 	Run:   runUpdate,
 	Usage: "update",
-	Long:  `Downloads and installs the next version of hk.`,
+	Long: `
+Update downloads and installs the next version of hk.
+
+This command is unlisted, since users never have to run it directly.
+`,
 }
 
 func runUpdate(cmd *Command, args []string) {
-	if err := updater.fetchAndApply(); err != nil {
+	if err := updater.update(); err != nil {
 		log.Fatal(err)
 	}
 }

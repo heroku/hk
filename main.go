@@ -14,10 +14,6 @@ import (
 	"syscall"
 )
 
-const (
-	Version = "0.8"
-)
-
 var (
 	apiURL    = "https://api.heroku.com"
 	hkHome    = filepath.Join(homePath, ".hk")
@@ -26,8 +22,10 @@ var (
 )
 
 var updater = Updater{
-	url: "https://hk.heroku.com/",
-	dir: hkHome + "/update/",
+	hkURL:   "https://hk.heroku.com/",
+	binURL:  "https://hkdist.s3.amazonaws.com/",
+	diffURL: "https://hkpatch.s3.amazonaws.com/",
+	dir:     hkHome + "/update/",
 }
 
 type Command struct {
@@ -101,7 +99,7 @@ func main() {
 		apiURL = strings.TrimRight(s, "/")
 	}
 	if s := os.Getenv("HKURL"); s != "" {
-		updater.url = strings.TrimRight(s, "/") + "/"
+		updater.hkURL = strings.TrimRight(s, "/") + "/"
 	}
 	defer updater.run() // doesn't run if os.Exit is called
 	log.SetFlags(0)
