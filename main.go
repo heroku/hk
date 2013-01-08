@@ -70,6 +70,7 @@ var commands = []*Command{
 	cmdCreate,
 	cmdDestroy,
 	cmdCreds,
+	cmdSSHCopyId,
 	cmdEnv,
 	cmdUpdate,
 	cmdGet,
