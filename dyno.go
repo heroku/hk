@@ -8,28 +8,6 @@ import (
 	"strings"
 )
 
-var cmdPs = &Command{
-	Run:   runPs,
-	Usage: "ps [-a app]",
-	Short: "list running dynos",
-	Long:  `List app's running dynos.`,
-}
-
-var cmdRestart = &Command{
-	Run:   runRestart,
-	Usage: "restart [-a app] [type or name]",
-	Short: "restart dynos",
-	Long: `
-Restart all app dynos, all dynos of a specific type, or a single dyno.
-
-Examples:
-
-  $ hk restart
-  $ hk restart web
-  $ hk restart web.1
-`,
-}
-
 func init() {
 	cmds := []*Command{cmdPs, cmdRestart}
 	for _, c := range cmds {
@@ -47,6 +25,13 @@ func (p Procs) Len() int           { return len(p) }
 func (p Procs) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p Procs) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
+var cmdPs = &Command{
+	Run:   runPs,
+	Usage: "ps [-a app]",
+	Short: "list running dynos",
+	Long:  `List app's running dynos.`,
+}
+
 func runPs(cmd *Command, args []string) {
 	var procs Procs
 	APIReq("GET", "/apps/"+mustApp()+"/ps").Do(&procs)
@@ -56,6 +41,21 @@ func runPs(cmd *Command, args []string) {
 	for _, proc := range procs {
 		fmt.Printf("%-16s  %-10s  %s\n", proc.Name, proc.State, proc.Command)
 	}
+}
+
+var cmdRestart = &Command{
+	Run:   runRestart,
+	Usage: "restart [-a app] [type or name]",
+	Short: "restart dynos",
+	Long: `
+Restart all app dynos, all dynos of a specific type, or a single dyno.
+
+Examples:
+
+  $ hk restart
+  $ hk restart web
+  $ hk restart web.1
+`,
 }
 
 func runRestart(cmd *Command, args []string) {
