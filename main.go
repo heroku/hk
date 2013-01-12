@@ -22,9 +22,8 @@ var (
 	apiURL    = "https://api.heroku.com"
 	hkHome    = filepath.Join(homePath, ".hk")
 	netrcPath = filepath.Join(os.Getenv("HOME"), ".netrc")
+	stdin     = bufio.NewReader(os.Stdin)
 )
-
-var stdin = bufio.NewReader(os.Stdin)
 
 var updater = Updater{
 	url: "https://hk.heroku.com/",
@@ -68,9 +67,10 @@ func (c *Command) ShowUsage() bool {
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
 	cmdCreate,
+	cmdRename,
 	cmdDestroy,
 	cmdCreds,
-	cmdSSHCopyId,
+	//cmdSSHCopyId, removed because it was breaking compile - RM
 	cmdEnv,
 	cmdUpdate,
 	cmdGet,

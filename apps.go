@@ -92,6 +92,33 @@ func runCreate(cmd *Command, args []string) {
 	fmt.Println(info.Name)
 }
 
+var cmdRename = &Command{
+	Run:   runRename,
+	Usage: "rename <current> <new>",
+	Short: "rename an app",
+	Long:  `Rename renames a heroku app.`,
+}
+
+func runRename(cmd *Command, args []string) {
+	if len(args) != 2 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+
+	var info struct {
+		Name string
+	}
+
+	v := make(url.Values)
+	v.Set("app[name]", args[1])
+
+	r := APIReq("PUT", "/apps/"+args[0])
+	r.SetBodyForm(v)
+	r.Do(&info)
+	fmt.Print(info.Name + " - ")
+	fmt.Println("Ensure you update your git remote URL.")
+}
+
 var cmdDestroy = &Command{
 	Run:   runDestroy,
 	Usage: "destroy <app>",
