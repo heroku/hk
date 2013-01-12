@@ -74,6 +74,7 @@ You'll need a line like this in $HOME/.netrc
   	get        get config var
   	set        set config var
   	info       show app info
+    rels       show releases and info
   	list       list apps
   	open       open app
   	ps         list processes
