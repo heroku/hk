@@ -77,6 +77,7 @@ var commands = []*Command{
 	cmdSet,
 	cmdUnset,
 	cmdInfo,
+	cmdRels,
 	cmdList,
 	cmdOpen,
 	cmdPs,
