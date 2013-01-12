@@ -115,7 +115,7 @@ func runRename(cmd *Command, args []string) {
 	r := APIReq("PUT", "/apps/"+args[0])
 	r.SetBodyForm(v)
 	r.Do(&info)
-	fmt.Print(info.Name + " - ")
+	fmt.Println("Renamed app to: " + info.Name)
 	fmt.Println("Ensure you update your git remote URL.")
 }
 
