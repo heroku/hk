@@ -10,6 +10,10 @@ import (
 	"syscall"
 )
 
+var (
+	hkPath string
+)
+
 var helpPlugins = &Command{
 	Usage: "plugins",
 	Short: "interface to plugin commands",
@@ -73,8 +77,6 @@ HKPLUGINMODE
   example set by built-in hk commands for the style of this documentation.
 `,
 }
-
-var hkPath string
 
 func init() {
 	const defaultPluginPath = "/usr/local/lib/hk/plugin"

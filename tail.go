@@ -10,19 +10,19 @@ import (
 	"strconv"
 )
 
-var cmdTail = &Command{
-	Run:   runTail,
-	Usage: "tail [-a app] [-f] [-n lines] [-s source] [-p process]",
-	Short: "tail log files",
-	Long:  `Tail tails log files.`,
-}
-
 var (
 	follow  bool
 	lines   int
 	source  string
 	process string
 )
+
+var cmdTail = &Command{
+	Run:   runTail,
+	Usage: "tail [-a app] [-f] [-n lines] [-s source] [-p process]",
+	Short: "tail log files",
+	Long:  `Tail tails log files.`,
+}
 
 func init() {
 	cmdTail.Flag.StringVar(&flagApp, "a", "", "app")

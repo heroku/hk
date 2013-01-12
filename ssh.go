@@ -3,19 +3,23 @@ package main
 import (
 	"bytes"
 	"errors"
-	"log"
-	"syscall"
 	"io/ioutil"
-	"path/filepath"
+	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"syscall"
+)
+
+var (
+	sshPubKeyPath string
 )
 
 var cmdSSHAuth = &Command{
 	Run:   runSSHAuth,
 	Usage: "sshauth [-i identity-file]",
 	Short: "authorize ssh public keys",
-	Long:  `
+	Long: `
 Command sshauth installs your ssh public keys for authorized use on Heroku.
 
 It tries these sources for keys, in order:
@@ -25,8 +29,6 @@ It tries these sources for keys, in order:
 3. file $HOME/.ssh/id_rsa.pub
 `,
 }
-
-var sshPubKeyPath string
 
 func init() {
 	cmdSSHAuth.Flag.StringVar(&sshPubKeyPath, "i", "", "ssh public key file")

@@ -17,7 +17,9 @@ import (
 	"time"
 )
 
-var magic = [8]byte{'h', 'k', 'D', 'I', 'F', 'F', '0', '1'}
+var (
+	magic = [8]byte{'h', 'k', 'D', 'I', 'F', 'F', '0', '1'}
+)
 
 const upcktimePath = "cktime"
 
