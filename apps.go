@@ -105,18 +105,16 @@ func runRename(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 
-	var info struct {
-		Name string
-	}
-
+	var info struct{ Name string }
 	v := make(url.Values)
 	v.Set("app[name]", args[1])
-
 	r := APIReq("PUT", "/apps/"+args[0])
 	r.SetBodyForm(v)
 	r.Do(&info)
 	fmt.Println("Renamed app to: " + info.Name)
 	fmt.Println("Ensure you update your git remote URL.")
+	// should we automatically update the remote if they specify an app
+	// or via mustApp + conditional logic - RM
 }
 
 var cmdDestroy = &Command{

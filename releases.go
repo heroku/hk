@@ -37,6 +37,7 @@ func runRels(cmd *Command, args []string) {
 		fmt.Printf("User:     %s\n", release.User)
 		fmt.Printf("Commit:   %s\n", release.Commit)
 		fmt.Printf("Created:  %s\n", release.Created_At)
+		// Should we display addons, pstable, and env? - RM
 	} else {
 		cmd.printUsage()
 		os.Exit(2)
