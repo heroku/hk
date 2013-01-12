@@ -9,7 +9,7 @@ var cmdRels = &Command{
 	Run:   runRels,
 	Usage: "rels [-a app] [release]",
 	Short: "show releases and info",
-	Long:  `Rels displays a list of the releases for an app and information for a single release.`,
+	Long:  `Rels displays a list of releases and information for a single release.`,
 }
 
 func init() {
