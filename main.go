@@ -70,7 +70,7 @@ var commands = []*Command{
 	cmdRename,
 	cmdDestroy,
 	cmdCreds,
-	//cmdSSHCopyId, removed because it was breaking compile - RM
+	cmdSSHAuth,
 	cmdEnv,
 	cmdUpdate,
 	cmdGet,
