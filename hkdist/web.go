@@ -158,6 +158,11 @@ func listReleases(w http.ResponseWriter, r *http.Request) {
 			rels = append(rels, rel)
 		}
 	}
+	if err := rows.Err(); err != nil {
+		log.Println(err)
+		http.Error(w, "internal error", 500)
+		return
+	}
 	b := new(bytes.Buffer)
 	if err = json.NewEncoder(b).Encode(rels); err != nil {
 		log.Println(err)
@@ -331,6 +336,7 @@ func initwebdb() {
 	if err != nil {
 		log.Fatal("sql.Open", err)
 	}
+	mustExec(`SET bytea_output = 'hex'`) // work around https://github.com/bmizerany/pq/issues/76
 	mustExec(`create table if not exists release (
 		plat text not null,
 		cmd text not null,
