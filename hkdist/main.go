@@ -35,7 +35,7 @@ var (
 	s3PatchURL = os.Getenv("S3PATCHURL")
 	buildName  = os.Getenv("BUILDNAME")
 	netrcPath  = filepath.Join(os.Getenv("HOME"), ".netrc")
-	branch = os.Getenv("BUILDBRANCH")
+	branch     = os.Getenv("BUILDBRANCH")
 	s3keys     = s3.Keys{
 		os.Getenv("S3_ACCESS_KEY"),
 		os.Getenv("S3_SECRET_KEY"),
@@ -44,7 +44,7 @@ var (
 
 type release struct {
 	Plat, Cmd, Ver string
-	Sha256 []byte
+	Sha256         []byte
 }
 
 func (r release) Name() string {

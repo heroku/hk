@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"code.google.com/p/go-netrc/netrc"
-	"encoding/json"
 	"compress/gzip"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -145,7 +145,7 @@ func getCreds(u *url.URL) (user, pass string) {
 func mustRegister(ver string, sha256 []byte) {
 	url := distURL + buildName + "-" + ver + "-" + buildPlat + ".json"
 	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(struct{Sha256 []byte}{sha256})
+	err := json.NewEncoder(b).Encode(struct{ Sha256 []byte }{sha256})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -168,7 +168,7 @@ func mustRegister(ver string, sha256 []byte) {
 func mustSetCur(ver string) {
 	url := distURL + buildName + "-" + buildPlat + ".json"
 	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(struct{Version string}{ver})
+	err := json.NewEncoder(b).Encode(struct{ Version string }{ver})
 	if err != nil {
 		log.Fatal(err)
 	}

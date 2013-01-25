@@ -1,9 +1,8 @@
 package main
 
 import (
-	"crypto/sha256"
 	"bytes"
-	"time"
+	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
 	"github.com/bmizerany/pat"
@@ -13,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
