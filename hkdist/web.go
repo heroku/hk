@@ -142,7 +142,7 @@ func getHash(w http.ResponseWriter, r *http.Request) {
 }
 
 func listReleases(w http.ResponseWriter, r *http.Request) {
-	var rels []release
+	rels := make([]release, 0)
 	rows, err := db.Query(`select plat, cmd, ver, sha256 from release`)
 	if err != nil {
 		log.Println(err)
