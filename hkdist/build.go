@@ -35,6 +35,7 @@ func build() {
 	mustHaveEnv("S3DISTURL")
 	mustHaveEnv("S3_ACCESS_KEY")
 	mustHaveEnv("S3_SECRET_KEY")
+	mustHaveEnv("BUILDBRANCH")
 	mustHaveEnv("BUILDNAME")
 	mustHaveEnv("DISTURL")
 	mustCmd("rm", "-rf", dir)
