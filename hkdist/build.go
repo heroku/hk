@@ -38,7 +38,9 @@ func build() {
 	mustHaveEnv("BUILDBRANCH")
 	mustHaveEnv("BUILDNAME")
 	mustHaveEnv("DISTURL")
-	mustCmd("rm", "-rf", dir)
+	if err := os.RemoveAll(dir); err != nil {
+		log.Fatal(err)
+	}
 	mustCmd("git", "clone", "-b", branch, repoURL, dir)
 	if err := os.Chdir(dir); err != nil {
 		log.Fatal(err)
