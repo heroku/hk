@@ -97,7 +97,7 @@ func runHelp(cmd *Command, args []string) {
 
 	if lookupPlugin(args[0]) != "" {
 		_, _, long := pluginInfo(string(args[0]))
-		fmt.Print(long)
+		fmt.Println(long)
 		return
 	}
 

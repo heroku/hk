@@ -145,7 +145,7 @@ func (p plugin) Short() string {
 
 func pluginInfo(name string) (ver, short, long string) {
 	if os.Getenv("HKPLUGINMODE") == "info" {
-		return "", "[plugin exec loop]", "[plugin exec loop]\n"
+		return "", "[plugin exec loop]", "[plugin exec loop]"
 	}
 	var cmd exec.Cmd
 	cmd.Args = []string{name}
@@ -154,25 +154,25 @@ func pluginInfo(name string) (ver, short, long string) {
 	buf, err := cmd.Output()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return "", "[unknown description]", "[unknown description]\n"
+		return "", "[unknown description]", "[unknown description]"
 	}
 	info := string(buf)
 	if !strings.HasPrefix(info, name+" ") {
-		return "", "[unknown description]", "[unknown description]\n"
+		return "", "[unknown description]", "[unknown description]"
 	}
 	info = info[len(name)+1:]
 	i := strings.Index(info, ": ")
 	if i < 0 {
-		return "", "[unknown description]", "[unknown description]\n"
+		return "", "[unknown description]", "[unknown description]"
 	}
 	ver, info = info[:i], info[i+2:]
 	i = strings.Index(info, "\n\n")
 	if i < 0 {
-		return "", "[unknown description]", "[unknown description]\n"
+		return "", "[unknown description]", "[unknown description]"
 	}
 	short, long = info[:i], info[i+2:]
 	if len(short) > 50 || strings.Contains(short, "\n") {
-		return "", "[unknown description]", "[unknown description]\n"
+		return "", "[unknown description]", "[unknown description]"
 	}
-	return ver, short, long
+	return ver, strings.TrimSpace(short), strings.TrimSpace(long)
 }
