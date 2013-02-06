@@ -147,6 +147,8 @@ func pluginInfo(name string) (ver, short, long string) {
 	if os.Getenv("HKPLUGINMODE") == "info" {
 		return "", "[plugin exec loop]", "[plugin exec loop]"
 	}
+	short = "[unknown description]"
+	long = "[unknown description]"
 	var cmd exec.Cmd
 	cmd.Args = []string{name}
 	cmd.Path = lookupPlugin(name)
@@ -154,25 +156,22 @@ func pluginInfo(name string) (ver, short, long string) {
 	buf, err := cmd.Output()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return "", "[unknown description]", "[unknown description]"
+		return
 	}
 	info := string(buf)
 	if !strings.HasPrefix(info, name+" ") {
-		return "", "[unknown description]", "[unknown description]"
+		return
 	}
 	info = info[len(name)+1:]
 	i := strings.Index(info, ": ")
 	if i < 0 {
-		return "", "[unknown description]", "[unknown description]"
+		return
 	}
 	ver, info = info[:i], info[i+2:]
 	i = strings.Index(info, "\n\n")
-	if i < 0 {
-		return "", "[unknown description]", "[unknown description]"
+	if i < 0 || 50 < i || strings.Contains(info[:i], "\n") {
+		return
 	}
 	short, long = info[:i], info[i+2:]
-	if len(short) > 50 || strings.Contains(short, "\n") {
-		return "", "[unknown description]", "[unknown description]"
-	}
 	return ver, strings.TrimSpace(short), strings.TrimSpace(long)
 }
