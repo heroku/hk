@@ -162,8 +162,14 @@ func pluginInfo(name string) (ver, short, long string) {
 	}
 	info = info[len(name)+1:]
 	i := strings.Index(info, ": ")
+	if i < 0 {
+		return "", "[unknown description]", "[unknown description]\n"
+	}
 	ver, info = info[:i], info[i+2:]
 	i = strings.Index(info, "\n\n")
+	if i < 0 {
+		return "", "[unknown description]", "[unknown description]\n"
+	}
 	short, long = info[:i], info[i+2:]
 	if len(short) > 50 || strings.Contains(short, "\n") {
 		return "", "[unknown description]", "[unknown description]\n"
