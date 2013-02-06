@@ -145,10 +145,10 @@ func (p plugin) Short() string {
 
 func pluginInfo(name string) (ver, short, long string) {
 	if os.Getenv("HKPLUGINMODE") == "info" {
-		return "", "[plugin exec loop]", "[plugin exec loop]"
+		return "", "plugin exec loop", "plugin exec loop"
 	}
-	short = "[unknown description]"
-	long = "[unknown description]"
+	short = "unknown description"
+	long = "unknown description"
 	var cmd exec.Cmd
 	cmd.Args = []string{name}
 	cmd.Path = lookupPlugin(name)
