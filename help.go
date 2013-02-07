@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 )
 
 var helpEnviron = &Command{
@@ -121,7 +122,8 @@ Additional help topics:
 
 See 'hk help [topic]' for more information about that topic.
 
-`))
+{{if .Dev}}This dev build of hk will expire at {{.Expiration}}
+{{end}}`))
 
 func printUsage() {
 	var plugins []plugin
@@ -143,11 +145,15 @@ func printUsage() {
 	}
 
 	usageTemplate.Execute(os.Stdout, struct {
-		Commands []*Command
-		Plugins  []plugin
+		Commands   []*Command
+		Plugins    []plugin
+		Dev        bool
+		Expiration time.Time
 	}{
 		commands,
 		plugins,
+		Version == "dev",
+		hkExpiration(),
 	})
 }
 

@@ -23,6 +23,8 @@ const (
 	plat         = runtime.GOOS + "-" + runtime.GOARCH
 )
 
+const devValidTime = 7 * 24 * time.Hour
+
 // Update protocol.
 //
 //   GET hk.heroku.com/hk-current-linux-amd64.json
@@ -193,4 +195,19 @@ func readTime(path string) time.Time {
 
 func writeTime(path string, t time.Time) bool {
 	return ioutil.WriteFile(path, []byte(t.Format(time.RFC3339)), 0644) == nil
+}
+
+func hkExpiration() time.Time {
+	fi, err := os.Stat(binPath())
+	if err != nil {
+		return time.Time{}
+	}
+	return fi.ModTime().Add(devValidTime)
+}
+
+func hkExpired() bool {
+	if Version == "dev" {
+		return time.Now().After(hkExpiration())
+	}
+	return false
 }
