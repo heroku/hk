@@ -27,7 +27,7 @@ HEROKU_API_URL
 
 HEROKU_SSL_VERIFY
 
-  When set to disable, hk will insecurly skip SSL verification.
+  When set to disable, hk will insecurely skip SSL verification.
 
 HKHEADERS
 
