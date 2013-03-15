@@ -37,7 +37,7 @@ func runEnv(cmd *Command, args []string) {
 
 var cmdGet = &Command{
 	Run:   runGet,
-	Usage: "get [-a app] <name>",
+	Usage: "get [-a app] name",
 	Short: "get config var",
 	Long: `
 Get the value of a config var.
@@ -64,7 +64,7 @@ func runGet(cmd *Command, args []string) {
 
 var cmdSet = &Command{
 	Run:   runSet,
-	Usage: "set [-a app] <name>=<value> ...",
+	Usage: "set [-a app] name=value ...",
 	Short: "set config var",
 	Long: `
 Set the value of a config var.
@@ -94,7 +94,7 @@ func runSet(cmd *Command, args []string) {
 
 var cmdUnset = &Command{
 	Run:   runUnset,
-	Usage: "unset [-a app] <name> ...",
+	Usage: "unset [-a app] name ...",
 	Short: "unset config var",
 	Long: `
 Unset a config var.

@@ -35,7 +35,7 @@ type Command struct {
 
 	Usage string // first word is the command name
 	Short string // `hk help` output
-	Long  string // `hk help <cmd>` output
+	Long  string // `hk help cmd` output
 }
 
 func (c *Command) printUsage() {

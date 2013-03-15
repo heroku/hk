@@ -94,9 +94,15 @@ func runCreate(cmd *Command, args []string) {
 
 var cmdRename = &Command{
 	Run:   runRename,
-	Usage: "rename <current> <new>",
+	Usage: "rename old new",
 	Short: "rename an app",
-	Long:  `Rename renames a heroku app.`,
+	Long:  `
+Rename renames a heroku app.
+
+Example:
+
+  $ hk rename myapp myapp2
+`,
 }
 
 func runRename(cmd *Command, args []string) {
@@ -119,9 +125,17 @@ func runRename(cmd *Command, args []string) {
 
 var cmdDestroy = &Command{
 	Run:   runDestroy,
-	Usage: "destroy <app>",
+	Usage: "destroy app",
 	Short: "destroy an app",
-	Long:  `Destroy destroys a heroku app.`,
+	Long:  `
+Destroy destroys a heroku app.
+
+There is no going back, so be sure you mean it.
+
+Example:
+
+  $ hk destroy myapp
+`,
 }
 
 func runDestroy(cmd *Command, args []string) {
