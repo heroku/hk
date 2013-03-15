@@ -135,12 +135,14 @@ func printUsage() {
 			}
 			log.Fatal(err)
 		}
-		names, err := d.Readdirnames(-1)
+		fi, err := d.Readdir(-1)
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, name := range names {
-			plugins = append(plugins, plugin(name))
+		for _, f := range fi {
+			if !f.IsDir() && f.Mode()&0111 != 0 {
+				plugins = append(plugins, plugin(f.Name()))
+			}
 		}
 	}
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -147,15 +146,14 @@ func pluginInfo(name string) (ver, short, long string) {
 	if os.Getenv("HKPLUGINMODE") == "info" {
 		return "", "plugin exec loop", "plugin exec loop"
 	}
-	short = "unknown description"
-	long = "unknown description"
+	short = "no description"
+	long = name + ": unknown description"
 	var cmd exec.Cmd
 	cmd.Args = []string{name}
 	cmd.Path = lookupPlugin(name)
 	cmd.Env = append([]string{"HKPLUGINMODE=info"}, os.Environ()...)
 	buf, err := cmd.Output()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		return
 	}
 	info := string(buf)
