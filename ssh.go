@@ -43,10 +43,8 @@ func runSSHAuth(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 
-	req := APIReq("POST", "/user/keys")
-	req.SetBody(bytes.NewBuffer(keys))
-	req.Header.Set("Content-Type", "text/ssh-authkey")
-	req.Do(nil) // TODO make non-2xx response non-fatal
+	// TODO make non-2xx response non-fatal
+	must(APIReq(v2nil, "POST", "/user/keys", bytes.NewBuffer(keys)))
 }
 
 func findSSHKeys() ([]byte, error) {

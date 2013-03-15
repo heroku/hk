@@ -48,8 +48,7 @@ func scale(app, ps, n string, wg *sync.WaitGroup) {
 	v := make(url.Values)
 	v.Add("type", ps)
 	v.Add("qty", n)
-	req := APIReq("POST", "/apps/"+app+"/ps/scale")
-	req.SetBodyForm(v)
-	req.Do(nil) // TODO make non-2xx response non-fatal
+	// TODO make non-2xx response non-fatal
+	must(APIReq(v2nil, "POST", "/apps/"+app+"/ps/scale", v))
 	wg.Done()
 }

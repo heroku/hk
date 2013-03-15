@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 )
@@ -19,19 +18,28 @@ func init() {
 }
 
 func runInfo(cmd *Command, args []string) {
-	var info struct {
-		Name   string
-		Owner  string `json:"owner_email"`
-		Stack  string
-		GitURL string `json:"git_url"`
-		WebURL string `json:"web_url"`
-	}
-	APIReq("GET", "/apps/"+mustApp()).Do(&info)
-	fmt.Printf("Name:     %s\n", info.Name)
-	fmt.Printf("Owner:    %s\n", info.Owner)
-	fmt.Printf("Stack:    %s\n", info.Stack)
-	fmt.Printf("Git URL:  %s\n", info.GitURL)
-	fmt.Printf("Web URL:  %s\n", info.WebURL)
+	var app App
+	must(Get(&app, "/apps/"+mustApp()))
+	fmt.Printf("Name:     %s\n", app.Name)
+	fmt.Printf("Owner:    %s\n", app.Owner.Email)
+	fmt.Printf("Stack:    %s\n", app.Stack)
+	fmt.Printf("Git URL:  %s\n", app.GitURL)
+	fmt.Printf("Web URL:  %s\n", app.WebURL)
+}
+
+var cmdURL = &Command{
+	Run:   runURL,
+	Usage: "url [-a app]",
+	Short: "show app url",
+	Long:  `Prints the web URL for the app.`,
+}
+
+func init() {
+	cmdURL.Flag.StringVar(&flagApp, "a", "", "app")
+}
+
+func runURL(cmd *Command, args []string) {
+	fmt.Println("https://" + mustApp() + ".herokuapp.com/")
 }
 
 var cmdOpen = &Command{
@@ -50,21 +58,6 @@ func runOpen(cmd *Command, args []string) {
 	exec.Command(command, u).Start()
 }
 
-var cmdList = &Command{
-	Run:   runList,
-	Usage: "list",
-	Short: "list apps",
-	Long:  `List lists all accessible apps.`,
-}
-
-func runList(cmd *Command, args []string) {
-	var apps []struct{ Name string }
-	APIReq("GET", "/apps").Do(&apps)
-	for _, app := range apps {
-		fmt.Printf("%s\n", app.Name)
-	}
-}
-
 var cmdCreate = &Command{
 	Run:   runCreate,
 	Usage: "create [app]",
@@ -73,30 +66,23 @@ var cmdCreate = &Command{
 }
 
 func runCreate(cmd *Command, args []string) {
-	var info struct {
-		Name   string
-		Stack  string
-		GitURL string `json:"git_url"`
+	var app App
+	var v struct {
+		Name string `json:"name,omitempty"`
 	}
-
-	v := make(url.Values)
-	v.Set("app[stack]", "cedar")
 	if len(args) > 0 {
-		v.Set("app[name]", args[0])
+		v.Name = args[0]
 	}
-
-	r := APIReq("POST", "/apps")
-	r.SetBodyForm(v)
-	r.Do(&info)
-	exec.Command("git", "remote", "add", "heroku", info.GitURL).Run()
-	fmt.Println(info.Name)
+	must(Post(&app, "/apps", v))
+	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
+	fmt.Println(app.Name)
 }
 
 var cmdRename = &Command{
 	Run:   runRename,
 	Usage: "rename old new",
 	Short: "rename an app",
-	Long:  `
+	Long: `
 Rename renames a heroku app.
 
 Example:
@@ -110,14 +96,11 @@ func runRename(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-
-	var info struct{ Name string }
-	v := make(url.Values)
-	v.Set("app[name]", args[1])
-	r := APIReq("PUT", "/apps/"+args[0])
-	r.SetBodyForm(v)
-	r.Do(&info)
-	fmt.Println("Renamed app to: " + info.Name)
+	oldname, newname := args[0], args[1]
+	var app App
+	p := map[string]string{"name": newname}
+	must(Put(&app, "/apps/"+oldname, p))
+	fmt.Println("Renamed app to: " + app.Name)
 	fmt.Println("Ensure you update your git remote URL.")
 	// should we automatically update the remote if they specify an app
 	// or via mustApp + conditional logic - RM
@@ -127,7 +110,7 @@ var cmdDestroy = &Command{
 	Run:   runDestroy,
 	Usage: "destroy app",
 	Short: "destroy an app",
-	Long:  `
+	Long: `
 Destroy destroys a heroku app.
 
 There is no going back, so be sure you mean it.
@@ -144,7 +127,7 @@ func runDestroy(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 
-	APIReq("DELETE", "/apps/"+args[0]).Do(nil)
+	must(APIReq(nil, "DELETE", "/apps/"+args[0], nil))
 	for _, remote := range gitRemotes(gitURL(args[0])) {
 		exec.Command("git", "remote", "rm", remote).Run()
 	}

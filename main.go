@@ -42,7 +42,7 @@ func (c *Command) printUsage() {
 	if c.Runnable() {
 		fmt.Printf("Usage: hk %s\n\n", c.Usage)
 	}
-	fmt.Println(strings.TrimSpace(c.Long))
+	fmt.Println(strings.Trim(c.Long, "\n"))
 }
 
 func (c *Command) Name() string {
@@ -58,31 +58,31 @@ func (c *Command) Runnable() bool {
 	return c.Run != nil
 }
 
-func (c *Command) ShowUsage() bool {
+func (c *Command) HasShort() bool {
 	return c.Short != ""
 }
 
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
 	cmdCreate,
-	cmdRename,
-	cmdDestroy,
-	cmdCreds,
-	cmdSSHAuth,
-	cmdEnv,
-	cmdUpdate,
-	cmdGet,
-	cmdSet,
-	cmdUnset,
-	cmdInfo,
-	cmdRels,
-	cmdList,
-	cmdOpen,
+	cmdLs,
 	cmdPs,
 	cmdScale,
 	cmdRestart,
-	cmdTail,
+	cmdEnv,
+	cmdGet,
+	cmdSet,
 	cmdRun,
+	cmdTail,
+	cmdDestroy,
+	cmdCreds,
+	cmdSSHAuth,
+	cmdUpdate,
+	cmdUnset,
+	cmdInfo,
+	cmdOpen,
+	cmdRename,
+	cmdURL,
 	cmdVersion,
 	cmdHelp,
 
@@ -91,7 +91,8 @@ var commands = []*Command{
 }
 
 var (
-	flagApp string // convience var for commands that need it
+	flagApp  string
+	flagLong bool
 )
 
 func main() {
@@ -187,4 +188,10 @@ func mustApp() string {
 		log.Fatal(err)
 	}
 	return name
+}
+
+func must(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }

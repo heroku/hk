@@ -52,9 +52,7 @@ func runRun(cmd *Command, args []string) {
 		Url *string `json:"rendezvous_url,omitempty"`
 	}{}
 
-	r := APIReq("POST", "/apps/"+mustApp()+"/ps")
-	r.SetBodyForm(data)
-	r.Do(&resp)
+	must(APIReq(&v2{&resp}, "POST", "/apps/"+mustApp()+"/ps", data))
 
 	if detachedRun {
 		return

@@ -109,7 +109,7 @@ func runHelp(cmd *Command, args []string) {
 var usageTemplate = template.Must(template.New("usage").Parse(`Usage: hk [command] [options] [arguments]
 
 Supported commands are:
-{{range .Commands}}{{if .Runnable}}{{if .ShowUsage}}
+{{range .Commands}}{{if .Runnable}}{{if .HasShort}}
   {{.Name | printf "%-8s"}} {{.Short}}{{end}}{{end}}{{end}}
 {{range .Plugins}}
   {{.Name | printf "%-8s"}} {{.Short}} (plugin){{end}}

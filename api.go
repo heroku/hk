@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -21,85 +21,110 @@ func init() {
 	}
 }
 
-type Request http.Request
+type Accepter interface {
+	Accept() string
+}
 
-func APIReq(meth, path string) *Request {
-	req, err := http.NewRequest(meth, apiURL+path, nil)
-	if err != nil {
-		log.Fatal(err)
+func Get(v interface{}, path string) error {
+	return APIReq(v, "GET", path, nil)
+}
+
+func Post(v interface{}, path string, body interface{}) error {
+	return APIReq(v, "POST", path, body)
+}
+
+func Put(v interface{}, path string, body interface{}) error {
+	return APIReq(v, "PUT", path, body)
+}
+
+// Sends a Heroku API request and decodes the response into v.
+// The type of v determines how to handle the response body:
+//
+//   nil        body is discarded
+//   io.Writer  body is copied directly into v
+//   else       body is decoded into v as json
+//
+// If v implements Accepter, v.Accept() will be used as the HTTP
+// Accept header.
+//
+// The type of body determines how to encode the request:
+//
+//   nil         no body
+//   io.Reader   body is sent verbatim
+//   url.Values  body is encoded as application/x-www-form-urlencoded
+//   else        body is encoded as application/json
+func APIReq(v interface{}, meth, path string, body interface{}) error {
+	var err error
+	var ctype string
+	var rbody io.Reader
+
+	switch t := body.(type) {
+	case nil:
+	case url.Values:
+		rbody = strings.NewReader(t.Encode())
+		ctype = "application/x-www-form-urlencoded"
+	case io.Reader:
+		rbody = t
+	default:
+		j, err := json.Marshal(body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rbody = bytes.NewReader(j)
+		ctype = "application/json"
 	}
-
+	req, err := http.NewRequest(meth, apiURL+path, rbody)
+	if err != nil {
+		return err
+	}
 	req.SetBasicAuth(getCreds(req.URL))
-	req.Header.Add("User-Agent", "hk/"+Version+" ("+runtime.GOOS+"-"+runtime.GOARCH+")")
-	req.Header.Add("Accept", "application/json")
+	if a, ok := v.(Accepter); ok {
+		req.Header.Add("Accept", a.Accept())
+	} else {
+		req.Header.Add("Accept", "application/vnd.heroku+json; version=3")
+	}
+	req.Header.Add("User-Agent", userAgent())
+	req.Header.Set("Content-Type", ctype)
 	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
 		i := strings.Index(h, ":")
 		if i >= 0 {
 			req.Header.Add(h[:i], strings.TrimSpace(h[i+1:]))
 		}
 	}
-	return (*Request)(req)
-}
-
-func (r *Request) SetBodyJson(data interface{}) {
-	body, err := json.Marshal(data)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	r.SetBody(bytes.NewReader(body))
-	r.Header.Set("Content-Type", "application/json")
-}
-
-func (r *Request) SetBodyForm(data url.Values) {
-	r.SetBody(strings.NewReader(data.Encode()))
-	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-}
-
-func (r *Request) SetBody(body io.Reader) {
-	rc, ok := body.(io.ReadCloser)
-	if !ok && body != nil {
-		rc = ioutil.NopCloser(body)
-	}
-	r.Body = rc
-	if body != nil {
-		switch v := body.(type) {
-		case *strings.Reader:
-			r.ContentLength = int64(v.Len())
-		case *bytes.Buffer:
-			r.ContentLength = int64(v.Len())
-		}
-	}
-}
-
-func (r *Request) Do(v interface{}) {
-	res := checkResp(http.DefaultClient.Do((*http.Request)(r)))
 	defer res.Body.Close()
-
-	if v != nil {
-		err := json.NewDecoder(res.Body).Decode(v)
-		if err != nil {
-			log.Fatal(err)
-		}
+	if err = checkResp(res); err != nil {
+		return err
 	}
+	switch t := v.(type) {
+	case nil:
+	case io.Writer:
+		_, err = io.Copy(t, res.Body)
+	default:
+		err = json.NewDecoder(res.Body).Decode(v)
+	}
+	return err
 }
 
-func checkResp(res *http.Response, err error) *http.Response {
-	if err != nil {
-		log.Fatal(err)
-	}
+func checkResp(res *http.Response) error {
 	if res.StatusCode == 401 {
-		log.Fatal("Unauthorized")
+		return errors.New("Unauthorized")
 	}
 	if res.StatusCode == 403 {
-		log.Fatal("Unauthorized")
+		return errors.New("Unauthorized")
 	}
 	if res.StatusCode/100 != 2 { // 200, 201, 202, etc
-		log.Fatal("Unexpected error: ", res.Status)
+		return errors.New("Unexpected error: " + res.Status)
 	}
-
 	if msg := res.Header.Get("X-Heroku-Warning"); msg != "" {
 		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
 	}
+	return nil
+}
 
-	return res
+func userAgent() string {
+	return "hk " + Version + " (" + runtime.GOOS + "-" + runtime.GOARCH + ")"
 }

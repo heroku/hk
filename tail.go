@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -52,20 +52,26 @@ func runTail(cmd *Command, args []string) {
 		data.Add("ps", process)
 	}
 
-	req := APIReq("GET", "/apps/"+mustApp()+"/logs")
-	req.SetBodyForm(data)
-	resp := checkResp(http.DefaultClient.Do((*http.Request)(req)))
-
-	surl, err := ioutil.ReadAll(resp.Body)
+	surl := new(logURL)
+	err := APIReq(surl, "GET", "/apps/"+mustApp()+"/logs", data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp.Body.Close()
-
-	resp = checkResp(http.Get(string(surl)))
-	_, err = io.Copy(os.Stdout, resp.Body)
+	resp, err := http.Get(surl.String())
 	if err != nil {
 		log.Fatal(err)
 	}
+	must(checkResp(resp))
+	if _, err = io.Copy(os.Stdout, resp.Body); err != nil {
+		log.Fatal(err)
+	}
 	resp.Body.Close()
+}
+
+type logURL struct {
+	bytes.Buffer
+}
+
+func (logURL) Accept() string {
+	return "application/json"
 }

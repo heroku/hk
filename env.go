@@ -24,7 +24,7 @@ func init() {
 
 func runEnv(cmd *Command, args []string) {
 	var config map[string]string
-	APIReq("GET", "/apps/"+mustApp()+"/config_vars").Do(&config)
+	must(APIReq(&v2{&config}, "GET", "/apps/"+mustApp()+"/config_vars", nil))
 	var configKeys []string
 	for k := range config {
 		configKeys = append(configKeys, k)
@@ -54,7 +54,7 @@ func runGet(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help get'")
 	}
 	var config map[string]string
-	APIReq("GET", "/apps/"+mustApp()+"/config_vars").Do(&config)
+	must(APIReq(&v2{&config}, "GET", "/apps/"+mustApp()+"/config_vars", nil))
 	value, found := config[args[0]]
 	if !found {
 		log.Fatalf("No such key as '%s'", args[0])
@@ -87,9 +87,7 @@ func runSet(cmd *Command, args []string) {
 		}
 		config[arg[:i]] = arg[i+1:]
 	}
-	r := APIReq("PUT", "/apps/"+mustApp()+"/config_vars")
-	r.SetBodyJson(config)
-	r.Do(nil)
+	must(APIReq(v2nil, "PUT", "/apps/"+mustApp()+"/config_vars", config))
 }
 
 var cmdUnset = &Command{
@@ -110,6 +108,7 @@ func runUnset(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help unset'")
 	}
 	for _, key := range args {
-		APIReq("DELETE", "/apps/"+mustApp()+"/config_vars/"+url.QueryEscape(key)).Do(nil)
+		q := url.QueryEscape(key)
+		must(APIReq(v2nil, "DELETE", "/apps/"+mustApp()+"/config_vars/"+q, nil))
 	}
 }
