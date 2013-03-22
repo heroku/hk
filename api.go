@@ -37,6 +37,10 @@ func Put(v interface{}, path string, body interface{}) error {
 	return APIReq(v, "PUT", path, body)
 }
 
+func Delete(path string) error {
+	return APIReq(nil, "DELETE", path, nil)
+}
+
 // Sends a Heroku API request and decodes the response into v.
 // The type of v determines how to handle the response body:
 //

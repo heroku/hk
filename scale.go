@@ -1,10 +1,10 @@
 package main
 
 import (
+	"log"
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 )
 
 var cmdScale = &Command{
@@ -36,19 +36,20 @@ func runScale(cmd *Command, args []string) {
 		todo[arg[:i]] = arg[i+1:]
 	}
 
-	var wg sync.WaitGroup
+	ch := make(chan error)
 	for ps, n := range todo {
-		wg.Add(1)
-		go scale(mustApp(), ps, n, &wg)
+		go scale(mustApp(), ps, n, ch)
 	}
-	wg.Wait()
+	for _ = range todo {
+		if err := <-ch; err != nil {
+			log.Println(err)
+		}
+	}
 }
 
-func scale(app, ps, n string, wg *sync.WaitGroup) {
+func scale(app, ps, n string, ch chan error) {
 	v := make(url.Values)
 	v.Add("type", ps)
 	v.Add("qty", n)
-	// TODO make non-2xx response non-fatal
-	must(APIReq(v2nil, "POST", "/apps/"+app+"/ps/scale", v))
-	wg.Done()
+	ch <- Post(v2nil, "/apps/"+app+"/ps/scale", v)
 }

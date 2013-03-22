@@ -34,7 +34,7 @@ var cmdPs = &Command{
 
 func runPs(cmd *Command, args []string) {
 	var procs Procs
-	must(APIReq(&v2{&procs}, "GET", "/apps/"+mustApp()+"/ps", nil))
+	must(Get(&v2{&procs}, "/apps/"+mustApp()+"/ps"))
 	sort.Sort(procs)
 	fmt.Printf("Process           State       Command\n")
 	fmt.Printf("----------------  ----------  ------------------------\n")
@@ -73,5 +73,5 @@ func runRestart(cmd *Command, args []string) {
 		}
 	}
 
-	must(APIReq(nil, "POST", "/apps/"+mustApp()+"/ps/restart", v))
+	must(Post(nil, "/apps/"+mustApp()+"/ps/restart", v))
 }

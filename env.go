@@ -24,7 +24,7 @@ func init() {
 
 func runEnv(cmd *Command, args []string) {
 	var config map[string]string
-	must(APIReq(&v2{&config}, "GET", "/apps/"+mustApp()+"/config_vars", nil))
+	must(Get(&v2{&config}, "/apps/"+mustApp()+"/config_vars"))
 	var configKeys []string
 	for k := range config {
 		configKeys = append(configKeys, k)
@@ -54,7 +54,7 @@ func runGet(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help get'")
 	}
 	var config map[string]string
-	must(APIReq(&v2{&config}, "GET", "/apps/"+mustApp()+"/config_vars", nil))
+	must(Get(&v2{&config}, "/apps/"+mustApp()+"/config_vars"))
 	value, found := config[args[0]]
 	if !found {
 		log.Fatalf("No such key as '%s'", args[0])
@@ -87,7 +87,7 @@ func runSet(cmd *Command, args []string) {
 		}
 		config[arg[:i]] = arg[i+1:]
 	}
-	must(APIReq(v2nil, "PUT", "/apps/"+mustApp()+"/config_vars", config))
+	must(Put(v2nil, "/apps/"+mustApp()+"/config_vars", config))
 }
 
 var cmdUnset = &Command{

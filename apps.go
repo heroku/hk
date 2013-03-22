@@ -127,7 +127,7 @@ func runDestroy(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 
-	must(APIReq(nil, "DELETE", "/apps/"+args[0], nil))
+	must(Delete("/apps/" + args[0]))
 	for _, remote := range gitRemotes(gitURL(args[0])) {
 		exec.Command("git", "remote", "rm", remote).Run()
 	}

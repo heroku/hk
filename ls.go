@@ -127,7 +127,7 @@ func (a appsByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 func listRels(w io.Writer, names []string) {
 	if len(names) == 0 {
 		var rels []*Release
-		must(APIReq(&rels, "GET", "/apps/"+mustApp()+"/releases", nil))
+		must(Get(&rels, "/apps/"+mustApp()+"/releases"))
 		gitDescribe(rels)
 		abbrevEmailReleases(rels)
 		for _, r := range rels {
@@ -240,8 +240,8 @@ func listAddons(w io.Writer, names []string) {
 	app := new(App)
 	app.Name = mustApp()
 	ch := make(chan error)
-	go func() { must(APIReq(&v2{&res}, "GET", "/apps/"+app.Name+"/addons", nil)); ch <- nil }()
-	go func() { must(APIReq(&v2{&v}, "GET", "/apps/"+app.Name+"/attachments", nil)); ch <- nil }()
+	go func() { ch <- Get(&v2{&res}, "/apps/"+app.Name+"/addons") }()
+	go func() { ch <- Get(&v2{&v}, "/apps/"+app.Name+"/attachments") }()
 	go func() { ch <- Get(app, "/apps/"+app.Name) }()
 	if err := <-ch; err != nil {
 		log.Fatal(err)

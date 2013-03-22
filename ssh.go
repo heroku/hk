@@ -43,8 +43,7 @@ func runSSHAuth(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 
-	// TODO make non-2xx response non-fatal
-	must(APIReq(v2nil, "POST", "/user/keys", bytes.NewBuffer(keys)))
+	must(Post(v2nil, "/user/keys", bytes.NewBuffer(keys)))
 }
 
 func findSSHKeys() ([]byte, error) {
