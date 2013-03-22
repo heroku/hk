@@ -118,8 +118,12 @@ func main() {
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] && cmd.Run != nil {
-			cmd.Flag.Usage = usage
-			cmd.Flag.Parse(args[1:])
+			cmd.Flag.Usage = func() {
+				cmd.printUsage()
+			}
+			if err := cmd.Flag.Parse(args[1:]); err != nil {
+				os.Exit(2)
+			}
 			cmd.Run(cmd, cmd.Flag.Args())
 			return
 		}
