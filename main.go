@@ -106,7 +106,8 @@ func main() {
 	log.SetFlags(0)
 	if hkExpired() {
 		fmt.Fprintln(os.Stderr, "This dev build of hk expired at", hkExpiration())
-		fmt.Fprintln(os.Stderr, "Please obtain a new version from https://hk.heroku.com/")
+		fmt.Fprintln(os.Stderr, "Obtain a new version from https://hk.heroku.com/")
+		fmt.Fprintln(os.Stderr, "or run go get -u github.com/kr/hk")
 		os.Exit(9)
 	}
 
