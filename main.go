@@ -88,6 +88,7 @@ var commands = []*Command{
 
 	helpEnviron,
 	helpPlugins,
+	helpAbout,
 }
 
 var (
