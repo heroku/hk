@@ -101,7 +101,7 @@ func (v v2) UnmarshalJSON(p []byte) error {
 	return json.Unmarshal(p, v.v)
 }
 
-var v2nil = &v2{&struct{}{}}
+var v2nil = &v2{new(interface{})}
 
 type V2Time struct {
 	time.Time
