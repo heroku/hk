@@ -235,24 +235,7 @@ func (a releasesByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a releasesByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 func listAddons(w io.Writer, names []string) {
-	var v []*Attachment
-	var res []*Resource
-	app := new(App)
-	app.Name = mustApp()
-	ch := make(chan error)
-	go func() { ch <- Get(&v2{&res}, "/apps/"+app.Name+"/addons") }()
-	go func() { ch <- Get(&v2{&v}, "/apps/"+app.Name+"/attachments") }()
-	go func() { ch <- Get(app, "/apps/"+app.Name) }()
-	if err := <-ch; err != nil {
-		log.Fatal(err)
-	}
-	if err := <-ch; err != nil {
-		log.Fatal(err)
-	}
-	if err := <-ch; err != nil {
-		log.Fatal(err)
-	}
-	ms := mergeAddons(app, res, v)
+	ms := getMergedAddons(mustApp())
 	abbrevEmailResources(ms)
 	for i, s := range names {
 		names[i] = strings.ToLower(s)
@@ -328,53 +311,9 @@ func listAddon(w io.Writer, m *mergedAddon) {
 		if name == "" {
 			name = "(" + m.Type + ")"
 		}
-		fmt.Fprintln(w, name)
+		fmt.Fprintln(w, m.String())
 	}
 }
-
-type mergedAddon struct {
-	Type      string
-	Name      string
-	Owner     string
-	ConfigVar string
-}
-
-func mergeAddons(app *App, res []*Resource, att []*Attachment) (ms []*mergedAddon) {
-	for _, a := range att {
-		m := new(mergedAddon)
-		ms = append(ms, m)
-		m.Type = a.Resource.Type
-		m.Name = a.Resource.Name
-		m.ConfigVar = a.ConfigVar
-		m.Owner = a.Resource.BillingApp.Owner
-	}
-
-	for _, r := range res {
-		var m *mergedAddon
-		for _, ex := range ms {
-			if ex.Type == r.Name {
-				m = ex
-				break
-			}
-		}
-		if m == nil {
-			m = new(mergedAddon)
-			ms = append(ms, m)
-		}
-		m.Type = r.Name
-		if m.Owner == "" {
-			m.Owner = app.Owner.Email
-		}
-	}
-	sort.Sort(mergedAddonsByType(ms))
-	return ms
-}
-
-type mergedAddonsByType []*mergedAddon
-
-func (a mergedAddonsByType) Len() int           { return len(a) }
-func (a mergedAddonsByType) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 
 type prettyTime struct {
 	time.Time
