@@ -3,15 +3,12 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
 	"time"
 )
-
-var _ = log.Print
 
 var cmdLs = &Command{
 	Run:   runLs,
