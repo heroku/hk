@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"runtime"
@@ -99,6 +100,15 @@ func APIReq(v interface{}, meth, path string, body interface{}) error {
 				strings.TrimSpace(h[:i]),
 				strings.TrimSpace(h[i+1:]),
 			)
+		}
+	}
+	if os.Getenv("HKDUMPREQ") != "" {
+		dump, err := httputil.DumpRequestOut(req, true)
+		if err != nil {
+			log.Println(err)
+		} else {
+			os.Stderr.Write(dump)
+			os.Stderr.Write([]byte{'\n'})
 		}
 	}
 	res, err := http.DefaultClient.Do(req)

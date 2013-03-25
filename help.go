@@ -41,6 +41,13 @@ HKPATH
   taken to be "/usr/local/lib/hk/plugin" on Unix.
 
   See 'hk help plugins' for information about the plugin interface.
+
+HKDUMPREQ
+
+  When this is set, hk prints the wire representation of each API
+  request to stderr just before sending the request. This will
+  most likely include your secret API key in the Authorization
+  header field, so be careful with the output.
 `,
 }
 
