@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"github.com/bmizerany/pat"
 	"github.com/bmizerany/pq"
+	"github.com/kr/secureheader"
 	"io"
 	"log"
 	"net/http"
@@ -39,12 +40,13 @@ func web() {
 	m.Put("/:cmd-:ver-:os-:arch.json", authenticate{herokaiOnly{http.HandlerFunc(putVer)}})
 	m.Put("/:cmd-:os-:arch.json", authenticate{herokaiOnly{http.HandlerFunc(setCur)}})
 	m.Get("/", http.FileServer(http.Dir("hkdist/public")))
-	if os.Getenv("ALLOWHTTP") != "" {
-		http.Handle("/", m)
-	} else {
-		http.Handle("/", httpsOnly{m})
+	http.Handle("/", m)
+	secureheader.DefaultConfig.HTTPSRedirect = false // use httpsOnly (defined below) instead
+	var h http.Handler = secureheader.DefaultConfig
+	if os.Getenv("ALLOWHTTP") == "" {
+		h = httpsOnly{h}
 	}
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	err := http.ListenAndServe(":"+os.Getenv("PORT"), h)
 	if err != nil {
 		log.Fatalf(`{"func":"ListenAndServe", "error":%q}`, err)
 	}
@@ -317,7 +319,6 @@ func (x httpsOnly) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, url.String(), http.StatusMovedPermanently)
 		return
 	}
-	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 	x.Handler.ServeHTTP(w, r)
 }
 
