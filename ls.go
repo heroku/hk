@@ -29,6 +29,14 @@ Options:
     -l       long listing
     -a=name  app name
 
+Long listing for apps shows the owner, slug size, last release
+time (or time the app was created, if it's never been released),
+and the app name. Long listing for releases shows the git commit
+id, who made the release, time of the release, name of the release
+(e.g. v1), and description. Long listing for addons shows the type
+of the addon, owner, name of the resource, and the config var it's
+attached to.
+
 Examples:
 
     $ hk ls
