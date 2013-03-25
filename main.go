@@ -77,7 +77,6 @@ var commands = []*Command{
 	cmdDestroy,
 	cmdCreds,
 	cmdSSHAuth,
-	cmdUpdate,
 	cmdUnset,
 	cmdInfo,
 	cmdOpen,
@@ -89,6 +88,9 @@ var commands = []*Command{
 	helpEnviron,
 	helpPlugins,
 	helpAbout,
+
+	cmdAPI,
+	cmdUpdate,
 }
 
 var (

@@ -48,8 +48,10 @@ func Delete(path string) error {
 //   io.Writer  body is copied directly into v
 //   else       body is decoded into v as json
 //
-// If v implements Accepter, v.Accept() will be used as the HTTP
-// Accept header.
+// If v implements Accepter, v.Accept() will be used for the
+// request Accept header field; otherwise it will be
+//
+//   Accept: application/vnd.heroku+json; version=3
 //
 // The type of body determines how to encode the request:
 //
@@ -82,17 +84,21 @@ func APIReq(v interface{}, meth, path string, body interface{}) error {
 		return err
 	}
 	req.SetBasicAuth(getCreds(req.URL))
-	if a, ok := v.(Accepter); ok {
-		req.Header.Add("Accept", a.Accept())
-	} else {
-		req.Header.Add("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("User-Agent", userAgent())
+	if ctype != "" {
+		req.Header.Set("Content-Type", ctype)
 	}
-	req.Header.Add("User-Agent", userAgent())
-	req.Header.Set("Content-Type", ctype)
+	if a, ok := v.(Accepter); ok {
+		req.Header.Set("Accept", a.Accept())
+	} else {
+		req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	}
 	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
-		i := strings.Index(h, ":")
-		if i >= 0 {
-			req.Header.Add(h[:i], strings.TrimSpace(h[i+1:]))
+		if i := strings.Index(h, ":"); i >= 0 {
+			req.Header.Set(
+				strings.TrimSpace(h[:i]),
+				strings.TrimSpace(h[i+1:]),
+			)
 		}
 	}
 	res, err := http.DefaultClient.Do(req)
@@ -131,4 +137,47 @@ func checkResp(res *http.Response) error {
 
 func userAgent() string {
 	return "hk " + Version + " (" + runtime.GOOS + "-" + runtime.GOARCH + ")"
+}
+
+var cmdAPI = &Command{
+	Run:   runAPI,
+	Usage: "api method path",
+	Long: `
+The api command is a convenient but low-level way to send requests
+to the Heroku API. It sends an HTTP request to the Heroku API
+using the given method on the given path, using stdin unmodified
+as the request body. It prints the response unmodified on stdout.
+Method GET doesn't read or send a request body.
+
+As with any hk command, the behavior of hk api is controlled by
+various environment variables. See 'hk help environ' for details.
+
+Examples:
+
+    $ hk api GET /apps/myapp | jq .
+    {
+      "name": "myapp",
+      "id": "app123@heroku.com",
+      "created_at": "2011-11-11T04:17:13-00:00",
+      …
+    }
+
+    $ export HKHEADER
+    $ HKHEADER='
+    Content-Type: application/x-www-form-urlencoded
+    Accept: application/json
+    '
+    $ printf 'type=web&qty=2' | hk api POST /apps/myapp/ps/scale
+    2
+`,
+}
+
+func runAPI(cmd *Command, args []string) {
+	if len(args) != 2 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	if err := APIReq(os.Stdout, args[0], args[1], os.Stdin); err != nil {
+		log.Fatal(err)
+	}
 }

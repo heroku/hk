@@ -29,9 +29,10 @@ HEROKU_SSL_VERIFY
 
   When set to disable, hk will insecurely skip SSL verification.
 
-HKHEADERS
+HKHEADER
 
-  A NL-separated list of headers to add to each API request.
+  A NL-separated list of fields to set in each API request header.
+  These override any fields set by hk if they have the same name.
 
 HKPATH
 
