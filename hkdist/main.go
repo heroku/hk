@@ -37,8 +37,8 @@ var (
 	netrcPath  = filepath.Join(os.Getenv("HOME"), ".netrc")
 	branch     = os.Getenv("BUILDBRANCH")
 	s3keys     = s3.Keys{
-		os.Getenv("S3_ACCESS_KEY"),
-		os.Getenv("S3_SECRET_KEY"),
+		AccessKey: os.Getenv("S3_ACCESS_KEY"),
+		SecretKey: os.Getenv("S3_SECRET_KEY"),
 	}
 )
 
