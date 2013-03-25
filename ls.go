@@ -48,7 +48,7 @@ Examples:
     0fda0ae  me  Jun 13 18:14  v2  Deploy 0fda0ae
     ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
 
-    $ hk ls -g rel v3
+    $ hk ls -l rel v3
     ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
 
     $ hk ls addons
