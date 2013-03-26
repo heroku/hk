@@ -22,7 +22,7 @@ Plugin commands extend hk's functionality.
 Plugins are located in one of the directories in hk's search path,
 HKPATH, and executed for unrecognized hk commands. If a plugin named
 "default" exists, it will be run when no suitably-named plugin can
-be found. (See 'hk help environ' for details on HKPATH.)
+be found. (Run 'hk help environ' for details on HKPATH.)
 
 The arguments to the plugin are the arguments to hk, not including
 "hk" itself.
@@ -35,7 +35,7 @@ HEROKU_API_URL
   plugin, this variable is always set and it always includes a
   username and password.
 
-  (See 'hk help environ' for details of the format.)
+  (Run 'hk help environ' for details of the format.)
 
 HKUSER
 

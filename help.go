@@ -114,24 +114,25 @@ func runHelp(cmd *Command, args []string) {
 	os.Exit(2)
 }
 
-var usageTemplate = template.Must(template.New("usage").Parse(`Usage: hk [command] [options] [arguments]
+var usageTemplate = template.Must(template.New("usage").Parse(`
+Usage: hk [command] [options] [arguments]
 
-Supported commands are:
+
+Supported commands:
 {{range .Commands}}{{if .Runnable}}{{if .HasShort}}
-  {{.Name | printf "%-8s"}} {{.Short}}{{end}}{{end}}{{end}}
+    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
 {{range .Plugins}}
-  {{.Name | printf "%-8s"}} {{.Short}} (plugin){{end}}
+    {{.Name | printf "%-8s"}}  {{.Short}} (plugin){{end}}
 
-See 'hk help [command]' for more information about a command.
+Run 'hk help [command]' for details.
+
 
 Additional help topics:
 {{range .Commands}}{{if not .Runnable}}
-  {{.Name | printf "%-8s"}} {{.Short}}{{end}}{{end}}
-
-See 'hk help [topic]' for more information about that topic.
+    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}
 
 {{if .Dev}}This dev build of hk will expire at {{.Expiration}}
-{{end}}`))
+{{end}}`[1:]))
 
 func printUsage() {
 	var plugins []plugin
