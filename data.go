@@ -26,6 +26,27 @@ type App struct {
 	BuildpackProvidedDescription *NullString `json:"buildpack_provided_description"`
 }
 
+type Dyno struct {
+	Name           string `json:"process"`
+	ID             string
+	UPID           *string
+	Type           string
+	Command        string
+	AppName        string `json:"app_name"`
+	Slug           string
+	Action         string
+	State          string
+	PrettyState    string `json:"pretty_state"`
+	Elapsed        int
+	RendezvousURL  *string `json:"rendezvous_url"`
+	Attached       *bool
+	TransisionedAt V2Time `json:"transitioned_at"`
+}
+
+func (d *Dyno) Age() time.Duration {
+	return time.Now().Sub(d.TransisionedAt.Time)
+}
+
 type Release struct {
 	Name      string
 	Descr     string

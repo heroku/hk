@@ -27,10 +27,10 @@ func runDestroy(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	name := args[0]
-	var procs Procs
-	err := Get(&v2{&procs}, "/apps/"+name+"/ps")
-	if err == nil && len(procs) > 0 {
-		log.Println("App", name, "has", len(procs), "running dynos")
+	var dynos []*Dyno
+	err := Get(&v2{&dynos}, "/apps/"+name+"/ps")
+	if err == nil && len(dynos) > 0 {
+		log.Println("App", name, "has", len(dynos), "running dynos")
 		log.Println("To destroy this app, first scale to zero")
 		log.Println("To list dynos: hk ps -a", name)
 		log.Println("For more on scaling: hk help scale")

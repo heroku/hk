@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +14,7 @@ import (
 var cmdLs = &Command{
 	Run:   runLs,
 	Usage: "ls [-l] [app...]",
-	Short: "list apps",
+	Short: "list apps, addons, dynos, and releases",
 	Long: `
        hk ls [-l] [-a app] releases [name...]
 
@@ -92,6 +93,8 @@ func list(w io.Writer, cmd *Command, args []string) {
 		listRels(w, args[1:])
 	case strings.HasPrefix("addons", a0):
 		listAddons(w, args[1:])
+	case strings.HasPrefix("dynos", a0):
+		listDynos(w, args[1:])
 	default:
 		listApps(w, args)
 	}
@@ -166,6 +169,34 @@ func listRels(w io.Writer, names []string) {
 			listRelease(w, r)
 		}
 	}
+}
+
+type DynosByName []*Dyno
+
+func (p DynosByName) Len() int           { return len(p) }
+func (p DynosByName) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p DynosByName) Less(i, j int) bool { return p[i].Name < p[j].Name }
+
+func listDynos(w io.Writer, names []string) {
+	var dynos []*Dyno
+	must(Get(&v2{&dynos}, "/apps/"+mustApp()+"/ps"))
+	sort.Sort(DynosByName(dynos))
+
+	if len(names) == 0 {
+		for _, d := range dynos {
+			listDyno(w, d)
+		}
+		return
+	}
+
+	for _, name := range names {
+		for _, d := range dynos {
+			if d.Name == name {
+				listDyno(w, d)
+			}
+		}
+	}
+	return
 }
 
 func abbrevEmailReleases(rels []*Release) {
@@ -303,6 +334,37 @@ func listRelease(w io.Writer, r *Release) {
 	}
 }
 
+func listDyno(w io.Writer, d *Dyno) {
+	if flagLong {
+		listRec(w,
+			d.Name,
+			d.State,
+			prettyDuration{d.Age()},
+			maybeQuote(d.Command),
+		)
+	} else {
+		fmt.Fprintln(w, d.Name)
+	}
+}
+
+// quotes s as a json string if it contains any weird chars
+// currently weird is anything other than [alnum]_-
+func maybeQuote(s string) string {
+	for _, r := range s {
+		if !('0' <= r && r <= '9' || 'a' <= r && r <= 'z' ||
+			'A' <= r && r <= 'Z' || r == '-' || r == '_') {
+			return quote(s)
+		}
+	}
+	return s
+}
+
+// quotes s as a json string
+func quote(s string) string {
+	b, _ := json.Marshal(s)
+	return string(b)
+}
+
 func listAddon(w io.Writer, m *mergedAddon) {
 	if flagLong {
 		listRec(w,
@@ -331,8 +393,28 @@ func (s prettyTime) String() string {
 	return s.Local().Format("Jan _2  2006")
 }
 
-func roundTime(d, k time.Duration) int {
-	return int((d + k - 1) / k)
+type prettyDuration struct {
+	time.Duration
+}
+
+func (a prettyDuration) String() string {
+	switch d := a.Duration; {
+	case d > 2*24*time.Hour:
+		return a.Unit(24*time.Hour, "d")
+	case d > 2*time.Hour:
+		return a.Unit(time.Hour, "h")
+	case d > 2*time.Minute:
+		return a.Unit(time.Minute, "m")
+	}
+	return a.Unit(time.Second, "s")
+}
+
+func (a prettyDuration) Unit(u time.Duration, s string) string {
+	return fmt.Sprintf("%2d", roundDur(a.Duration, u)) + s
+}
+
+func roundDur(d, k time.Duration) int {
+	return int((d + k/2 - 1) / k)
 }
 
 func abbrev(s string, n int) string {

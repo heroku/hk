@@ -66,7 +66,6 @@ func (c *Command) HasShort() bool {
 var commands = []*Command{
 	cmdCreate,
 	cmdLs,
-	cmdPs,
 	cmdScale,
 	cmdRestart,
 	cmdEnv,
