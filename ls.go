@@ -33,7 +33,8 @@ and the app name. Long listing for releases shows the git commit
 id, who made the release, time of the release, name of the release
 (e.g. v1), and description. Long listing for addons shows the type
 of the addon, owner, name of the resource, and the config var it's
-attached to.
+attached to. Long listing for dynos shows the name, state, age,
+and command.
 
 Examples:
 
@@ -44,6 +45,16 @@ Examples:
     $ hk ls -l
     app  me  1234k  Jan 2 12:34  myapp
     app  me  4567k  Jan 2 12:34  myapp2
+
+    $ hk ls dynos
+    run.3794
+    web.1
+    web.2
+
+    $ hk ls -l dynos
+    run.3794  up   1m  bash
+    web.1     up  15h  "blog /app /tmp/dst"
+    web.2     up   8h  "blog /app /tmp/dst"
 
     $ hk ls rel
     v1
