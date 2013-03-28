@@ -45,7 +45,7 @@ func runURL(cmd *Command, args []string) {
 var cmdOpen = &Command{
 	Run:   runOpen,
 	Usage: "open",
-	Short: "open app",
+	Short: "open app in a web browser",
 	Long:  `Open opens the app in a web browser. (Assumes cedar.)`,
 }
 

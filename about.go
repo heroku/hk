@@ -2,7 +2,7 @@ package main
 
 var helpAbout = &Command{
 	Usage: "about",
-	Short: "copyright, license, and other info about hk itself",
+	Short: "information about hk (e.g. copyright, license, etc.)",
 	Long: userAgent + `
 
 Copyright © 2013 Keith Rarick

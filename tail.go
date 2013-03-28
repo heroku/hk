@@ -20,7 +20,7 @@ var (
 var cmdTail = &Command{
 	Run:   runTail,
 	Usage: "tail [-a app] [-f] [-n lines] [-s source] [-p process]",
-	Short: "tail log files",
+	Short: "show the last part of the app log",
 	Long:  `Tail tails log files.`,
 }
 
