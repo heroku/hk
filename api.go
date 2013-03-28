@@ -16,6 +16,8 @@ import (
 	"strings"
 )
 
+const userAgent = "hk " + Version + " " + runtime.GOOS + " " + runtime.GOARCH
+
 func init() {
 	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
@@ -85,7 +87,7 @@ func APIReq(v interface{}, meth, path string, body interface{}) error {
 		return err
 	}
 	req.SetBasicAuth(getCreds(req.URL))
-	req.Header.Set("User-Agent", userAgent())
+	req.Header.Set("User-Agent", userAgent)
 	if ctype != "" {
 		req.Header.Set("Content-Type", ctype)
 	}
@@ -143,10 +145,6 @@ func checkResp(res *http.Response) error {
 		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
 	}
 	return nil
-}
-
-func userAgent() string {
-	return "hk " + Version + " (" + runtime.GOOS + "-" + runtime.GOARCH + ")"
 }
 
 var cmdAPI = &Command{
