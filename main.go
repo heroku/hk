@@ -98,6 +98,7 @@ var commands = []*Command{
 
 	// listed by hk help more
 	cmdAPI,
+	cmdApp,
 	cmdGet,
 	cmdCreds,
 	cmdURL,
