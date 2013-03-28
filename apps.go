@@ -30,7 +30,7 @@ func runInfo(cmd *Command, args []string) {
 var cmdURL = &Command{
 	Run:   runURL,
 	Usage: "url [-a app]",
-	Short: "show app url",
+	Short: "show app url" + extra,
 	Long:  `Prints the web URL for the app.`,
 }
 

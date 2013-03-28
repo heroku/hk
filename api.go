@@ -150,6 +150,7 @@ func checkResp(res *http.Response) error {
 var cmdAPI = &Command{
 	Run:   runAPI,
 	Usage: "api method path",
+	Short: "make a single API request" + extra,
 	Long: `
 The api command is a convenient but low-level way to send requests
 to the Heroku API. It sends an HTTP request to the Heroku API

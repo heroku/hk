@@ -58,8 +58,18 @@ func (c *Command) Runnable() bool {
 	return c.Run != nil
 }
 
-func (c *Command) HasShort() bool {
-	return c.Short != ""
+const extra = " (extra)"
+
+func (c *Command) List() bool {
+	return c.Short != "" && !strings.HasSuffix(c.Short, extra)
+}
+
+func (c *Command) ListAsExtra() bool {
+	return c.Short != "" && strings.HasSuffix(c.Short, extra)
+}
+
+func (c *Command) ShortExtra() string {
+	return c.Short[:len(c.Short)-len(extra)]
 }
 
 // Running `hk help` will list commands in this order.
@@ -69,26 +79,30 @@ var commands = []*Command{
 	cmdScale,
 	cmdRestart,
 	cmdEnv,
-	cmdGet,
 	cmdSet,
 	cmdRun,
 	cmdTail,
 	cmdDestroy,
-	cmdCreds,
 	cmdSSHAuth,
 	cmdUnset,
 	cmdInfo,
 	cmdOpen,
 	cmdRename,
-	cmdURL,
 	cmdVersion,
 	cmdHelp,
 
 	helpEnviron,
 	helpPlugins,
+	helpMore,
 	helpAbout,
 
+	// listed by hk help more
 	cmdAPI,
+	cmdGet,
+	cmdCreds,
+	cmdURL,
+
+	// unlisted
 	cmdUpdate,
 }
 

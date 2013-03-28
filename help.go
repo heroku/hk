@@ -78,10 +78,15 @@ func runVersion(cmd *Command, args []string) {
 	fmt.Println(Version)
 }
 
+var helpMore = &Command{
+	Usage: "more",
+	Short: "additional commands, less frequently used",
+	Long:  "(not displayed; see special case in runHelp)",
+}
+
 var cmdHelp = &Command{
-	Usage: "help [command]",
-	Short: "show help",
-	Long:  `Help shows usage for a command.`,
+	Usage: "help [topic]",
+	Long:  `Help shows usage for a command or other topic.`,
 }
 
 func init() {
@@ -95,6 +100,10 @@ func runHelp(cmd *Command, args []string) {
 	}
 	if len(args) != 1 {
 		log.Fatal("too many arguments")
+	}
+	if args[0] == helpMore.Name() {
+		printExtra()
+		return
 	}
 
 	for _, cmd := range commands {
@@ -118,8 +127,8 @@ var usageTemplate = template.Must(template.New("usage").Parse(`
 Usage: hk [command] [options] [arguments]
 
 
-Supported commands:
-{{range .Commands}}{{if .Runnable}}{{if .HasShort}}
+Commands:
+{{range .Commands}}{{if .Runnable}}{{if .List}}
     {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
 {{range .Plugins}}
     {{.Name | printf "%-8s"}}  {{.Short}} (plugin){{end}}
@@ -133,6 +142,15 @@ Additional help topics:
 
 {{if .Dev}}This dev build of hk will expire at {{.Expiration}}
 {{end}}`[1:]))
+
+var extraTemplate = template.Must(template.New("usage").Parse(`
+Additional commands:
+{{range .Commands}}{{if .Runnable}}{{if .ListAsExtra}}
+    {{.Name | printf "%-8s"}}  {{.ShortExtra}}{{end}}{{end}}{{end}}
+
+Run 'hk help [command]' for details.
+
+`[1:]))
 
 func printUsage() {
 	var plugins []plugin
@@ -165,6 +183,14 @@ func printUsage() {
 		plugins,
 		Version == "dev",
 		hkExpiration(),
+	})
+}
+
+func printExtra() {
+	extraTemplate.Execute(os.Stdout, struct {
+		Commands []*Command
+	}{
+		commands,
 	})
 }
 

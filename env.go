@@ -38,7 +38,7 @@ func runEnv(cmd *Command, args []string) {
 var cmdGet = &Command{
 	Run:   runGet,
 	Usage: "get [-a app] name",
-	Short: "get config var",
+	Short: "get config var" + extra,
 	Long: `
 Get the value of a config var.
 
