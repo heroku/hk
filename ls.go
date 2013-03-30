@@ -92,11 +92,7 @@ func list(w io.Writer, cmd *Command, args []string) {
 	if len(args) == 0 {
 		var apps []*App
 		must(Get(&apps, "/apps"))
-		sort.Sort(appsByName(apps))
-		abbrevEmailApps(apps)
-		for _, a := range apps {
-			listApp(w, a)
-		}
+		printAppList(w, apps)
 		return
 	}
 	switch a0 := args[0]; {
@@ -128,6 +124,10 @@ func listApps(w io.Writer, names []string) {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}
+	printAppList(w, apps)
+}
+
+func printAppList(w io.Writer, apps []*App) {
 	sort.Sort(appsByName(apps))
 	abbrevEmailApps(apps)
 	for _, a := range apps {
