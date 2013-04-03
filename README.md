@@ -50,8 +50,11 @@ applicable.
 
 ### Installation
 
-	$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk
-	$ chmod +x /usr/local/bin/hk
+Currently, you need to have a [Go development environment](http://golang.org/doc/install) to install hk.
+We intend to provide compiled binary forms of hk for easy installation,
+but this isn't ready yet.
+
+	$ go get github.com/kr/hk
 
 ### netrc
 
