@@ -174,11 +174,22 @@ func app() (string, error) {
 		return flagApp, nil
 	}
 
-	b, err := exec.Command("git", "config", "remote.heroku.url").Output()
+	herokuRemoteApp, err := appFromGitRemote("heroku")
+	if err != nil {
+		return "", err
+	}
+
+	flagApp = herokuRemoteApp
+
+	return flagApp, nil
+}
+
+func appFromGitRemote(remote string) (string, error) {
+	b, err := exec.Command("git", "config", "remote."+remote+".url").Output()
 	if err != nil {
 		if isNotFound(err) {
 			wdir, _ := os.Getwd()
-			return "", fmt.Errorf("could not find git remote heroku in %s", wdir)
+			return "", fmt.Errorf("could not find git remote "+remote+" in %s", wdir)
 		}
 		return "", err
 	}
@@ -186,13 +197,10 @@ func app() (string, error) {
 	out := strings.Trim(string(b), "\r\n ")
 
 	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
-		return "", fmt.Errorf("could not find app name in heroku git remote")
+		return "", fmt.Errorf("could not find app name in " + remote + " git remote")
 	}
 
-	// Memoize for later use
-	flagApp = out[len(gitURLPre) : len(out)-len(gitURLSuf)]
-
-	return flagApp, nil
+	return out[len(gitURLPre) : len(out)-len(gitURLSuf)], nil
 }
 
 func isNotFound(err error) bool {
