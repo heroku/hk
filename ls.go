@@ -213,9 +213,9 @@ func listDynos(w io.Writer, names []string) {
 func abbrevEmailReleases(rels []*Release) {
 	domains := make(map[string]int)
 	for _, r := range rels {
-		parts := strings.SplitN(r.User, "@", 2)
-		if len(parts) == 2 {
-			domains["@"+parts[1]]++
+		r.Who = r.User.Email
+		if a := strings.SplitN(r.Who, "@", 2); len(a) == 2 {
+			domains["@"+a[1]]++
 		}
 	}
 	smax, nmax := "", 0
@@ -225,8 +225,8 @@ func abbrevEmailReleases(rels []*Release) {
 		}
 	}
 	for _, r := range rels {
-		if strings.HasSuffix(r.User, smax) {
-			r.User = r.User[:len(r.User)-len(smax)]
+		if strings.HasSuffix(r.Who, smax) {
+			r.Who = r.Who[:len(r.Who)-len(smax)]
 		}
 	}
 }
@@ -334,11 +334,11 @@ func listApp(w io.Writer, a *App) {
 func listRelease(w io.Writer, r *Release) {
 	if flagLong {
 		listRec(w,
-			abbrev(GitRef(r.Commit), 10),
-			abbrev(r.User, 10),
-			prettyTime{r.CreatedAt.Time},
+			abbrev(r.Commit, 10),
+			abbrev(r.Who, 10),
+			prettyTime{r.CreatedAt},
 			r.Name,
-			r.Descr,
+			r.Description,
 		)
 	} else {
 		fmt.Fprintln(w, r.Name)

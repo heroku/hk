@@ -39,24 +39,31 @@ func gitRemotes(url string) (names []string) {
 func gitDescribe(rels []*Release) error {
 	args := []string{"name-rev", "--tags", "--no-undefined", "--always", "--"}
 	for _, r := range rels {
-		if r.Commit != nil {
-			args = append(args, string(*r.Commit))
+		if isDeploy(r.Description) {
+			r.Commit = r.Description[len(r.Description)-7:]
+		}
+		if r.Commit != "" {
+			args = append(args, r.Commit)
 		}
 	}
 	out, err := exec.Command("git", args...).Output()
 	names := mapOutput(out, " ", "\n")
 	for _, r := range rels {
-		if name, ok := names[GitRef(r.Commit)]; ok {
+		if name, ok := names[r.Commit]; ok {
 			if strings.HasPrefix(name, "tags/") {
 				name = name[5:]
 			}
 			if strings.HasSuffix(name, "^0") {
 				name = name[:len(name)-2]
 			}
-			*r.Commit = name
+			r.Commit = name
 		}
 	}
 	return err
+}
+
+func isDeploy(s string) bool {
+	return len(s) == len("Deploy 0000000") && strings.HasPrefix(s, "Deploy ")
 }
 
 func mapOutput(out []byte, sep, term string) map[string]string {

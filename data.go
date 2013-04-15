@@ -48,19 +48,17 @@ func (d *Dyno) Age() time.Duration {
 }
 
 type Release struct {
-	Name      string
-	Descr     string
-	User      string
-	Commit    *string
-	CreatedAt V2Time `json:"created_at"`
-}
-
-// Merely returns *c, or "0000000" if c is nil.
-func GitRef(c *string) string {
-	if c == nil {
-		return "0000000"
+	ID   string
+	Name string
+	User struct {
+		ID    string
+		Email string
 	}
-	return *c
+	Description string
+	CreatedAt   time.Time `json:"created_at"`
+
+	Who    string // same as User.Email or abbreviated
+	Commit string // deduced from Description, if possible
 }
 
 type Resource struct {
