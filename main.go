@@ -108,8 +108,9 @@ var commands = []*Command{
 }
 
 var (
-	flagApp  string
-	flagLong bool
+	flagApp   string // convenience var for commands that need it
+	cachedApp string
+	flagLong  bool
 )
 
 func main() {
@@ -170,16 +171,24 @@ func getCreds(u *url.URL) (user, pass string) {
 }
 
 func app() (string, error) {
-	if flagApp != "" {
-		return flagApp, nil
+	if cachedApp != "" {
+		return cachedApp, nil
 	}
 
-	herokuRemoteApp, err := appFromGitRemote("heroku")
-	if err != nil {
+	var mustBeGitRemote bool
+	if flagApp == "" {
+		flagApp = "heroku"
+		mustBeGitRemote = true
+	}
+
+	gitRemoteApp, err := appFromGitRemote(flagApp)
+	if err == nil {
+		flagApp = gitRemoteApp
+	} else if mustBeGitRemote {
 		return "", err
 	}
 
-	flagApp = herokuRemoteApp
+	cachedApp = flagApp
 
 	return flagApp, nil
 }
