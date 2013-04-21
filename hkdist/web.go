@@ -41,12 +41,8 @@ func web() {
 	m.Put("/:cmd-:os-:arch.json", authenticate{herokaiOnly{http.HandlerFunc(setCur)}})
 	m.Get("/", http.FileServer(http.Dir("hkdist/public")))
 	http.Handle("/", m)
-	secureheader.DefaultConfig.HTTPSRedirect = false // use httpsOnly (defined below) instead
-	var h http.Handler = secureheader.DefaultConfig
-	if os.Getenv("ALLOWHTTP") == "" {
-		h = httpsOnly{h}
-	}
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), h)
+	secureheader.DefaultConfig.PermitClearLoopback = true
+	err := http.ListenAndServe(":"+os.Getenv("PORT"), secureheader.DefaultConfig)
 	if err != nil {
 		log.Fatalf(`{"func":"ListenAndServe", "error":%q}`, err)
 	}
@@ -303,20 +299,6 @@ type herokaiOnly struct {
 func (x herokaiOnly) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasSuffix(r.Header.Get(":email"), "@heroku.com") {
 		http.Error(w, "unauthorized", 401)
-		return
-	}
-	x.Handler.ServeHTTP(w, r)
-}
-
-type httpsOnly struct {
-	http.Handler
-}
-
-func (x httpsOnly) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("X-Forwarded-Proto") != "https" {
-		url := *r.URL
-		url.Scheme = "https"
-		http.Redirect(w, r, url.String(), http.StatusMovedPermanently)
 		return
 	}
 	x.Handler.ServeHTTP(w, r)
