@@ -32,6 +32,10 @@ func Get(v interface{}, path string) error {
 	return APIReq(v, "GET", path, nil)
 }
 
+func Patch(v interface{}, path string, body interface{}) error {
+	return APIReq(v, "PATCH", path, body)
+}
+
 func Post(v interface{}, path string, body interface{}) error {
 	return APIReq(v, "POST", path, body)
 }

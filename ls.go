@@ -30,11 +30,11 @@ Options:
 Long listing for apps shows the owner, slug size, last release
 time (or time the app was created, if it's never been released),
 and the app name. Long listing for releases shows the git commit
-id, who made the release, time of the release, name of the release
-(e.g. v1), and description. Long listing for addons shows the type
-of the addon, owner, name of the resource, and the config var it's
-attached to. Long listing for dynos shows the name, state, age,
-and command.
+id, who made the release, time of the release, version of the
+release (e.g. 1), and description. Long listing for addons shows
+the type of the addon, owner, name of the resource, and the config
+var it's attached to. Long listing for dynos shows the name,
+state, age, and command.
 
 Examples:
 
@@ -65,7 +65,7 @@ Examples:
     0fda0ae  me  Jun 13 18:14  v2  Deploy 0fda0ae
     ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
 
-    $ hk ls -l rel v3
+    $ hk ls -l rel 3
     ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
 
     $ hk ls addons
@@ -143,12 +143,13 @@ func (a appsByName) Len() int           { return len(a) }
 func (a appsByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a appsByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
-func listRels(w io.Writer, names []string) {
-	if len(names) == 0 {
+func listRels(w io.Writer, versions []string) {
+	if len(versions) == 0 {
 		var rels []*Release
 		must(Get(&rels, "/apps/"+mustApp()+"/releases"))
 		gitDescribe(rels)
 		abbrevEmailReleases(rels)
+		sort.Sort(releasesByVersion(rels))
 		for _, r := range rels {
 			listRelease(w, r)
 		}
@@ -156,9 +157,9 @@ func listRels(w io.Writer, names []string) {
 	}
 
 	app := mustApp()
-	ch := make(chan error, len(names))
+	ch := make(chan error, len(versions))
 	var rels []*Release
-	for _, name := range names {
+	for _, name := range versions {
 		if name == "" {
 			ch <- nil
 		} else {
@@ -167,18 +168,16 @@ func listRels(w io.Writer, names []string) {
 			go func() { ch <- Get(r, url) }()
 		}
 	}
-	for _ = range names {
+	for _ = range versions {
 		if err := <-ch; err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}
-	sort.Sort(releasesByName(rels))
+	sort.Sort(releasesByVersion(rels))
 	gitDescribe(rels)
 	abbrevEmailReleases(rels)
 	for _, r := range rels {
-		if r.Name != "" {
-			listRelease(w, r)
-		}
+		listRelease(w, r)
 	}
 }
 
@@ -190,7 +189,7 @@ func (p DynosByName) Less(i, j int) bool { return p[i].Name < p[j].Name }
 
 func listDynos(w io.Writer, names []string) {
 	var dynos []*Dyno
-	must(Get(&v2{&dynos}, "/apps/"+mustApp()+"/ps"))
+	must(Get(&dynos, "/apps/"+mustApp()+"/dynos"))
 	sort.Sort(DynosByName(dynos))
 
 	if len(names) == 0 {
@@ -275,11 +274,11 @@ func abbrevEmailResources(ms []*mergedAddon) {
 	}
 }
 
-type releasesByName []*Release
+type releasesByVersion []*Release
 
-func (a releasesByName) Len() int           { return len(a) }
-func (a releasesByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a releasesByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+func (a releasesByVersion) Len() int           { return len(a) }
+func (a releasesByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a releasesByVersion) Less(i, j int) bool { return a[i].Version < a[j].Version }
 
 func listAddons(w io.Writer, names []string) {
 	ms := getMergedAddons(mustApp())
@@ -299,10 +298,7 @@ func addonMatch(m *mergedAddon, a []string) bool {
 		if s == strings.ToLower(m.Type) {
 			return true
 		}
-		if s == strings.ToLower(m.Name) {
-			return true
-		}
-		if s == strings.ToLower(m.ConfigVar) {
+		if s == strings.ToLower(m.ID) {
 			return true
 		}
 	}
@@ -337,11 +333,11 @@ func listRelease(w io.Writer, r *Release) {
 			abbrev(r.Commit, 10),
 			abbrev(r.Who, 10),
 			prettyTime{r.CreatedAt},
-			r.Name,
+			fmt.Sprintf("%d", r.Version),
 			r.Description,
 		)
 	} else {
-		fmt.Fprintln(w, r.Name)
+		fmt.Fprintln(w, fmt.Sprintf("v%d", r.Version))
 	}
 }
 
@@ -381,14 +377,9 @@ func listAddon(w io.Writer, m *mergedAddon) {
 		listRec(w,
 			m.Type,
 			abbrev(m.Owner, 10),
-			m.Name,
-			m.ConfigVar,
+			m.ID,
 		)
 	} else {
-		name := m.ConfigVar
-		if name == "" {
-			name = "(" + m.Type + ")"
-		}
 		fmt.Fprintln(w, m.String())
 	}
 }

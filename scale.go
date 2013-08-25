@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"net/url"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -26,14 +26,19 @@ func init() {
 
 // takes args of the form "web=1", "worker=3", etc
 func runScale(cmd *Command, args []string) {
-	todo := make(map[string]string)
+	todo := make(map[string]int)
 	for _, arg := range args {
 		i := strings.IndexRune(arg, '=')
 		if i < 0 {
 			cmd.printUsage()
 			os.Exit(2)
 		}
-		todo[arg[:i]] = arg[i+1:]
+		val, err := strconv.Atoi(arg[i+1:])
+		if err != nil {
+			cmd.printUsage()
+			os.Exit(2)
+		}
+		todo[arg[:i]] = val
 	}
 
 	ch := make(chan error)
@@ -47,9 +52,7 @@ func runScale(cmd *Command, args []string) {
 	}
 }
 
-func scale(app, ps, n string, ch chan error) {
-	v := make(url.Values)
-	v.Add("type", ps)
-	v.Add("qty", n)
-	ch <- Post(v2nil, "/apps/"+app+"/ps/scale", v)
+func scale(app, ps string, n int, ch chan error) {
+	data := map[string]int{"quantity": n}
+	ch <- Patch(nil, "/apps/"+app+"/formation/"+ps, data)
 }

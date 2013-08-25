@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/url"
 	"sort"
 	"strings"
 )
@@ -24,7 +23,7 @@ func init() {
 
 func runEnv(cmd *Command, args []string) {
 	var config map[string]string
-	must(Get(&v2{&config}, "/apps/"+mustApp()+"/config_vars"))
+	must(Get(&config, "/apps/"+mustApp()+"/config-vars"))
 	var configKeys []string
 	for k := range config {
 		configKeys = append(configKeys, k)
@@ -54,7 +53,7 @@ func runGet(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help get'")
 	}
 	var config map[string]string
-	must(Get(&v2{&config}, "/apps/"+mustApp()+"/config_vars"))
+	must(Get(&config, "/apps/"+mustApp()+"/config-vars"))
 	value, found := config[args[0]]
 	if !found {
 		log.Fatalf("No such key as '%s'", args[0])
@@ -87,7 +86,7 @@ func runSet(cmd *Command, args []string) {
 		}
 		config[arg[:i]] = arg[i+1:]
 	}
-	must(Put(v2nil, "/apps/"+mustApp()+"/config_vars", config))
+	must(Patch(nil, "/apps/"+mustApp()+"/config-vars", config))
 }
 
 var cmdUnset = &Command{
@@ -107,8 +106,9 @@ func runUnset(cmd *Command, args []string) {
 	if len(args) < 1 {
 		log.Fatal("Invalid usage. See 'hk help unset'")
 	}
+	config := make(map[string]*string)
 	for _, key := range args {
-		q := url.QueryEscape(key)
-		must(APIReq(v2nil, "DELETE", "/apps/"+mustApp()+"/config_vars/"+q, nil))
+		config[key] = nil
 	}
+	must(Patch(nil, "/apps/"+mustApp()+"/config-vars", config))
 }

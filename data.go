@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -27,38 +26,52 @@ type App struct {
 }
 
 type Dyno struct {
-	Name           string `json:"process"`
-	ID             string
-	UPID           *string
-	Type           string
-	Command        string
-	AppName        string `json:"app_name"`
-	Slug           string
-	Action         string
-	State          string
-	PrettyState    string `json:"pretty_state"`
-	Elapsed        int
-	RendezvousURL  *string `json:"rendezvous_url"`
-	Attached       *bool
-	TransisionedAt V2Time `json:"transitioned_at"`
+	Name    string
+	ID      string
+	Type    string
+	Command string
+	AppName string `json:"app_name"`
+	Release struct {
+		ID      string
+		Version int
+	}
+	Size      int
+	State     string
+	AttachURL *string   `json:"attach_url"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (d *Dyno) Age() time.Duration {
-	return time.Now().Sub(d.TransisionedAt.Time)
+	return time.Now().Sub(d.CreatedAt)
 }
 
 type Release struct {
 	ID   string
-	Name string
 	User struct {
 		ID    string
 		Email string
 	}
+	Slug struct {
+		ID string
+	}
 	Description string
+	Version     int
 	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 
 	Who    string // same as User.Email or abbreviated
 	Commit string // deduced from Description, if possible
+}
+
+type Addon struct {
+	ID   string
+	Plan struct {
+		ID   string
+		Name string
+	}
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Resource struct {
@@ -105,33 +118,6 @@ type Attachment struct {
 type LogSession struct {
 	LogplexURL string `json:"logplex_url"`
 	CreatedAt  time.Time
-}
-
-type v2 struct {
-	v interface{}
-}
-
-// Called by APIReq. Causes Heroku to use its "v2" API.
-func (v2) Accept() string {
-	return "application/json"
-}
-
-func (v v2) UnmarshalJSON(p []byte) error {
-	return json.Unmarshal(p, v.v)
-}
-
-var v2nil = &v2{new(interface{})}
-
-type V2Time struct {
-	time.Time
-}
-
-const V2TimeFormat = "2006/01/02 15:04:05 -0700"
-
-func (t *V2Time) UnmarshalJSON(data []byte) (err error) {
-	// Fractional seconds are handled implicitly by Parse.
-	t.Time, err = time.Parse(`"`+V2TimeFormat+`"`, string(data))
-	return
 }
 
 type NullString string

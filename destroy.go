@@ -28,7 +28,7 @@ func runDestroy(cmd *Command, args []string) {
 	}
 	name := args[0]
 	var dynos []*Dyno
-	err := Get(&v2{&dynos}, "/apps/"+name+"/ps")
+	err := Get(&dynos, "/apps/"+name+"/dynos")
 	if err == nil && len(dynos) > 0 {
 		log.Println("App", name, "has", len(dynos), "running dynos")
 		log.Println("To destroy this app, first scale to zero")

@@ -39,20 +39,22 @@ func runRun(cmd *Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	data := make(url.Values)
+	data := make(map[string]interface{})
+	data["command"] = strings.Join(args, " ")
 	if !detachedRun {
-		data.Add("attach", "true")
-		data.Add("ps_env[TERM]", os.Getenv("TERM"))
-		data.Add("ps_env[COLUMNS]", strconv.Itoa(cols))
-		data.Add("ps_env[LINES]", strconv.Itoa(lines))
+		data["attach"] = true
+		data["env"] = map[string]interface{}{
+			"COLUMNS": strconv.Itoa(cols),
+			"LINES":   strconv.Itoa(lines),
+			"TERM":    os.Getenv("TERM"),
+		}
 	}
-	data.Add("command", strings.Join(args, " "))
 
 	resp := struct {
-		Url *string `json:"rendezvous_url,omitempty"`
+		Url *string `json:"attach_url,omitempty"`
 	}{}
 
-	must(Post(&v2{&resp}, "/apps/"+mustApp()+"/ps", data))
+	must(Post(&resp, "/apps/"+mustApp()+"/dynos", data))
 
 	if detachedRun {
 		return

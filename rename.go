@@ -26,7 +26,7 @@ func runRename(cmd *Command, args []string) {
 	oldname, newname := args[0], args[1]
 	var app App
 	p := map[string]string{"name": newname}
-	must(Put(&app, "/apps/"+oldname, p))
+	must(Patch(&app, "/apps/"+oldname, p))
 	fmt.Println("Renamed app to: " + app.Name)
 	fmt.Println("Ensure you update your git remote URL.")
 	// should we automatically update the remote if they specify an app
