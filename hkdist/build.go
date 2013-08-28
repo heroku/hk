@@ -50,7 +50,14 @@ func build() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sha256 := mustUpload(body, ver)
+
+	sha256 := mustSha256(body)
+	_, err = body.Seek(int64(0), 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mustUpload(body, ver)
 	mustRegister(ver, sha256)
 	mustSetCur(ver)
 }
@@ -96,7 +103,15 @@ func mustBuild() (ver string) {
 	return ver
 }
 
-func mustUpload(r io.Reader, ver string) (hash []byte) {
+func mustSha256(r io.Reader) ([]byte) {
+	h := sha256.New()
+	if _, err := io.Copy(h, r); err != nil {
+		log.Fatal(err)
+	}
+	return h.Sum(nil)
+}
+
+func mustUpload(r io.Reader, ver string) {
 	buf := new(bytes.Buffer)
 	gz, _ := gzip.NewWriterLevel(buf, gzip.BestCompression)
 	gz.Name = buildName + "-" + ver
@@ -106,14 +121,12 @@ func mustUpload(r io.Reader, ver string) (hash []byte) {
 	if err := gz.Close(); err != nil {
 		log.Fatal(err)
 	}
-	h := sha256.New()
-	h.Write(buf.Bytes())
-	hash = h.Sum(nil)
+
 	filename := buildName + "-" + ver + "-" + buildPlat + ".gz"
 	if err := s3put(buf, s3DistURL+filename); err != nil {
 		log.Fatal(err)
 	}
-	return hash
+	return
 }
 
 func mustCmd(arg ...string) []byte {
