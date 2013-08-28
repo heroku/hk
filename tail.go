@@ -21,7 +21,7 @@ var cmdTail = &Command{
 	Run:   runTail,
 	Usage: "tail [-a app] [-f] [-n lines] [-s source] [-p process]",
 	Short: "show the last part of the app log",
-	Long:  `Tail tails log files.`,
+	Long:  `Tail prints recent application logs.`,
 }
 
 func init() {
