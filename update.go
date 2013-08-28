@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
@@ -145,7 +146,16 @@ func (u *Updater) fetchBin() ([]byte, error) {
 		return nil, err
 	}
 	defer r.Close()
-	return ioutil.ReadAll(r)
+	buf := new(bytes.Buffer)
+	gz, err := gzip.NewReader(r)
+	if err != nil {
+		return nil, err
+	}
+	if _, err = io.Copy(buf, gz); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 func install(name string, p []byte) error {
