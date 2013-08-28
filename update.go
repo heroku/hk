@@ -55,7 +55,7 @@ type Updater struct {
 	dir     string
 	info    struct {
 		Version   string
-		CmdSha256 []byte
+		Sha256 []byte
 	}
 }
 
@@ -106,7 +106,7 @@ func (u *Updater) update() error {
 	}
 	h := sha256.New()
 	h.Write(bin)
-	if !bytes.Equal(h.Sum(nil), u.info.CmdSha256) {
+	if !bytes.Equal(h.Sum(nil), u.info.Sha256) {
 		return errors.New("new file hash mismatch after patch")
 	}
 	return install(old.Name(), bin)
@@ -122,7 +122,7 @@ func (u *Updater) fetchInfo() error {
 	if err != nil {
 		return err
 	}
-	if len(u.info.CmdSha256) != sha256.Size {
+	if len(u.info.Sha256) != sha256.Size {
 		return errors.New("bad cmd hash in info")
 	}
 	return nil
