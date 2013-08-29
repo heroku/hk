@@ -73,5 +73,5 @@ func computeAndStorePatch(a, b release) error {
 }
 
 func patchFilename(a, b release) string {
-	return s3DistURL + a.Cmd + "-" + a.Ver + "-" + a.Plat + "-to-" + b.Ver
+	return a.Cmd + "-" + a.Ver + "-" + a.Plat + "-to-" + b.Ver
 }
