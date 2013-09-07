@@ -20,13 +20,12 @@ var (
 
 var cmdRun = &Command{
 	Run:   runRun,
-	Usage: "run [-a app] command [arguments]",
+	Usage: "run command [arguments]",
 	Short: "run a process in a dyno",
 	Long:  `Run a process on Heroku`,
 }
 
 func init() {
-	cmdRun.Flag.StringVar(&flagApp, "a", "", "app")
 	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
 }
 

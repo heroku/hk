@@ -19,13 +19,12 @@ var (
 
 var cmdTail = &Command{
 	Run:   runTail,
-	Usage: "tail [-a app] [-f] [-n lines] [-s source] [-p process]",
+	Usage: "tail [-f] [-n lines] [-s source] [-p process]",
 	Short: "show the last part of the app log",
 	Long:  `Tail prints recent application logs.`,
 }
 
 func init() {
-	cmdTail.Flag.StringVar(&flagApp, "a", "", "app")
 	cmdTail.Flag.BoolVar(&follow, "f", false, "do not stop when end of file is reached")
 	cmdTail.Flag.IntVar(&lines, "n", -1, "number of log lines to request")
 	cmdTail.Flag.StringVar(&source, "s", "", "only display logs from the given source")

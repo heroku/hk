@@ -6,13 +6,9 @@ import (
 
 var cmdURL = &Command{
 	Run:   runURL,
-	Usage: "url [-a app]",
+	Usage: "url",
 	Short: "show app url" + extra,
 	Long:  `Prints the web URL for the app.`,
-}
-
-func init() {
-	cmdURL.Flag.StringVar(&flagApp, "a", "", "app")
 }
 
 func runURL(cmd *Command, args []string) {

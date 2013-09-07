@@ -16,16 +16,15 @@ var cmdLs = &Command{
 	Usage: "ls [-l] [app...]",
 	Short: "list apps, addons, dynos, and releases",
 	Long: `
-       hk ls [-l] [-a app] releases [name...]
+       hk ls [-l] releases [name...]
 
-       hk ls [-l] [-a app] addons [name...]
+       hk ls [-l] addons [name...]
 
 Command hk ls lists apps, releases, and addons.
 
 Options:
 
     -l       long listing
-    -a=name  app name
 
 Long listing for apps shows the owner, slug size, last release
 time (or time the app was created, if it's never been released),
@@ -78,7 +77,6 @@ Examples:
 }
 
 func init() {
-	cmdLs.Flag.StringVar(&flagApp, "a", "", "app")
 	cmdLs.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 

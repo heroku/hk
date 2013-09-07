@@ -4,13 +4,9 @@ import (
 	"log"
 )
 
-func init() {
-	cmdRestart.Flag.StringVar(&flagApp, "a", "", "app")
-}
-
 var cmdRestart = &Command{
 	Run:   runRestart,
-	Usage: "restart [-a app] [type or name]",
+	Usage: "restart [type or name]",
 	Short: "restart dynos",
 	Long: `
 Restart all app dynos, all dynos of a specific type, or a single dyno.

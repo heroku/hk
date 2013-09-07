@@ -9,7 +9,7 @@ import (
 
 var cmdScale = &Command{
 	Run:   runScale,
-	Usage: "scale [-a app] type=n...",
+	Usage: "scale type=n...",
 	Short: "change dyno counts",
 	Long: `
 Scale changes the number of dynos for each process type.
@@ -18,10 +18,6 @@ Example:
 
 	$ hk scale web=2 worker=5
 `,
-}
-
-func init() {
-	cmdScale.Flag.StringVar(&flagApp, "a", "", "app")
 }
 
 // takes args of the form "web=1", "worker=3", etc
