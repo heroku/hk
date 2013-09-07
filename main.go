@@ -109,7 +109,6 @@ var commands = []*Command{
 
 var (
 	flagApp   string // convenience var for commands that need it
-	cachedApp string
 	flagLong  bool
 )
 
@@ -165,10 +164,6 @@ func getCreds(u *url.URL) (user, pass string) {
 }
 
 func app() (string, error) {
-	if cachedApp != "" {
-		return cachedApp, nil
-	}
-
 	var mustBeGitRemote bool
 	if flagApp == "" {
 		flagApp = "heroku"
@@ -181,8 +176,6 @@ func app() (string, error) {
 	} else if mustBeGitRemote {
 		return "", err
 	}
-
-	cachedApp = flagApp
 
 	return flagApp, nil
 }
