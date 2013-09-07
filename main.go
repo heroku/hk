@@ -183,13 +183,11 @@ func app() (string, error) {
 	}
 
 	gitRemoteApp, err := appFromGitRemote("heroku")
-	if err == nil {
-		flagApp = gitRemoteApp
-	} else {
+	if err != nil {
 		return "", err
 	}
 
-	return flagApp, nil
+	return gitRemoteApp, nil
 }
 
 func appFromGitRemote(remote string) (string, error) {
