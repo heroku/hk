@@ -108,7 +108,7 @@ var commands = []*Command{
 }
 
 var (
-	flagApp   string // convenience var for commands that need it
+	flagApp   string
 	flagLong  bool
 )
 
