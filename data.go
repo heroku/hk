@@ -43,7 +43,7 @@ type Dyno struct {
 }
 
 func (d *Dyno) Age() time.Duration {
-	return time.Now().Sub(d.CreatedAt)
+	return time.Now().Sub(d.UpdatedAt)
 }
 
 type Release struct {
