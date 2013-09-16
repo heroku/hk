@@ -2,8 +2,6 @@ package main
 
 import (
 	"log"
-	"net/url"
-	"strings"
 )
 
 func init() {
@@ -30,15 +28,11 @@ func runRestart(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help restart'")
 	}
 
-	v := make(url.Values)
+	path := "/apps/"+mustApp()+"/dynos"
 
 	if len(args) == 1 {
-		if strings.Index(args[0], ".") > 0 {
-			v.Add("ps", args[0])
-		} else {
-			v.Add("type", args[0])
-		}
+		path += "/" + args[0]
 	}
 
-	must(Post(nil, "/apps/"+mustApp()+"/ps/restart", v))
+	must(Delete(path))
 }
