@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"text/template"
-	"time"
 )
 
 var helpEnviron = &Command{
@@ -140,7 +139,7 @@ Additional help topics:
 {{range .Commands}}{{if not .Runnable}}
     {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}
 
-{{if .Dev}}This dev build of hk will expire at {{.Expiration}}
+{{if .Dev}}This dev build of hk cannot auto-update itself.
 {{end}}`[1:]))
 
 var extraTemplate = template.Must(template.New("usage").Parse(`
@@ -177,12 +176,10 @@ func printUsage() {
 		Commands   []*Command
 		Plugins    []plugin
 		Dev        bool
-		Expiration time.Time
 	}{
 		commands,
 		plugins,
 		Version == "dev",
-		hkExpiration(),
 	})
 }
 

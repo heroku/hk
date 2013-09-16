@@ -122,12 +122,6 @@ func main() {
 	}
 	defer updater.run() // doesn't run if os.Exit is called
 	log.SetFlags(0)
-	if hkExpired() {
-		fmt.Fprintln(os.Stderr, "This dev build of hk expired at", hkExpiration())
-		fmt.Fprintln(os.Stderr, "Obtain a new version from https://hk.heroku.com/")
-		fmt.Fprintln(os.Stderr, "or run go get -u github.com/kr/hk")
-		os.Exit(9)
-	}
 
 	args := os.Args[1:]
 	if len(args) < 1 {
