@@ -183,12 +183,8 @@ func install(name string, p []byte) error {
 
 	if err != nil {
 		// copy unsuccessful
-		errRecover := os.Rename(oldExecPath, name)
-		if errRecover != nil {
-			return errRecover
-		} else {
-			return err
-		}
+		_ := os.Rename(oldExecPath, name)
+		return err
 	} else {
 		// copy successful, remove the old binary
 		_ = os.Remove(oldExecPath)
