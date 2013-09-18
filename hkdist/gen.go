@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func gen() {
+func gen(args []string) {
 	var mod time.Time
 	for {
 		genPatches(&mod)

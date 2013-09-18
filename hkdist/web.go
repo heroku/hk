@@ -30,7 +30,7 @@ var db *sql.DB
 //   GET /hk-current-linux-386.json
 //   GET /hk-1-linux-386.json
 //   GET /hk.gz
-func web() {
+func web(args []string) {
 	initwebdb()
 	m := pat.New()
 	m.Get("/:cmd.gz", http.HandlerFunc(initial))

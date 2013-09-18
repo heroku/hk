@@ -87,12 +87,6 @@ func fetchJSON(url string, mod *time.Time, v interface{}) error {
 	return json.NewDecoder(r).Decode(v)
 }
 
-func fetchBytes(url string) ([]byte, error) {
-	r := fetch(url, nil)
-	defer r.Close()
-	return ioutil.ReadAll(r)
-}
-
 func s3put(bb *bytes.Buffer, url string) error {
 	r, _ := http.NewRequest("PUT", url, bb)
 	r.Header.Set("Date", time.Now().UTC().Format(http.TimeFormat))

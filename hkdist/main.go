@@ -2,11 +2,14 @@
 //
 // It has three sub-commands: build, web, and gen.
 //
-//   $ hkdist build
+//   $ hkdist build [platforms]
 //
-// This command fetches source code from github, builds it, uploads the
-// binary to and S3 bucket, and posts its SHA-256 hash to the hk distribution
-// server (hk.heroku.com in production).
+// This command builds cross-compiled binaries. The tool builds all known
+// platforms by default, but will optionally build for a specified list of
+// platforms instead.  It first fetches the source code and termines the latest
+// git tag on BUILDBRANCH.  Then, for each platform, it builds a binary
+// executable, uploads the binary to an S3 bucket, and posts its SHA-256 hash
+// to the hk distribution server (hk.heroku.com in production).
 //
 //   $ hkdist web
 //
@@ -30,13 +33,13 @@ import (
 )
 
 var (
-	distURL    = os.Getenv("DISTURL")
-	s3DistURL  = os.Getenv("S3DISTURL")
-	s3PatchURL = os.Getenv("S3PATCHURL")
-	buildName  = os.Getenv("BUILDNAME")
-	netrcPath  = filepath.Join(os.Getenv("HOME"), ".netrc")
-	branch     = os.Getenv("BUILDBRANCH")
-	s3keys     = s3.Keys{
+	distURL     = os.Getenv("DISTURL")
+	s3DistURL   = os.Getenv("S3DISTURL")
+	s3PatchURL  = os.Getenv("S3PATCHURL")
+	buildName   = os.Getenv("BUILDNAME")
+	netrcPath   = filepath.Join(os.Getenv("HOME"), ".netrc")
+	buildbranch = os.Getenv("BUILDBRANCH")
+	s3keys      = s3.Keys{
 		AccessKey: os.Getenv("S3_ACCESS_KEY"),
 		SecretKey: os.Getenv("S3_SECRET_KEY"),
 	}
@@ -55,22 +58,27 @@ func (r release) Gzname() string {
 	return r.Name() + ".gz"
 }
 
-var subcmds = map[string]func(){
+var subcmds = map[string]func([]string){
 	"gen":   gen,
 	"build": build,
 	"web":   web,
 }
 
+func usage() {
+	fmt.Fprintln(os.Stderr, "Usage: hkdist (web|gen|build [platforms])")
+	os.Exit(2)
+}
+
 func main() {
 	log.SetFlags(log.Lshortfile)
-	if len(os.Args) != 2 {
-		fmt.Fprintln(os.Stderr, "Usage: hkdist web|gen|build")
-		os.Exit(2)
+	if len(os.Args) < 2 {
+		usage()
+	} else if os.Args[1] != "build" && len(os.Args) != 2 {
+		usage()
 	}
 	f := subcmds[os.Args[1]]
 	if f == nil {
-		fmt.Fprintln(os.Stderr, "Usage: hkdist web|gen|build")
-		os.Exit(2)
+		usage()
 	}
-	f()
+	f(os.Args[2:])
 }
