@@ -83,7 +83,11 @@ func (u *Updater) wantUpdate() bool {
 }
 
 func (u *Updater) update() error {
-	path, err := exec.LookPath("hk")
+	filename := "hk"
+	if runtime.GOOS == "windows" {
+		filename += ".exe"
+	}
+	path, err := exec.LookPath(filename)
 	if err != nil {
 		return err
 	}
@@ -171,10 +175,10 @@ func install(name string, p []byte) error {
 	oldExecPath := filepath.Join(execDir, fmt.Sprintf(".%s.old", name))
 	err = os.Rename(name, oldExecPath)
 	if err != nil {
-		return nil
+		return err
 	}
 
-	// move the new exectuable in to become the new program
+	// move the new executable in to become the new program
 	err = os.Rename(part, name)
 
 	if err != nil {
