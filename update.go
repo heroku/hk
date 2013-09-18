@@ -172,7 +172,7 @@ func install(name string, p []byte) error {
 	defer os.Remove(part)
 
 	// move the existing executable to a new file in the same directory
-	oldExecPath := filepath.Join(execDir, fmt.Sprintf(".%s.old", name))
+	oldExecPath := filepath.Join(name, ".old")
 	err = os.Rename(name, oldExecPath)
 	if err != nil {
 		return err
