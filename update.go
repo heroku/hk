@@ -159,13 +159,38 @@ func (u *Updater) fetchBin() ([]byte, error) {
 }
 
 func install(name string, p []byte) error {
-	part := filepath.Join(filepath.Dir(name), "hk.part")
+	execDir := filepath.Dir(name)
+	part := filepath.Join(execDir, "hk.part")
 	err := ioutil.WriteFile(part, p, 0755)
 	if err != nil {
 		return err
 	}
 	defer os.Remove(part)
-	return os.Rename(part, name)
+
+	// move the existing executable to a new file in the same directory
+	oldExecPath := filepath.Join(execDir, fmt.Sprintf(".%s.old", name))
+	err = os.Rename(name, oldExecPath)
+	if err != nil {
+		return nil
+	}
+
+	// move the new exectuable in to become the new program
+	err = os.Rename(part, name)
+
+	if err != nil {
+		// copy unsuccessful
+		errRecover := os.Rename(oldExecPath, name)
+		if errRecover != nil {
+			return errRecover
+		} else {
+			return err
+		}
+	} else {
+		// copy successful, remove the old binary
+		_ = os.Remove(oldExecPath)
+	}
+
+	return nil
 }
 
 // returns a random duration in [0,n).
