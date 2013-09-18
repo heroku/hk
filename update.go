@@ -55,8 +55,8 @@ type Updater struct {
 	diffURL string
 	dir     string
 	info    struct {
-		Version   string
-		Sha256 []byte
+		Version string
+		Sha256  []byte
 	}
 }
 
@@ -95,6 +95,7 @@ func (u *Updater) update() error {
 	if err != nil {
 		return err
 	}
+	defer old.Close()
 	err = u.fetchInfo()
 	if err != nil {
 		return err
@@ -114,7 +115,11 @@ func (u *Updater) update() error {
 	if !bytes.Equal(h.Sum(nil), u.info.Sha256) {
 		return errors.New("new file hash mismatch after patch")
 	}
-	return install(old.Name(), bin)
+	oldName := old.Name()
+	// close the old binary before installing because on windows
+	// it can't be renamed if a handle to the file is still open
+	old.Close()
+	return install(oldName, bin)
 }
 
 func (u *Updater) fetchInfo() error {
@@ -183,7 +188,7 @@ func install(name string, p []byte) error {
 
 	if err != nil {
 		// copy unsuccessful
-		_ := os.Rename(oldExecPath, name)
+		_ = os.Rename(oldExecPath, name)
 		return err
 	} else {
 		// copy successful, remove the old binary
