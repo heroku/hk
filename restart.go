@@ -28,7 +28,7 @@ func runRestart(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help restart'")
 	}
 
-	path := "/apps/"+mustApp()+"/dynos"
+	path := "/apps/" + mustApp() + "/dynos"
 
 	if len(args) == 1 {
 		path += "/" + args[0]

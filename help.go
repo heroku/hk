@@ -173,9 +173,9 @@ func printUsage() {
 	}
 
 	usageTemplate.Execute(os.Stdout, struct {
-		Commands   []*Command
-		Plugins    []plugin
-		Dev        bool
+		Commands []*Command
+		Plugins  []plugin
+		Dev      bool
 	}{
 		commands,
 		plugins,
