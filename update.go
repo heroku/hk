@@ -168,6 +168,7 @@ func (u *Updater) fetchBin() ([]byte, error) {
 }
 
 func install(name string, p []byte) error {
+	oldExecPath := name + ".old"
 	execDir := filepath.Dir(name)
 	part := filepath.Join(execDir, "hk.part")
 	err := ioutil.WriteFile(part, p, 0755)
@@ -176,8 +177,12 @@ func install(name string, p []byte) error {
 	}
 	defer os.Remove(part)
 
+	// remove old executable leftover from previous update
+	if err = os.Remove(oldExecPath); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+
 	// move the existing executable to a new file in the same directory
-	oldExecPath := name + ".old"
 	err = os.Rename(name, oldExecPath)
 	if err != nil {
 		return err
@@ -191,7 +196,7 @@ func install(name string, p []byte) error {
 		_ = os.Rename(oldExecPath, name)
 		return err
 	} else {
-		// copy successful, remove the old binary
+		// copy successful, remove the old binary (fails on Windows)
 		_ = os.Remove(oldExecPath)
 	}
 
