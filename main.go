@@ -108,8 +108,8 @@ var commands = []*Command{
 }
 
 var (
-	flagApp   string
-	flagLong  bool
+	flagApp  string
+	flagLong bool
 )
 
 func main() {
