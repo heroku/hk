@@ -73,5 +73,5 @@ func computeAndStorePatch(a, b release) error {
 }
 
 func patchFilename(a, b release) string {
-	return a.Cmd + "-" + a.Ver + "-" + a.Plat + "-to-" + b.Ver
+	return a.Cmd + "/" + a.Ver + "/" + b.Ver + "/" + a.Plat
 }

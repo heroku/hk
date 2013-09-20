@@ -51,7 +51,7 @@ type release struct {
 }
 
 func (r release) Name() string {
-	return r.Cmd + "-" + r.Ver + "-" + r.Plat
+	return r.Cmd + "/" + r.Ver + "/" + r.Plat
 }
 
 func (r release) Gzname() string {

@@ -139,7 +139,7 @@ func (u *Updater) fetchInfo() error {
 }
 
 func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
-	r, err := fetch(u.diffURL + slug(Version) + "-to-" + u.info.Version)
+	r, err := fetch(u.diffURL + "hk/" + Version + "/" + u.info.Version + "/" + plat)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
 }
 
 func (u *Updater) fetchBin() ([]byte, error) {
-	r, err := fetch(u.binURL + slug(u.info.Version) + ".gz")
+	r, err := fetch(u.binURL + "hk/" + u.info.Version + "/" + plat + ".gz")
 	if err != nil {
 		return nil, err
 	}
