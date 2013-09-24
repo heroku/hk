@@ -199,7 +199,7 @@ func (b *Build) upload(r io.Reader) error {
 		return err
 	}
 
-	filename := b.Name + "-" + b.Ver + "-" + b.platform() + ".gz"
+	filename := b.Name + "/" + b.Ver + "/" + b.platform() + ".gz"
 	if err := s3put(buf, s3DistURL+filename); err != nil {
 		return err
 	}
