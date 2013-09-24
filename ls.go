@@ -181,9 +181,11 @@ func listRels(w io.Writer, versions []string) {
 
 type DynosByName []*Dyno
 
-func (p DynosByName) Len() int           { return len(p) }
-func (p DynosByName) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p DynosByName) Less(i, j int) bool { return p[i].Name < p[j].Name }
+func (p DynosByName) Len() int      { return len(p) }
+func (p DynosByName) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p DynosByName) Less(i, j int) bool {
+	return p[i].Type < p[j].Type || (p[i].Type == p[j].Type && p[i].Seq() < p[j].Seq())
+}
 
 func listDynos(w io.Writer, names []string) {
 	var dynos []*Dyno

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -44,6 +46,11 @@ type Dyno struct {
 
 func (d *Dyno) Age() time.Duration {
 	return time.Now().Sub(d.UpdatedAt)
+}
+
+func (d *Dyno) Seq() int {
+	i, _ := strconv.Atoi(strings.TrimPrefix(d.Name, d.Type+"."))
+	return i
 }
 
 type Release struct {
