@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/go-netrc/netrc"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/url"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+	"time"
 )
 
 var (
@@ -78,7 +80,7 @@ var commands = []*Command{
 	cmdApps,
 	cmdDynos,
 	cmdReleases,
-	cmdLs,
+	cmdAddons,
 	cmdScale,
 	cmdRestart,
 	cmdSet,
@@ -232,6 +234,17 @@ func mustApp() string {
 func must(err error) {
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func listRec(w io.Writer, a ...interface{}) {
+	for i, x := range a {
+		fmt.Fprint(w, x)
+		if i+1 < len(a) {
+			w.Write([]byte{'\t'})
+		} else {
+			w.Write([]byte{'\n'})
+		}
 	}
 }
 
