@@ -77,6 +77,7 @@ var commands = []*Command{
 	cmdCreate,
 	cmdApps,
 	cmdDynos,
+	cmdReleases,
 	cmdLs,
 	cmdScale,
 	cmdRestart,
@@ -232,4 +233,15 @@ func must(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+type prettyTime struct {
+	time.Time
+}
+
+func (s prettyTime) String() string {
+	if time.Now().Sub(s.Time) < 12*30*24*time.Hour {
+		return s.Local().Format("Jan _2 15:04")
+	}
+	return s.Local().Format("Jan _2  2006")
 }
