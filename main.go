@@ -76,6 +76,7 @@ func (c *Command) ShortExtra() string {
 var commands = []*Command{
 	cmdCreate,
 	cmdApps,
+	cmdDynos,
 	cmdLs,
 	cmdScale,
 	cmdRestart,
