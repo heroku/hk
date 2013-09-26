@@ -13,22 +13,20 @@ import (
 
 var cmdLs = &Command{
 	Run:   runLs,
-	Usage: "ls [-l] [app...]",
-	Short: "list apps, addons, dynos, and releases",
+	Usage: "ls [-l] [resource...]",
+	Short: "list addons, dynos, and releases",
 	Long: `
        hk ls [-l] releases [name...]
 
        hk ls [-l] addons [name...]
 
-Command hk ls lists apps, releases, and addons.
+Command hk ls lists releases, and addons.
 
 Options:
 
     -l       long listing
 
-Long listing for apps shows the owner, slug size, last release
-time (or time the app was created, if it's never been released),
-and the app name. Long listing for releases shows the git commit
+Long listing for releases shows the git commit
 id, who made the release, time of the release, version of the
 release (e.g. 1), and description. Long listing for addons shows
 the type of the addon, owner, name of the resource, and the config
@@ -36,14 +34,6 @@ var it's attached to. Long listing for dynos shows the name,
 state, age, and command.
 
 Examples:
-
-    $ hk ls
-    myapp
-    myapp2
-
-    $ hk ls -l
-    app  me  1234k  Jan 2 12:34  myapp
-    app  me  4567k  Jan 2 12:34  myapp2
 
     $ hk ls dynos
     run.3794
@@ -87,12 +77,6 @@ func runLs(cmd *Command, args []string) {
 }
 
 func list(w io.Writer, cmd *Command, args []string) {
-	if len(args) == 0 {
-		var apps []*App
-		must(Get(&apps, "/apps"))
-		printAppList(w, apps)
-		return
-	}
 	switch a0 := args[0]; {
 	case strings.HasPrefix("releases", a0):
 		listRels(w, args[1:])
@@ -100,46 +84,8 @@ func list(w io.Writer, cmd *Command, args []string) {
 		listAddons(w, args[1:])
 	case strings.HasPrefix("dynos", a0):
 		listDynos(w, args[1:])
-	default:
-		listApps(w, args)
 	}
 }
-
-func listApps(w io.Writer, names []string) {
-	ch := make(chan error, len(names))
-	var apps []*App
-	for _, name := range names {
-		if name == "" {
-			ch <- nil
-		} else {
-			v, url := new(App), "/apps/"+name
-			apps = append(apps, v)
-			go func() { ch <- Get(v, url) }()
-		}
-	}
-	for _ = range names {
-		if err := <-ch; err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-	}
-	printAppList(w, apps)
-}
-
-func printAppList(w io.Writer, apps []*App) {
-	sort.Sort(appsByName(apps))
-	abbrevEmailApps(apps)
-	for _, a := range apps {
-		if a.Name != "" {
-			listApp(w, a)
-		}
-	}
-}
-
-type appsByName []*App
-
-func (a appsByName) Len() int           { return len(a) }
-func (a appsByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a appsByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 func listRels(w io.Writer, versions []string) {
 	if len(versions) == 0 {
@@ -230,27 +176,6 @@ func abbrevEmailReleases(rels []*Release) {
 	}
 }
 
-func abbrevEmailApps(apps []*App) {
-	domains := make(map[string]int)
-	for _, a := range apps {
-		parts := strings.SplitN(a.Owner.Email, "@", 2)
-		if len(parts) == 2 {
-			domains["@"+parts[1]]++
-		}
-	}
-	smax, nmax := "", 0
-	for s, n := range domains {
-		if n > nmax {
-			smax = s
-			nmax = n
-		}
-	}
-	for _, a := range apps {
-		if strings.HasSuffix(a.Owner.Email, smax) {
-			a.Owner.Email = a.Owner.Email[:len(a.Owner.Email)-len(smax)]
-		}
-	}
-}
 
 func abbrevEmailResources(ms []*mergedAddon) {
 	domains := make(map[string]int)
@@ -303,28 +228,6 @@ func addonMatch(m *mergedAddon, a []string) bool {
 		}
 	}
 	return false
-}
-
-func listApp(w io.Writer, a *App) {
-	if flagLong {
-		size := 0
-		if a.SlugSize != nil {
-			size = *a.SlugSize
-		}
-		t := a.CreatedAt
-		if a.ReleasedAt != nil {
-			t = *a.ReleasedAt
-		}
-		listRec(w,
-			"app",
-			abbrev(a.Owner.Email, 10),
-			fmt.Sprintf("%6dk", (size+501)/(1000)),
-			prettyTime{t},
-			a.Name,
-		)
-	} else {
-		fmt.Fprintln(w, a.Name)
-	}
 }
 
 func listRelease(w io.Writer, r *Release) {
