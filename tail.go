@@ -8,15 +8,15 @@ import (
 )
 
 var (
-	follow  bool
-	lines   int
-	source  string
-	process string
+	follow bool
+	lines  int
+	source string
+	dyno   string
 )
 
 var cmdTail = &Command{
 	Run:   runTail,
-	Usage: "tail [-f] [-n lines] [-s source] [-p process]",
+	Usage: "tail [-f] [-n lines] [-s source] [-d dyno]",
 	Short: "show the last part of the app log",
 	Long:  `Tail prints recent application logs.`,
 }
@@ -25,7 +25,7 @@ func init() {
 	cmdTail.Flag.BoolVar(&follow, "f", false, "do not stop when end of file is reached")
 	cmdTail.Flag.IntVar(&lines, "n", -1, "number of log lines to request")
 	cmdTail.Flag.StringVar(&source, "s", "", "only display logs from the given source")
-	cmdTail.Flag.StringVar(&process, "p", "", "only display logs from the given process")
+	cmdTail.Flag.StringVar(&dyno, "d", "", "only display logs from the given dyno or process type")
 }
 
 func runTail(cmd *Command, args []string) {
@@ -36,7 +36,7 @@ func runTail(cmd *Command, args []string) {
 		Tail   bool   `json:"tail,omitempty"`
 	}
 
-	v.Dyno = process
+	v.Dyno = dyno
 	v.Lines = lines
 	v.Source = source
 	v.Tail = follow
