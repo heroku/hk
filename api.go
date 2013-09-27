@@ -48,15 +48,10 @@ func Delete(path string) error {
 	return APIReq(nil, "DELETE", path, nil)
 }
 
-// Sends a Heroku API request and decodes the response into v.
-// The type of v determines how to handle the response body:
-//
-//   nil        body is discarded
-//   io.Writer  body is copied directly into v
-//   else       body is decoded into v as json
-//
-// If v implements Accepter, v.Accept() will be used for the
-// request Accept header field; otherwise it will be
+// Generates an HTTP request for the Heroku API, but does not
+// perform the request. If v implements Accepter, v.Accept() will
+// be used for the request Accept header field; otherwise it will
+// be:
 //
 //   Accept: application/vnd.heroku+json; version=3
 //
@@ -66,8 +61,7 @@ func Delete(path string) error {
 //   io.Reader   body is sent verbatim
 //   url.Values  body is encoded as application/x-www-form-urlencoded
 //   else        body is encoded as application/json
-func APIReq(v interface{}, meth, path string, body interface{}) error {
-	var err error
+func NewRequest(v interface{}, method, path string, body interface{}) (*http.Request, error) {
 	var ctype string
 	var rbody io.Reader
 
@@ -86,9 +80,9 @@ func APIReq(v interface{}, meth, path string, body interface{}) error {
 		rbody = bytes.NewReader(j)
 		ctype = "application/json"
 	}
-	req, err := http.NewRequest(meth, apiURL+path, rbody)
+	req, err := http.NewRequest(method, apiURL+path, rbody)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req.SetBasicAuth(getCreds(req.URL))
 	req.Header.Set("User-Agent", userAgent)
@@ -108,6 +102,30 @@ func APIReq(v interface{}, meth, path string, body interface{}) error {
 			)
 		}
 	}
+	return req, nil
+}
+
+// Sends a Heroku API request and decodes the response into v. As
+// described in NewRequest(), the type of body determines how to
+// encode the request body. As described in DoReq(), the type of
+// v determines how to handle the response body.
+func APIReq(v interface{}, meth, path string, body interface{}) error {
+	req, err := NewRequest(v, meth, path, body)
+	if err != nil {
+		return err
+	}
+	return DoReq(req, v)
+}
+
+// Submits an HTTP request, checks its response, and deserializes
+// the response into v. The type of v determines how to handle
+// the response body:
+//
+//   nil        body is discarded
+//   io.Writer  body is copied directly into v
+//   else       body is decoded into v as json
+//
+func DoReq(req *http.Request, v interface{}) error {
 	if os.Getenv("HKDUMPREQ") != "" {
 		dump, err := httputil.DumpRequestOut(req, true)
 		if err != nil {
