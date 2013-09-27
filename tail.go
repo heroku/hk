@@ -1,13 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"strconv"
 )
 
 var (
@@ -32,31 +29,27 @@ func init() {
 }
 
 func runTail(cmd *Command, args []string) {
-	data := make(url.Values)
-	data.Add("logplex", "true")
-
-	if follow {
-		data.Add("tail", "1")
+	var v struct {
+		Dyno   string `json:"dyno,omitempty"`
+		Lines  int    `json:"lines,omitempty"`
+		Source string `json:"source,omitempty"`
+		Tail   bool   `json:"tail,omitempty"`
 	}
 
-	if lines > 0 {
-		data.Add("num", strconv.Itoa(lines))
-	}
+	v.Dyno = process
+	v.Lines = lines
+	v.Source = source
+	v.Tail = follow
 
-	if source != "" {
-		data.Add("source", source)
+	var session struct {
+		Id         string `json:"id"`
+		LogplexURL string `json:"logplex_url"`
 	}
-
-	if process != "" {
-		data.Add("ps", process)
-	}
-
-	surl := new(logURL)
-	err := APIReq(surl, "GET", "/apps/"+mustApp()+"/logs", data)
+	err := APIReq(&session, "POST", "/apps/"+mustApp()+"/log-sessions", v)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp, err := http.Get(surl.String())
+	resp, err := http.Get(session.LogplexURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,12 +58,4 @@ func runTail(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 	resp.Body.Close()
-}
-
-type logURL struct {
-	bytes.Buffer
-}
-
-func (logURL) Accept() string {
-	return "application/json"
 }

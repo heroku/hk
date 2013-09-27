@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"os"
 	"runtime"
 	"strings"
@@ -22,10 +21,6 @@ func init() {
 	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
-}
-
-type Accepter interface {
-	Accept() string
 }
 
 func Get(v interface{}, path string) error {
@@ -49,9 +44,8 @@ func Delete(path string) error {
 }
 
 // Generates an HTTP request for the Heroku API, but does not
-// perform the request. If v implements Accepter, v.Accept() will
-// be used for the request Accept header field; otherwise it will
-// be:
+// perform the request. The request's Accept header field will be
+// set to:
 //
 //   Accept: application/vnd.heroku+json; version=3
 //
@@ -59,17 +53,13 @@ func Delete(path string) error {
 //
 //   nil         no body
 //   io.Reader   body is sent verbatim
-//   url.Values  body is encoded as application/x-www-form-urlencoded
 //   else        body is encoded as application/json
-func NewRequest(v interface{}, method, path string, body interface{}) (*http.Request, error) {
+func NewRequest(method, path string, body interface{}) (*http.Request, error) {
 	var ctype string
 	var rbody io.Reader
 
 	switch t := body.(type) {
 	case nil:
-	case url.Values:
-		rbody = strings.NewReader(t.Encode())
-		ctype = "application/x-www-form-urlencoded"
 	case io.Reader:
 		rbody = t
 	default:
@@ -89,11 +79,7 @@ func NewRequest(v interface{}, method, path string, body interface{}) (*http.Req
 	if ctype != "" {
 		req.Header.Set("Content-Type", ctype)
 	}
-	if a, ok := v.(Accepter); ok {
-		req.Header.Set("Accept", a.Accept())
-	} else {
-		req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
-	}
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
 	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
 		if i := strings.Index(h, ":"); i >= 0 {
 			req.Header.Set(
@@ -110,7 +96,7 @@ func NewRequest(v interface{}, method, path string, body interface{}) (*http.Req
 // encode the request body. As described in DoReq(), the type of
 // v determines how to handle the response body.
 func APIReq(v interface{}, meth, path string, body interface{}) error {
-	req, err := NewRequest(v, meth, path, body)
+	req, err := NewRequest(meth, path, body)
 	if err != nil {
 		return err
 	}
