@@ -15,7 +15,7 @@ environment
 		url for the hk directory server
 		(e.g. https://hk.heroku.com)
 
-	S3DISTURL (build, gen)
+	S3DISTURL (build, gen, web)
 
 		url for the s3 bucket for distributing full hk binaries
 		(e.g. https://hkdist.s3.amazonaws.com/)
