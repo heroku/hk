@@ -41,8 +41,8 @@ func init() {
 
 func runAddons(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
 	listAddons(w, names)
-	w.Flush()
 }
 
 func listAddons(w io.Writer, names []string) {

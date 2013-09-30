@@ -45,6 +45,7 @@ func init() {
 
 func runApps(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
 	var apps []*App
 	if len(names) == 0 {
 		must(Get(&apps, "/apps"))
@@ -66,7 +67,6 @@ func runApps(cmd *Command, names []string) {
 		}
 	}
 	printAppList(w, apps)
-	w.Flush()
 }
 
 func printAppList(w io.Writer, apps []*App) {

@@ -45,8 +45,8 @@ func init() {
 
 func runReleases(cmd *Command, versions []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
 	listReleases(w, versions)
-	w.Flush()
 }
 
 func listReleases(w io.Writer, versions []string) {

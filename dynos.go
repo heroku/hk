@@ -48,8 +48,8 @@ func init() {
 
 func runDynos(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
 	listDynos(w, names)
-	w.Flush()
 }
 
 func listDynos(w io.Writer, names []string) {
