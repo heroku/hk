@@ -127,4 +127,3 @@ type releasesByVersion []*Release
 func (a releasesByVersion) Len() int           { return len(a) }
 func (a releasesByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a releasesByVersion) Less(i, j int) bool { return a[i].Version < a[j].Version }
-
