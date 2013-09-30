@@ -7,16 +7,26 @@ import (
 
 var cmdCreate = &Command{
 	Run:   runCreate,
-	Usage: "create [app]",
+	Usage: "create [-r region] [app]",
 	Short: "create an app",
 	Long:  `Create creates a new heroku app.`,
+}
+
+var flagRegion string
+
+func init() {
+	cmdCreate.Flag.StringVar(&flagRegion, "r", "", "region name")
 }
 
 func runCreate(cmd *Command, args []string) {
 	var app App
 	var v struct {
-		Name string `json:"name,omitempty"`
+		Name   string `json:"name,omitempty"`
+		Region struct {
+			Name string `json:"name,omitempty"`
+		} `json:"region,omitempty"`
 	}
+	v.Region.Name = flagRegion
 	if len(args) > 0 {
 		v.Name = args[0]
 	}

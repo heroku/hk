@@ -17,6 +17,10 @@ type App struct {
 		Id    string
 		Email string
 	}
+	Region struct {
+		ID   string
+		Name string
+	}
 	RepoSize    *int       `json:"repo_size"`
 	SlugSize    *int       `json:"slug_size"`
 	CreatedAt   time.Time  `json:"created_at"`
