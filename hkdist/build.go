@@ -14,9 +14,13 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
+	"sync"
 	"time"
 )
+
+const numgen = 20
 
 var allPlatforms = []string{
 	"darwin-386",
@@ -49,11 +53,13 @@ func cloneRepo(repo, branch, dir string) error {
 
 func build(args []string) {
 	mustHaveEnv("S3DISTURL")
+	mustHaveEnv("S3PATCHURL")
 	mustHaveEnv("S3_ACCESS_KEY")
 	mustHaveEnv("S3_SECRET_KEY")
 	mustHaveEnv("BUILDBRANCH")
 	mustHaveEnv("BUILDNAME")
 	mustHaveEnv("DISTURL")
+	mustHaveEnv("HKGENAPPNAME")
 
 	// determine list of platforms to be built
 	platforms := allPlatforms
@@ -83,7 +89,21 @@ func build(args []string) {
 
 	// TODO(kr): verify signature
 
+	var dgroup sync.WaitGroup
+	dchan := make(chan diff)
+	// spawn diff generators
+	for i := 0; i < numgen; i++ {
+		go func() {
+			for d := range dchan {
+				d.Generate()
+				dgroup.Done()
+			}
+		}()
+	}
+
 	// run Build for each platform
+	allSuccessful := true
+	builds := make([]*Build, 0)
 	for _, platform := range platforms {
 		sepIndex := strings.Index(platform, "-")
 		b := &Build{
@@ -92,10 +112,29 @@ func build(args []string) {
 			Arch: platform[sepIndex+1:],
 			Ver:  ver[1:],
 		}
-		err := b.Run()
+
+		err = b.EnsureBuiltAndRegistered()
 		if err != nil {
-			log.Printf("building %s on %s for %s: %s\n", b.Name, b.Ver, b.platform(), err)
+			allSuccessful = false
+			log.Println(err)
+			continue
 		}
+		builds = append(builds, b) // only add to release list if successful
+
+		// Generate diffs
+		b.GenDiffs(dchan, &dgroup)
+	}
+	dgroup.Wait()
+	close(dchan)
+
+	for _, b := range builds {
+		if err = b.setCurVersion(); err != nil {
+			allSuccessful = false
+			log.Printf("setCurVersion: %s", err)
+		}
+	}
+	if !allSuccessful {
+		os.Exit(1)
 	}
 }
 
@@ -117,42 +156,46 @@ func (b *Build) platform() string {
 	return b.OS + "-" + b.Arch
 }
 
-func (b *Build) Run() error {
-	url := distURL + b.Name + "-" + b.Ver + "-" + b.platform() + ".json"
-	if resp, err := http.Head(url); err == nil && resp.StatusCode == 200 {
-		return fmt.Errorf("already built: %s", b.Ver)
+func (b *Build) EnsureBuiltAndRegistered() error {
+	var sha []byte
+	// Check if it's already registered
+	if registered, err := b.alreadyRegistered(); err != nil {
+		return fmt.Errorf("checking registration %s on %s for %s: %s", b.Name, b.Ver, b.platform(), err)
+	} else if registered {
+		log.Printf("already registered %s on %s for %s", b.Name, b.Ver, b.platform())
+	} else {
+		sha, err = b.buildAndUpload()
+		if err != nil {
+			return fmt.Errorf("building %s on %s for %s: %s", b.Name, b.Ver, b.platform(), err)
+		}
+		if err = b.register(sha); err != nil {
+			return fmt.Errorf("registration: %s", err)
+		}
 	}
+	return nil
+}
 
-	err := b.build()
-	if err != nil {
-		return err
+func (b *Build) buildAndUpload() (shasum []byte, err error) {
+	if err = b.build(); err != nil {
+		return
 	}
 	body, err := os.Open(b.filename())
 	if err != nil {
-		return err
+		return
 	}
 
 	h := sha256.New()
-	if _, err := io.Copy(h, body); err != nil {
-		return err
+	if _, err = io.Copy(h, body); err != nil {
+		return
 	}
-	shasum := h.Sum(nil)
+	shasum = h.Sum(nil)
 
-	_, err = body.Seek(int64(0), 0)
-	if err != nil {
-		return err
+	if _, err = body.Seek(int64(0), 0); err != nil {
+		return
 	}
 
-	if err = b.upload(body); err != nil {
-		return fmt.Errorf("upload: %s", err)
-	}
-	if err = b.register(shasum); err != nil {
-		return fmt.Errorf("registration: %s", err)
-	}
-	if err = b.setCurVersion(); err != nil {
-		return fmt.Errorf("release: %s", err)
-	}
-	return nil
+	err = b.upload(body)
+	return
 }
 
 const relverGo = `
@@ -172,7 +215,6 @@ func (b *Build) build() (err error) {
 	if err != nil {
 		return fmt.Errorf("writing relver.go: %s", err)
 	}
-	log.Printf("GOOS=%s GOARCH=%s go build -tags release -o %s\n", b.OS, b.Arch, b.filename())
 	cmd := exec.Command("go", "build", "-tags", "release", "-o", b.filename())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -199,11 +241,14 @@ func (b *Build) upload(r io.Reader) error {
 		return err
 	}
 
-	filename := b.Name + "/" + b.Ver + "/" + b.platform() + ".gz"
-	if err := s3put(buf, s3DistURL+filename); err != nil {
+	if err := s3put(buf, b.url()); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (b *Build) url() string {
+	return s3DistURL + b.Name + "/" + b.Ver + "/" + b.platform() + ".gz"
 }
 
 func cmd(arg ...string) ([]byte, error) {
@@ -225,6 +270,15 @@ func getCreds(u *url.URL) (user, pass string) {
 	}
 
 	return m.Login, m.Password
+}
+
+func (b *Build) alreadyRegistered() (bool, error) {
+	url := distURL + b.Name + "-" + b.Ver + "-" + b.platform() + ".json"
+	if resp, err := http.Head(url); err != nil {
+		return false, err
+	} else {
+		return resp.StatusCode == 200, nil
+	}
 }
 
 func (b *Build) register(sha256 []byte) error {
@@ -272,5 +326,140 @@ func (b *Build) setCurVersion() error {
 		body, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("http status %v putting %q: %q", resp.Status, r.URL, string(body))
 	}
+	return nil
+}
+
+func (b *Build) GenDiffs(dchan chan diff, dgroup *sync.WaitGroup) {
+	diffs, err := b.getDiffs()
+	if err != nil {
+		// TODO: Log error
+		log.Printf("Build.getDiffs release=%s os=%s arch=%s msg=%q\n", b.Ver, b.OS, b.Arch, err)
+		return
+	}
+
+	// Add diff gens to work queue
+	dgroup.Add(len(diffs))
+	for _, d := range diffs {
+		dchan <- d
+	}
+}
+
+func (b *Build) getDiffs() ([]diff, error) {
+	versions, err := b.getOldVersions()
+	if err != nil {
+		return nil, err
+	}
+	diffs := make([]diff, len(versions))
+	for i, ver := range versions {
+		diffs[i] = diff{Cmd: b.Name, Platform: b.platform(), From: ver, To: b.Ver}
+	}
+	return diffs, nil
+}
+
+func (b *Build) getOldVersions() ([]string, error) {
+	url := distURL + "release.json"
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	} else if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("error fetching releases: %d", resp.StatusCode)
+	}
+	var rels []release
+	if err = json.NewDecoder(resp.Body).Decode(&rels); err != nil {
+		return nil, err
+	}
+	var versions sort.StringSlice
+	for _, r := range rels {
+		if r.Cmd == b.Name && r.Plat == b.platform() && r.Ver != b.Ver {
+			versions = append(versions, r.Ver)
+		}
+	}
+
+	sort.Sort(sort.Reverse(versions))
+	return versions, nil
+}
+
+type diff struct {
+	Cmd      string
+	Platform string
+	From     string
+	To       string
+}
+
+func (d *diff) Exists() bool {
+	// Check if diff already exists
+	url := s3PatchURL + patchFilename(d.Cmd, d.Platform, d.From, d.To)
+	if resp, err := http.Head(url); err != nil {
+		log.Printf("diff.Exists name=%s platform=%s from=%s to=%s error=%s", d.Cmd, d.Platform, d.From, d.To, err)
+		return false
+	} else {
+		return resp.StatusCode == 200
+	}
+}
+
+func (d *diff) Generate() {
+	if d.Exists() {
+		return
+	}
+
+	d.runGen(time.Now().Add(45 * time.Second))
+}
+
+func (d *diff) runGen(deadline time.Time) {
+	err := runreq(hkgenAppName, "hkdist gen "+d.Cmd+" "+d.Platform+" "+d.From+" "+d.To)
+	if err != nil {
+		log.Printf("diff.runGen %s -> %s: %s", d.From, d.To, err)
+		return
+	}
+
+	for _ = range time.Tick(5 * time.Second) {
+		if time.Now().After(deadline) {
+			log.Printf("diff.runGen timeout cmd=%s platform=%s from=%s to=%s", d.Cmd, d.Platform, d.From, d.To)
+			return
+		}
+
+		if d.Exists() {
+			return
+		}
+	}
+}
+
+// wish this was all using a proper API client
+
+func apireq(method, path string, body interface{}) (*http.Response, error) {
+	var rbody io.Reader
+	switch body.(type) {
+	case nil:
+	default:
+		j, err := json.Marshal(body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rbody = bytes.NewReader(j)
+	}
+	req, err := http.NewRequest(method, path, rbody)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth(getCreds(req.URL))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+
+	return http.DefaultClient.Do(req)
+}
+
+func runreq(appname, command string) error {
+	var v struct {
+		Command string `json:"command"`
+	}
+	v.Command = command
+	res, err := apireq("POST", "https://api.heroku.com/apps/"+appname+"/dynos", v)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode/100 != 2 {
+		return fmt.Errorf("unexpected response code: %d", res.StatusCode)
+	}
+
 	return nil
 }

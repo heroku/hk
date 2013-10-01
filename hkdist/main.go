@@ -33,13 +33,14 @@ import (
 )
 
 var (
-	distURL     = os.Getenv("DISTURL")
-	s3DistURL   = os.Getenv("S3DISTURL")
-	s3PatchURL  = os.Getenv("S3PATCHURL")
-	buildName   = os.Getenv("BUILDNAME")
-	netrcPath   = filepath.Join(os.Getenv("HOME"), ".netrc")
-	buildbranch = os.Getenv("BUILDBRANCH")
-	s3keys      = s3.Keys{
+	distURL      = os.Getenv("DISTURL")
+	s3DistURL    = os.Getenv("S3DISTURL")
+	s3PatchURL   = os.Getenv("S3PATCHURL")
+	buildName    = os.Getenv("BUILDNAME")
+	netrcPath    = filepath.Join(os.Getenv("HOME"), ".netrc")
+	buildbranch  = os.Getenv("BUILDBRANCH")
+	hkgenAppName = os.Getenv("HKGENAPPNAME")
+	s3keys       = s3.Keys{
 		AccessKey: os.Getenv("S3_ACCESS_KEY"),
 		SecretKey: os.Getenv("S3_SECRET_KEY"),
 	}
@@ -73,7 +74,9 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 	if len(os.Args) < 2 {
 		usage()
-	} else if os.Args[1] != "build" && len(os.Args) != 2 {
+	} else if os.Args[1] == "web" && len(os.Args) != 2 {
+		usage()
+	} else if os.Args[1] == "gen" && len(os.Args) != 6 {
 		usage()
 	}
 	f := subcmds[os.Args[1]]

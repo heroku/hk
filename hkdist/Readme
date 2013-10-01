@@ -47,6 +47,10 @@ environment
 
 		which tcp port to listen on
 
+  HKGENAPPNAME (build)
+
+    the name of the heroku app to generate diffs with
+
 
 how to release a new version of hk
 

@@ -4,51 +4,12 @@ import (
 	"bytes"
 	"github.com/kr/binarydist"
 	"log"
-	"net/http"
-	"time"
 )
 
 func gen(args []string) {
-	var mod time.Time
-	for {
-		genPatches(&mod)
-		time.Sleep(time.Minute)
-	}
-}
-
-func genPatches(mod *time.Time) {
-	r := rels(mod)
-	for i, a := range r {
-		for _, b := range r[i+1:] {
-			if a.Plat == b.Plat && a.Cmd == b.Cmd {
-				if exists, err := patchExists(a, b); !exists && err == nil {
-					genPatch(a, b)
-				} else if err != nil {
-					log.Println(err)
-				}
-			}
-		}
-	}
-}
-
-func patchExists(a, b release) (bool, error) {
-	res, err := http.Head(s3PatchURL + patchFilename(a, b))
-	if err != nil {
-		return false, err
-	}
-	return res.StatusCode == 200, nil
-}
-
-func rels(mod *time.Time) (a []release) {
-	url := distURL + "release.json"
-	log.Println("fetch rels", url)
-	err := fetchJSON(url, mod, &a)
-	if err != nil {
-		log.Println("fetch rels: ", err)
-		return nil
-	}
-	log.Println("fetch rels finish")
-	return a
+	from := release{Plat: args[1], Cmd: args[0], Ver: args[2]}
+	to := release{Plat: args[1], Cmd: args[0], Ver: args[3]}
+	genPatch(from, to)
 }
 
 func genPatch(a, b release) {
@@ -69,9 +30,9 @@ func computeAndStorePatch(a, b release) error {
 	if err := binarydist.Diff(ar, br, patch); err != nil {
 		return err
 	}
-	return s3put(patch, s3PatchURL+patchFilename(a, b))
+	return s3put(patch, s3PatchURL+patchFilename(a.Cmd, a.Plat, a.Ver, b.Ver))
 }
 
-func patchFilename(a, b release) string {
-	return a.Cmd + "/" + a.Ver + "/" + b.Ver + "/" + a.Plat
+func patchFilename(cmd, plat, from, to string) string {
+	return cmd + "/" + from + "/" + to + "/" + plat
 }
