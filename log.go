@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/bgentry/heroku-go"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -92,11 +93,13 @@ func runLog(cmd *Command, args []string) {
 		}
 	}
 
+	writer := io.Writer(os.Stdout)
+
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		if _, err = fmt.Fprintln(os.Stdout, scanner.Text()); err != nil {
+		if _, err = fmt.Fprintln(writer, scanner.Text()); err != nil {
 			log.Fatal(err)
 		}
 	}
