@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/term"
 	"io"
 	"log"
 	"net/http"
@@ -95,6 +96,10 @@ func runLog(cmd *Command, args []string) {
 	}
 
 	writer := LineWriter(WriterAdapter{os.Stdout})
+
+	if term.IsTerminal(os.Stdout) {
+		writer = newColorizer(writer)
+	}
 
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Split(bufio.ScanLines)
