@@ -77,7 +77,7 @@ func build(args []string) {
 		log.Fatalf("listing tags: %s", err)
 	}
 	ver := string(bytes.TrimSpace(tagb))
-	if (ver[0] != 'v' || strings.IndexFunc(ver[1:], badVersionRune) >= 0) {
+	if ver[0] != 'v' || strings.IndexFunc(ver[1:], badVersionRune) >= 0 {
 		log.Fatalf("bad tag name: %s", ver)
 	}
 
