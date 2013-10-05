@@ -126,3 +126,18 @@ type colorizer struct {
 	filter      *regexp.Regexp
 	writer      LineWriter
 }
+
+func newColorizer(writer LineWriter) *colorizer {
+	return &colorizer{
+		colors: make(map[string]string),
+		colorScheme: []string{
+			"36", //cyan
+			"33", //yellow
+			"32", //green
+			"35", //magenta
+			"31", //red
+		},
+		filter: regexp.MustCompile(`(?s)^(.*?\[([\w-]+)(?:[\d\.]+)?\]:)(.*)?$`),
+		writer: writer,
+	}
+}
