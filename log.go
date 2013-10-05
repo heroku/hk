@@ -90,8 +90,10 @@ func runLog(cmd *Command, args []string) {
 			log.Fatal("Unexpected error: " + resp.Status)
 		}
 	}
+
 	if _, err = io.Copy(os.Stdout, resp.Body); err != nil {
 		log.Fatal(err)
 	}
+
 	resp.Body.Close()
 }
