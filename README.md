@@ -70,14 +70,14 @@ You'll need a line like this in $HOME/.netrc
 	Supported commands are:
 
   	create     create an app
-    rename     rename an app
+  	rename     rename an app
   	destroy    destroy an app
   	creds      show auth creds
   	env        list config vars
   	get        get config var
   	set        set config var
   	info       show app info
-    rels       show releases and info
+  	rels       show releases and info
   	list       list apps
   	open       open app
   	ps         list processes
