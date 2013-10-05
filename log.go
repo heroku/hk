@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 var (
@@ -117,4 +118,11 @@ type WriterAdapter struct {
 
 func (w WriterAdapter) Writeln(p string) (n int, err error) {
 	return fmt.Fprintln(w, p)
+}
+
+type colorizer struct {
+	colors      map[string]string
+	colorScheme []string
+	filter      *regexp.Regexp
+	writer      LineWriter
 }
