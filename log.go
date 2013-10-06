@@ -93,13 +93,13 @@ func runLog(cmd *Command, args []string) {
 		}
 	}
 
-	writer := io.Writer(os.Stdout)
+	writer := LineWriter(WriterAdapter{os.Stdout})
 
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		if _, err = fmt.Fprintln(writer, scanner.Text()); err != nil {
+		if _, err = writer.Writeln(scanner.Text()); err != nil {
 			log.Fatal(err)
 		}
 	}
