@@ -110,3 +110,11 @@ func runLog(cmd *Command, args []string) {
 type LineWriter interface {
 	Writeln(p string) (int, error)
 }
+
+type WriterAdapter struct {
+	io.Writer
+}
+
+func (w WriterAdapter) Writeln(p string) (n int, err error) {
+	return fmt.Fprintln(w, p)
+}
