@@ -106,3 +106,7 @@ func runLog(cmd *Command, args []string) {
 
 	resp.Body.Close()
 }
+
+type LineWriter interface {
+	Writeln(p string) (int, error)
+}
