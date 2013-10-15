@@ -117,7 +117,7 @@ func (m *mergedAddon) String() string {
 func getMergedAddons(appname string) []*mergedAddon {
 	var addons []*Addon
 	app := new(App)
-	app.Name = mustApp()
+	app.Name = appname
 	ch := make(chan error)
 	go func() { ch <- Get(&addons, "/apps/"+app.Name+"/addons") }()
 	go func() { ch <- Get(app, "/apps/"+app.Name) }()
