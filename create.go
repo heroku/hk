@@ -22,11 +22,9 @@ func runCreate(cmd *Command, args []string) {
 	var app App
 	var v struct {
 		Name   string `json:"name,omitempty"`
-		Region struct {
-			Name string `json:"name,omitempty"`
-		} `json:"region,omitempty"`
+		Region string `json:"region,omitempty"`
 	}
-	v.Region.Name = flagRegion
+	v.Region = flagRegion
 	if len(args) > 0 {
 		v.Name = args[0]
 	}
