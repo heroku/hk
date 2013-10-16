@@ -87,7 +87,7 @@ var commands = []*Command{
 	cmdUnset,
 	cmdEnv,
 	cmdRun,
-	cmdTail,
+	cmdLog,
 	cmdInfo,
 	cmdOpen,
 	cmdRename,
