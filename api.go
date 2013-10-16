@@ -112,13 +112,14 @@ func APIReq(v interface{}, meth, path string, body interface{}) error {
 //   else       body is decoded into v as json
 //
 func DoReq(req *http.Request, v interface{}) error {
-	if os.Getenv("HKDUMPREQ") != "" {
+	debug := os.Getenv("HKDEBUG") != ""
+	if debug {
 		dump, err := httputil.DumpRequestOut(req, true)
 		if err != nil {
 			log.Println(err)
 		} else {
 			os.Stderr.Write(dump)
-			os.Stderr.Write([]byte{'\n'})
+			os.Stderr.Write([]byte{'\n', '\n'})
 		}
 	}
 	res, err := http.DefaultClient.Do(req)
@@ -126,6 +127,15 @@ func DoReq(req *http.Request, v interface{}) error {
 		return err
 	}
 	defer res.Body.Close()
+	if debug {
+		dump, err := httputil.DumpResponse(res, true)
+		if err != nil {
+			log.Println(err)
+		} else {
+			os.Stderr.Write(dump)
+			os.Stderr.Write([]byte{'\n'})
+		}
+	}
 	if err = checkResp(res); err != nil {
 		return err
 	}

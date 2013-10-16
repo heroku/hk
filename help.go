@@ -41,12 +41,12 @@ HKPATH
 
   See 'hk help plugins' for information about the plugin interface.
 
-HKDUMPREQ
+HKDEBUG
 
   When this is set, hk prints the wire representation of each API
-  request to stderr just before sending the request. This will
-  most likely include your secret API key in the Authorization
-  header field, so be careful with the output.
+  request to stderr just before sending the request, and prints the
+  response. This will most likely include your secret API key in
+  the Authorization header field, so be careful with the output.
 `,
 }
 
