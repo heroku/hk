@@ -390,7 +390,7 @@ func (d *diff) Exists() bool {
 	// Check if diff already exists
 	url := s3PatchURL + patchFilename(d.Cmd, d.Platform, d.From, d.To)
 	if resp, err := http.Head(url); err != nil {
-		log.Printf("diff.Exists name=%s platform=%s from=%s to=%s error=%s", d.Cmd, d.Platform, d.From, d.To, err)
+		log.Printf("diff.Exists name=%s platform=%s from=%s to=%s error=%q", d.Cmd, d.Platform, d.From, d.To, err)
 		return false
 	} else {
 		return resp.StatusCode == 200
