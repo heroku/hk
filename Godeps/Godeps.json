@@ -1,0 +1,34 @@
+{
+	"ImportPath": "github.com/kr/hk",
+	"GoVersion": "go1.1.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go-netrc/netrc",
+			"Comment": "null-9",
+			"Rev": "28676070ab99a6a09739963c7857fc61553ff8a9"
+		},
+		{
+			"ImportPath": "github.com/bmizerany/pat",
+			"Rev": "51b7af73e39f6dc59846b22d56ca886d105ef0c3"
+		},
+		{
+			"ImportPath": "github.com/bmizerany/pq",
+			"Rev": "284a1d41dcc27fe8ccc413c339464698ab99f6d1"
+		},
+		{
+			"ImportPath": "github.com/kr/binarydist",
+			"Rev": "9955b0ab8708602d411341e55fffd7e0700f86bd"
+		},
+		{
+			"ImportPath": "github.com/kr/s3",
+			"Rev": "bf9eae96b5ce016e308439d4415421e4392b20c3"
+		},
+		{
+			"ImportPath": "github.com/kr/secureheader",
+			"Rev": "58fc607ae48d7c16a9a53c9213b6d98127dc05fe"
+		}
+	]
+}
