@@ -215,14 +215,14 @@ func (b *Build) build() (err error) {
 	if err != nil {
 		return fmt.Errorf("writing relver.go: %s", err)
 	}
-	cmd := exec.Command("go", "build", "-tags", "release", "-o", b.filename())
+	cmd := exec.Command("godep", "go", "build", "-tags", "release", "-o", b.filename())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	env := []string{"GOOS=" + b.OS, "GOARCH=" + b.Arch, "CGO_ENABLED=0"}
 	cmd.Env = append(env, os.Environ()...)
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("go build -tags release: ", err)
+		return fmt.Errorf("godep go build -tags release: ", err)
 	}
 	return nil
 }

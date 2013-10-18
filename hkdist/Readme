@@ -54,6 +54,7 @@ environment
 
 how to release a new version of hk
 
-	1. make a gpg-signed git tag of the form vYYYYMMDD or vYYYYMMDD.N
-	2. push the release branch to that tag on github
-	3. run hkdist build on each supported platform
+	1. install godep to manage dependencies: https://github.com/kr/godep
+	2. make a gpg-signed git tag of the form vYYYYMMDD or vYYYYMMDD.N
+	3. push the release branch to that tag on github
+	4. run hkdist build to build for all platforms and generate diffs
