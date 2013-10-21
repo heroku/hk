@@ -20,11 +20,11 @@ hk is a command line client to the Heroku runtime platform, designed to be as fa
 
 	## list
 
-	$ time heroku list >/dev/null
-	real	0m8.826s
+	$ time heroku apps >/dev/null
+	real	0m3.830s
 
 	$ time hk apps >/dev/null
-	real  0m3.658s
+	real	0m0.785s
 
 **Focus on API**
 
