@@ -23,7 +23,7 @@ hk is a command line client to the Heroku runtime platform, designed to be as fa
 	$ time heroku list >/dev/null
 	real	0m8.826s
 
-	$ time hk list >/dev/null
+	$ time hk apps >/dev/null
 	real  0m3.658s
 
 **Focus on API**
@@ -64,30 +64,43 @@ You'll need a line like this in $HOME/.netrc
 
 ### Usage
 
-	$ hk help
-	Usage: hk <command> [options] [arguments]
+```
+$ hk help
 
-	Supported commands are:
+Usage: hk [-a app] [command] [options] [arguments]
 
-  	create     create an app
-  	rename     rename an app
-  	destroy    destroy an app
-  	creds      show auth creds
-  	env        list config vars
-  	get        get config var
-  	set        set config var
-  	info       show app info
-  	rels       show releases and info
-  	list       list apps
-  	open       open app
-  	ps         list processes
-  	scale      change dyno counts
-  	tail       tail log files
-  	run        run a process
-  	version    show hk version
-  	help       show help
 
-	See 'hk help [command]' for more information about a command.
+Commands:
+
+    create    create an app
+    apps      list apps
+    dynos     list dynos
+    releases  list releases
+    addons    list addons
+    scale     change dyno counts
+    restart   restart dynos
+    set       set config var
+    unset     unset config var
+    env       list config vars
+    run       run a process in a dyno
+    log       stream app log lines
+    info      show app info
+    open      open app in a web browser
+    rename    rename an app
+    destroy   destroy an app
+    sshauth   authorize ssh public keys
+    version   show hk version
+
+Run 'hk help [command]' for details.
+
+
+Additional help topics:
+
+    environ   environment variables used by hk
+    plugins   interface to plugin commands
+    more      additional commands, less frequently used
+    about     information about hk (e.g. copyright, license, etc.)
+```
 
 ## Plugins
 
@@ -104,15 +117,13 @@ hk will set these environment variables for a plugin:
 ### Development
 
 	$ cd hk
-	$ go get
+	$ godep go get
 	$ mate main.go
-	$ go build
+	$ godep go build
 	$ ./hk list
 
 ### Release
 
 	$ cd hk
 	$ vim main.go # edit Version
-	$ go build
-	$ ./pub # publish ./hk
-	$ ./def # make `./hk version` the default
+	$ godep go build
