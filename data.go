@@ -41,7 +41,7 @@ type Dyno struct {
 		ID      string
 		Version int
 	}
-	Size      int
+	Size      string
 	State     string
 	AttachURL *string   `json:"attach_url"`
 	CreatedAt time.Time `json:"created_at"`
