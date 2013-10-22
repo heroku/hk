@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
-	"github.com/kr/hk/term"
+	"github.com/heroku/hk/term"
 	"io"
 	"log"
 	"net/url"

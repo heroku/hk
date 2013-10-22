@@ -69,7 +69,7 @@ func build(args []string) {
 
 	// clone repo
 	dir := buildName + "-build"
-	err := cloneRepo("https://github.com/kr/hk.git", buildbranch, dir)
+	err := cloneRepo("https://github.com/heroku/hk.git", buildbranch, dir)
 	if err != nil {
 		log.Fatalf("cloning repo to %s on branch %s: %s\n", dir, buildbranch, err)
 	}
