@@ -5,7 +5,10 @@ var helpAbout = &Command{
 	Short: "information about hk (e.g. copyright, license, etc.)",
 	Long: userAgent + `
 
-Copyright © 2013 Keith Rarick
+Copyright © 2013 Keith Rarick and the hk contributors. A full list of
+contributors is available on GitHub:
+
+    https://github.com/heroku/hk/graphs/contributors
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -28,7 +31,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 For source code, to contribute to hk, or just to say hello:
 
-    https://github.com/kr/hk
+    https://github.com/heroku/hk
 
 Happy hacking!
 `,
