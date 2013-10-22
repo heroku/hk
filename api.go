@@ -176,6 +176,9 @@ using the given method on the given path, using stdin unmodified
 as the request body. It prints the response unmodified on stdout.
 Method GET doesn't read or send a request body.
 
+Method name input will be upcased, so both 'hk api GET /apps' and
+'hk api get /apps' are valid commands.
+
 As with any hk command, the behavior of hk api is controlled by
 various environment variables. See 'hk help environ' for details.
 
@@ -204,11 +207,12 @@ func runAPI(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
+	method := strings.ToUpper(args[0])
 	var body io.Reader
-	if args[0] != "GET" {
+	if method != "GET" {
 		body = os.Stdin
 	}
-	if err := APIReq(os.Stdout, args[0], args[1], body); err != nil {
+	if err := APIReq(os.Stdout, method, args[1], body); err != nil {
 		log.Fatal(err)
 	}
 }
