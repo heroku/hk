@@ -6,6 +6,16 @@ Fast Heroku client.
 
 hk is a command line client to the Heroku runtime platform, designed to be as fast as possible.
 
+#### Disclaimer
+
+This is pre-alpha software. It will undergo substantial changes during the
+coming months. Don't be surprised if it is broken or if the interface is
+completely altered without warning.
+
+Issues and pull requests are still welcome, but please understand that they may
+be rejected if it's an issue we just aren't ready to tackle this early in the
+project.
+
 ### Motivation
 
 #### Fast as a feature
