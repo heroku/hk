@@ -63,10 +63,13 @@ applicable.
 ### Installation
 
 Currently, you need to have a [Go development environment](http://golang.org/doc/install) to install hk.
-We intend to provide compiled binary forms of hk for easy installation,
-but this isn't ready yet.
+We intend to provide compiled binary forms of hk for easy installation and
+automatic updating, but this isn't ready yet.
 
-	$ go get github.com/kr/hk
+	$ go get github.com/heroku/hk
+
+Please note that versions of hk installed from source are unsupported and
+should only be installed for development purposes.
 
 ### netrc
 
