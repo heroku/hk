@@ -66,7 +66,7 @@ Currently, you need to have a [Go development environment](http://golang.org/doc
 We intend to provide compiled binary forms of hk for easy installation,
 but this isn't ready yet.
 
-	$ go get github.com/kr/hk
+	$ go get github.com/heroku/hk
 
 ### netrc
 
