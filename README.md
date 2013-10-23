@@ -20,7 +20,7 @@ project.
 
 #### Fast as a feature
 
-```
+```bash
 ## version
 
 $ time heroku version >/dev/null
