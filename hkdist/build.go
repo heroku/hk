@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"sort"
@@ -34,6 +33,8 @@ var allPlatforms = []string{
 	"windows-386",
 	"windows-amd64",
 }
+
+var hkuser, hkpass, identityToken string
 
 func mustHaveEnv(name string) {
 	if os.Getenv(name) == "" {
@@ -88,6 +89,13 @@ func build(args []string) {
 	}
 
 	// TODO(kr): verify signature
+
+	hkuser, hkpass = getCreds("api.heroku.com")
+	// get Heroku OAuth token to provide to the hkdist API
+	identityToken, err = identityauthreq(fmt.Sprintf("hk release %s", ver), []string{"identity"})
+	if err != nil {
+		log.Fatalf("provision identity oauth authorization: %s", err)
+	}
 
 	var dgroup sync.WaitGroup
 	dchan := make(chan diff)
@@ -251,27 +259,6 @@ func (b *Build) url() string {
 	return s3DistURL + b.Name + "/" + b.Ver + "/" + b.platform() + ".gz"
 }
 
-func cmd(arg ...string) ([]byte, error) {
-	log.Println(strings.Join(arg, " "))
-	cmd := exec.Command(arg[0], arg[1:]...)
-	cmd.Stderr = os.Stderr
-	return cmd.Output()
-}
-
-func getCreds(u *url.URL) (user, pass string) {
-	if u.User != nil {
-		pw, _ := u.User.Password()
-		return u.User.Username(), pw
-	}
-
-	m, err := netrc.FindMachine(netrcPath, u.Host)
-	if err != nil {
-		log.Fatalf("netrc error (%s): %v", u.Host, err)
-	}
-
-	return m.Login, m.Password
-}
-
 func (b *Build) alreadyRegistered() (bool, error) {
 	url := distURL + b.Name + "-" + b.Ver + "-" + b.platform() + ".json"
 	if resp, err := http.Head(url); err != nil {
@@ -292,7 +279,7 @@ func (b *Build) register(sha256 []byte) error {
 	if err != nil {
 		return err
 	}
-	r.SetBasicAuth(getCreds(r.URL))
+	r.SetBasicAuth(hkuser, identityToken)
 	r.Header.Set("Date", time.Now().UTC().Format(http.TimeFormat))
 	resp, err := http.DefaultClient.Do(r)
 	if err != nil {
@@ -316,7 +303,7 @@ func (b *Build) setCurVersion() error {
 	if err != nil {
 		return err
 	}
-	r.SetBasicAuth(getCreds(r.URL))
+	r.SetBasicAuth(hkuser, identityToken)
 	r.Header.Set("Date", time.Now().UTC().Format(http.TimeFormat))
 	resp, err := http.DefaultClient.Do(r)
 	if err != nil {
@@ -424,9 +411,25 @@ func (d *diff) runGen(deadline time.Time) {
 	}
 }
 
+func cmd(arg ...string) ([]byte, error) {
+	log.Println(strings.Join(arg, " "))
+	cmd := exec.Command(arg[0], arg[1:]...)
+	cmd.Stderr = os.Stderr
+	return cmd.Output()
+}
+
+func getCreds(host string) (user, pass string) {
+	m, err := netrc.FindMachine(netrcPath, host)
+	if err != nil {
+		log.Fatalf("netrc error (%s): %v", host, err)
+	}
+
+	return m.Login, m.Password
+}
+
 // wish this was all using a proper API client
 
-func apireq(method, path string, body interface{}) (*http.Response, error) {
+func apireq(method, urlstr string, body interface{}) (*http.Response, error) {
 	var rbody io.Reader
 	switch body.(type) {
 	case nil:
@@ -437,11 +440,11 @@ func apireq(method, path string, body interface{}) (*http.Response, error) {
 		}
 		rbody = bytes.NewReader(j)
 	}
-	req, err := http.NewRequest(method, path, rbody)
+	req, err := http.NewRequest(method, urlstr, rbody)
 	if err != nil {
 		return nil, err
 	}
-	req.SetBasicAuth(getCreds(req.URL))
+	req.SetBasicAuth(hkuser, hkpass)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
 
@@ -454,6 +457,7 @@ func runreq(appname, command string) error {
 	}
 	v.Command = command
 	res, err := apireq("POST", "https://api.heroku.com/apps/"+appname+"/dynos", v)
+	defer res.Body.Close()
 	if err != nil {
 		return err
 	}
@@ -462,4 +466,34 @@ func runreq(appname, command string) error {
 	}
 
 	return nil
+}
+
+func identityauthreq(desc string, scopes []string) (string, error) {
+	var v struct {
+		Scope       []string `json:"scope"`
+		Description string   `json:"description"`
+		ExpiresIn   int      `json:"expires_in"`
+	}
+	v.Scope = scopes
+	v.Description = desc
+	v.ExpiresIn = 600
+
+	resp, err := apireq("POST", "https://api.heroku.com/oauth/authorizations", v)
+	defer resp.Body.Close()
+	if err != nil {
+		return "", err
+	} else if resp.StatusCode != 201 {
+		return "", fmt.Errorf("unexpected status: %d", resp.StatusCode)
+	}
+
+	var r struct {
+		AccessToken struct {
+			Token string `json:"token"`
+		} `json:"access_token"`
+		Scope []string `json:"scope"`
+	}
+	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return "", err
+	}
+	return r.AccessToken.Token, nil
 }
