@@ -259,8 +259,8 @@ type authenticate struct {
 }
 
 func (x authenticate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	hr, _ := http.NewRequest("GET", "https://api.heroku.com/user", nil)
-	hr.Header.Set("Accept", "application/json")
+	hr, _ := http.NewRequest("GET", "https://api.heroku.com/account", nil)
+	hr.Header.Set("Accept", "application/vnd.heroku+json; version=3")
 	hr.Header.Set("Authorization", r.Header.Get("Authorization"))
 	res, err := http.DefaultClient.Do(hr)
 	if err != nil {
