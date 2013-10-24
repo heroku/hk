@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/kr/hk",
+	"ImportPath": "github.com/heroku/hk",
 	"GoVersion": "go1.1.2",
 	"Packages": [
 		"./..."
