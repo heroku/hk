@@ -31,6 +31,7 @@ var db *sql.DB
 //   GET /hk-1-linux-386.json
 //   GET /hk.gz
 func web(args []string) {
+	mustHaveEnv("DATABASE_URL")
 	initwebdb()
 	m := pat.New()
 	m.Get("/:cmd.gz", http.HandlerFunc(initial))
