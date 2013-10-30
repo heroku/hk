@@ -137,7 +137,7 @@ hk requires Go 1.1 or later.
 	$ godep go get
 	$ mate main.go
 	$ godep go build
-	$ ./hk list
+	$ ./hk apps
 
 ### Release
 
