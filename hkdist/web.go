@@ -133,7 +133,7 @@ func curInfo(w http.ResponseWriter, r *http.Request) {
 
 func getHash(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	var info struct{ Sha256 []byte }
+	var info jsonsha
 	const s = `select sha256 from release where plat=$1 and cmd=$2 and ver=$3`
 	if scan(w, r, db.QueryRow(s, q.Get(":plat"), q.Get(":cmd"), q.Get(":ver")), &info.Sha256) {
 		logErr(json.NewEncoder(w).Encode(info))
@@ -215,7 +215,7 @@ func putVer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var info struct{ Sha256 []byte }
+	var info jsonsha
 	if !readReqJSON(w, r, 1000, &info) {
 		return
 	}

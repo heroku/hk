@@ -111,3 +111,7 @@ func b64md5(p []byte) string {
 	h.Write(p)
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
+
+type jsonsha struct {
+	Sha256 []byte `json:"sha256"`
+}
