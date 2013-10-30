@@ -47,8 +47,10 @@ var (
 )
 
 type release struct {
-	Plat, Cmd, Ver string
-	Sha256         []byte
+	Plat   string `json:"platform"`
+	Ver    string `json:"version"`
+	Cmd    string `json:"cmd"`
+	Sha256 []byte `json:"sha256"`
 }
 
 func (r release) Name() string {

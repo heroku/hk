@@ -35,11 +35,11 @@ func web(args []string) {
 	initwebdb()
 	m := pat.New()
 	m.Get("/:cmd.gz", http.HandlerFunc(initial))
-	m.Get("/:cmd-current-:plat.json", http.HandlerFunc(curInfo))
-	m.Get("/:cmd-:ver-:plat.json", http.HandlerFunc(getHash))
+	m.Get("/:cmd/current/:plat.json", http.HandlerFunc(curInfo))
+	m.Get("/:cmd/:ver/:plat.json", http.HandlerFunc(getHash))
 	m.Get("/release.json", http.HandlerFunc(listReleases))
-	m.Put("/:cmd-:ver-:os-:arch.json", authenticate{herokaiOnly{http.HandlerFunc(putVer)}})
-	m.Put("/:cmd-:os-:arch.json", authenticate{herokaiOnly{http.HandlerFunc(setCur)}})
+	m.Put("/:cmd/current/:plat.json", authenticate{herokaiOnly{http.HandlerFunc(setCur)}})
+	m.Put("/:cmd/:ver/:plat.json", authenticate{herokaiOnly{http.HandlerFunc(putVer)}})
 	m.Get("/", http.FileServer(http.Dir("hkdist/public")))
 	http.Handle("/", m)
 	secureheader.DefaultConfig.PermitClearLoopback = true
@@ -52,7 +52,7 @@ func web(args []string) {
 func setCur(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	q := r.URL.Query()
-	plat := q.Get(":os") + "-" + q.Get(":arch")
+	plat := q.Get(":plat")
 	cmd := q.Get(":cmd")
 	if strings.IndexFunc(plat, badIdentRune) >= 0 ||
 		strings.IndexFunc(cmd, badIdentRune) >= 0 {
@@ -104,30 +104,29 @@ func scan(w http.ResponseWriter, r *http.Request, q *sql.Row, v ...interface{}) 
 	return true
 }
 
-func lookupCurInfo(w http.ResponseWriter, r *http.Request, plat, cmd string) (v struct {
-	Version string
-	Sha256  []byte
-}, ok bool) {
+func lookupCurRel(w http.ResponseWriter, r *http.Request, plat, cmd string) (v release, ok bool) {
+	v.Cmd = cmd
+	v.Plat = plat
 	const s = `select c.curver, r.sha256 from cur c, release r
 				where c.plat=$1 and c.cmd=$2
 				and c.plat = r.plat and c.cmd = r.cmd and c.curver = r.ver`
-	ok = scan(w, r, db.QueryRow(s, plat, cmd), &v.Version, &v.Sha256)
+	ok = scan(w, r, db.QueryRow(s, plat, cmd), &v.Ver, &v.Sha256)
 	return
 }
 
 func initial(w http.ResponseWriter, r *http.Request) {
 	cmd := r.URL.Query().Get(":cmd")
 	plat := guessPlat(r.UserAgent())
-	if info, ok := lookupCurInfo(w, r, plat, cmd); ok {
-		url := s3DistURL + cmd + "-" + info.Version + "-" + plat + ".gz"
+	if rel, ok := lookupCurRel(w, r, plat, cmd); ok {
+		url := s3DistURL + rel.Gzname()
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	}
 }
 
 func curInfo(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
-	if info, ok := lookupCurInfo(w, r, q.Get(":plat"), q.Get(":cmd")); ok {
-		logErr(json.NewEncoder(w).Encode(info))
+	if rel, ok := lookupCurRel(w, r, q.Get(":plat"), q.Get(":cmd")); ok {
+		logErr(json.NewEncoder(w).Encode(rel))
 	}
 }
 
@@ -205,7 +204,7 @@ func guessPlat(ua string) string {
 func putVer(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	q := r.URL.Query()
-	plat := q.Get(":os") + "-" + q.Get(":arch")
+	plat := q.Get(":plat")
 	cmd := q.Get(":cmd")
 	ver := q.Get(":ver")
 	if strings.IndexFunc(plat, badIdentRune) >= 0 ||

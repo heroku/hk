@@ -28,7 +28,7 @@ const devValidTime = 7 * 24 * time.Hour
 
 // Update protocol.
 //
-//   GET hk.heroku.com/hk-current-linux-amd64.json
+//   GET hk.heroku.com/hk/current/linux-amd64.json
 //
 //   200 ok
 //   {
@@ -38,14 +38,14 @@ const devValidTime = 7 * 24 * time.Hour
 //
 // then
 //
-//   GET hkpatch.s3.amazonaws.com/hk-1-linux-amd64-to-2
+//   GET hkpatch.s3.amazonaws.com/hk/1/2/linux-amd64
 //
 //   200 ok
 //   [bsdiff data]
 //
 // or
 //
-//   GET hkdist.s3.amazonaws.com/hk-2-linux-amd64.gz
+//   GET hkdist.s3.amazonaws.com/hk/2/linux-amd64.gz
 //
 //   200 ok
 //   [gzipped executable data]
@@ -123,7 +123,7 @@ func (u *Updater) update() error {
 }
 
 func (u *Updater) fetchInfo() error {
-	r, err := fetch(u.hkURL + "hk-current-" + plat + ".json")
+	r, err := fetch(u.hkURL + "hk/current/" + plat + ".json")
 	if err != nil {
 		return err
 	}

@@ -260,7 +260,7 @@ func (b *Build) url() string {
 }
 
 func (b *Build) alreadyRegistered() (bool, error) {
-	url := distURL + b.Name + "-" + b.Ver + "-" + b.platform() + ".json"
+	url := distURL + b.Name + "/" + b.Ver + "/" + b.platform() + ".json"
 	if resp, err := http.Head(url); err != nil {
 		return false, err
 	} else {
@@ -269,7 +269,7 @@ func (b *Build) alreadyRegistered() (bool, error) {
 }
 
 func (b *Build) register(sha256 []byte) error {
-	url := distURL + b.Name + "-" + b.Ver + "-" + b.platform() + ".json"
+	url := distURL + b.Name + "/" + b.Ver + "/" + b.platform() + ".json"
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(jsonsha{sha256})
 	if err != nil {
