@@ -293,7 +293,7 @@ func (b *Build) register(sha256 []byte) error {
 }
 
 func (b *Build) setCurVersion() error {
-	url := distURL + b.Name + "-" + b.platform() + ".json"
+	url := distURL + b.Name + "/current/" + b.platform() + ".json"
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(struct{ Version string }{b.Ver})
 	if err != nil {
