@@ -23,13 +23,6 @@ var (
 	stdin     = bufio.NewReader(os.Stdin)
 )
 
-var updater = Updater{
-	hkURL:   "https://hk.heroku.com/",
-	binURL:  "https://hkdist.s3.amazonaws.com/",
-	diffURL: "https://hkpatch.s3.amazonaws.com/",
-	dir:     hkHome + "/update/",
-}
-
 type Command struct {
 	// args does not include the command name
 	Run  func(cmd *Command, args []string)
@@ -121,10 +114,9 @@ func main() {
 	if s := os.Getenv("HEROKU_API_URL"); s != "" {
 		apiURL = strings.TrimRight(s, "/")
 	}
-	if s := os.Getenv("HKURL"); s != "" {
-		updater.hkURL = strings.TrimRight(s, "/") + "/"
+	if updater != nil {
+		defer updater.backgroundRun() // doesn't run if os.Exit is called
 	}
-	defer updater.run() // doesn't run if os.Exit is called
 	log.SetFlags(0)
 
 	args := os.Args[1:]

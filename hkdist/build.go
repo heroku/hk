@@ -210,7 +210,17 @@ const relverGo = `
 // +build release
 
 package main
-const Version = %q
+const (
+	Version = %q
+)
+
+var updater = &Updater{
+	apiURL:  %q,
+	binURL:  %q,
+	diffURL: %q,
+	dir:     hkHome + "/update/",
+	cmdName: %q,
+}
 `
 
 func (b *Build) build() (err error) {
@@ -219,7 +229,7 @@ func (b *Build) build() (err error) {
 	if err != nil {
 		return fmt.Errorf("writing relver.go: %s", err)
 	}
-	_, err = fmt.Fprintf(f, relverGo, b.Ver)
+	_, err = fmt.Fprintf(f, relverGo, b.Ver, distURL, s3DistURL, s3PatchURL, b.Name)
 	if err != nil {
 		return fmt.Errorf("writing relver.go: %s", err)
 	}

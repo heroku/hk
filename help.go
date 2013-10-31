@@ -50,22 +50,6 @@ HKDEBUG
 `,
 }
 
-var cmdUpdate = &Command{
-	Run:   runUpdate,
-	Usage: "update",
-	Long: `
-Update downloads and installs the next version of hk.
-
-This command is unlisted, since users never have to run it directly.
-`,
-}
-
-func runUpdate(cmd *Command, args []string) {
-	if err := updater.update(); err != nil {
-		log.Fatal(err)
-	}
-}
-
 var cmdVersion = &Command{
 	Run:   runVersion,
 	Usage: "version",

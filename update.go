@@ -1,23 +1,44 @@
 package main
 
 import (
+	"bitbucket.org/kardianos/osext"
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/inconshreveable/go-update"
 	"github.com/kr/binarydist"
 	"io"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"time"
 )
+
+var cmdUpdate = &Command{
+	Run:   runUpdate,
+	Usage: "update",
+	Long: `
+Update downloads and installs the next version of hk.
+
+This command is unlisted, since users never have to run it directly.
+`,
+}
+
+func runUpdate(cmd *Command, args []string) {
+	if updater == nil {
+		log.Fatal("Dev builds don't support auto-updates")
+	}
+	if err := updater.update(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 const (
 	upcktimePath = "cktime"
@@ -50,7 +71,8 @@ const devValidTime = 7 * 24 * time.Hour
 //   200 ok
 //   [gzipped executable data]
 type Updater struct {
-	hkURL   string
+	apiURL  string
+	cmdName string
 	binURL  string
 	diffURL string
 	dir     string
@@ -60,11 +82,21 @@ type Updater struct {
 	}
 }
 
-func (u *Updater) run() {
+func (u *Updater) backgroundRun() {
 	os.MkdirAll(u.dir, 0777)
 	if u.wantUpdate() {
+		if err := update.SanityCheck(); err != nil {
+			// fail
+			return
+		}
+		self, err := osext.Executable()
+		if err != nil {
+			// fail update, couldn't figure out path to self
+			return
+		}
+		// TODO(bgentry): logger isn't on Windows. Replace w/ proper error reports.
 		l := exec.Command("logger", "-thk")
-		c := exec.Command("hk", "update")
+		c := exec.Command(self, "update")
 		if w, err := l.StdinPipe(); err == nil && l.Start() == nil {
 			c.Stdout = w
 			c.Stderr = w
@@ -83,11 +115,7 @@ func (u *Updater) wantUpdate() bool {
 }
 
 func (u *Updater) update() error {
-	filename := "hk"
-	if runtime.GOOS == "windows" {
-		filename += ".exe"
-	}
-	path, err := exec.LookPath(filename)
+	path, err := osext.Executable()
 	if err != nil {
 		return err
 	}
@@ -96,6 +124,7 @@ func (u *Updater) update() error {
 		return err
 	}
 	defer old.Close()
+
 	err = u.fetchInfo()
 	if err != nil {
 		return err
@@ -110,20 +139,29 @@ func (u *Updater) update() error {
 			return err
 		}
 	}
+
 	h := sha256.New()
 	h.Write(bin)
 	if !bytes.Equal(h.Sum(nil), u.info.Sha256) {
 		return errors.New("new file hash mismatch after patch")
 	}
-	oldName := old.Name()
+
 	// close the old binary before installing because on windows
 	// it can't be renamed if a handle to the file is still open
 	old.Close()
-	return install(oldName, bin)
+
+	err, errRecover := update.FromStream(bytes.NewBuffer(bin))
+	if errRecover != nil {
+		return fmt.Errorf("update and recovery errors: %q %q", err, errRecover)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *Updater) fetchInfo() error {
-	r, err := fetch(u.hkURL + "hk/current/" + plat + ".json")
+	r, err := fetch(u.apiURL + u.cmdName + "/current/" + plat + ".json")
 	if err != nil {
 		return err
 	}
@@ -139,7 +177,7 @@ func (u *Updater) fetchInfo() error {
 }
 
 func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
-	r, err := fetch(u.diffURL + "hk/" + Version + "/" + u.info.Version + "/" + plat)
+	r, err := fetch(u.diffURL + u.cmdName + "/" + Version + "/" + u.info.Version + "/" + plat)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +188,7 @@ func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
 }
 
 func (u *Updater) fetchBin() ([]byte, error) {
-	r, err := fetch(u.binURL + "hk/" + u.info.Version + "/" + plat + ".gz")
+	r, err := fetch(u.binURL + u.cmdName + "/" + u.info.Version + "/" + plat + ".gz")
 	if err != nil {
 		return nil, err
 	}
@@ -167,49 +205,9 @@ func (u *Updater) fetchBin() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func install(name string, p []byte) error {
-	oldExecPath := name + ".old"
-	execDir := filepath.Dir(name)
-	part := filepath.Join(execDir, "hk.part")
-	err := ioutil.WriteFile(part, p, 0755)
-	if err != nil {
-		return err
-	}
-	defer os.Remove(part)
-
-	// remove old executable leftover from previous update
-	if err = os.Remove(oldExecPath); err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	// move the existing executable to a new file in the same directory
-	err = os.Rename(name, oldExecPath)
-	if err != nil {
-		return err
-	}
-
-	// move the new executable in to become the new program
-	err = os.Rename(part, name)
-
-	if err != nil {
-		// copy unsuccessful
-		_ = os.Rename(oldExecPath, name)
-		return err
-	} else {
-		// copy successful, remove the old binary (fails on Windows)
-		_ = os.Remove(oldExecPath)
-	}
-
-	return nil
-}
-
 // returns a random duration in [0,n).
 func randDuration(n time.Duration) time.Duration {
 	return time.Duration(rand.Int63n(int64(n)))
-}
-
-func slug(ver string) string {
-	return "hk-" + ver + "-" + plat
 }
 
 func fetch(url string) (io.ReadCloser, error) {

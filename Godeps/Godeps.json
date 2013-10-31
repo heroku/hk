@@ -6,6 +6,11 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "bitbucket.org/kardianos/osext",
+			"Comment": "null-9",
+			"Rev": "364fb577de68fb646c4cb39cc0e09c887ee16376"
+		},
+		{
 			"ImportPath": "code.google.com/p/go-netrc/netrc",
 			"Comment": "null-9",
 			"Rev": "28676070ab99a6a09739963c7857fc61553ff8a9"
@@ -17,6 +22,10 @@
 		{
 			"ImportPath": "github.com/bmizerany/pq",
 			"Rev": "284a1d41dcc27fe8ccc413c339464698ab99f6d1"
+		},
+		{
+			"ImportPath": "github.com/inconshreveable/go-update",
+			"Rev": "3f0466666779bd2143f368a207b0641f0ed536e8"
 		},
 		{
 			"ImportPath": "github.com/kr/binarydist",
