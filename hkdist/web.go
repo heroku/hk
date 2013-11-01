@@ -179,25 +179,29 @@ func logErr(err error) error {
 	return err
 }
 
+func isDarwin(ua string) bool {
+	return strings.Contains(ua, "mac os x") || strings.Contains(ua, "darwin")
+}
+
 func guessArch(ua string) string {
-	if strings.Contains(ua, "amd64") || strings.Contains(ua, "x86_64") {
+	if strings.Contains(ua, "amd64") || strings.Contains(ua, "x86_64") || isDarwin(ua) {
 		return "amd64"
 	}
 	return "386"
 }
 
 func guessOS(ua string) string {
-	ua = strings.ToLower(ua)
+	if isDarwin(ua) {
+		return "darwin"
+	}
 	if strings.Contains(ua, "windows") {
 		return "windows"
-	}
-	if strings.Contains(ua, "mac os x") || strings.Contains(ua, "darwin") {
-		return "darwin"
 	}
 	return "linux"
 }
 
 func guessPlat(ua string) string {
+	ua = strings.ToLower(ua)
 	return guessOS(ua) + "-" + guessArch(ua)
 }
 
