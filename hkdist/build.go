@@ -91,8 +91,9 @@ func build(args []string) {
 	// TODO(kr): verify signature
 
 	hkuser, hkpass = getCreds("api.heroku.com")
+	desc := fmt.Sprintf("%s release %s", buildName, ver)
 	// get Heroku OAuth token to provide to the hkdist API
-	identityToken, err = identityauthreq(fmt.Sprintf("hk release %s", ver), []string{"identity"})
+	identityToken, err = identityauthreq(desc, []string{"identity"})
 	if err != nil {
 		log.Fatalf("provision identity oauth authorization: %s", err)
 	}
