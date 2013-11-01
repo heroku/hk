@@ -47,6 +47,8 @@ const (
 
 const devValidTime = 7 * 24 * time.Hour
 
+var ErrHashMismatch = errors.New("new file hash mismatch after patch")
+
 // Update protocol.
 //
 //   GET hk.heroku.com/hk/current/linux-amd64.json
@@ -132,18 +134,22 @@ func (u *Updater) update() error {
 	if u.info.Version == Version {
 		return nil
 	}
-	bin, err := u.fetchAndApplyPatch(old)
+	bin, err := u.fetchAndVerifyPatch(old)
 	if err != nil {
-		bin, err = u.fetchBin()
+		if err == ErrHashMismatch {
+			log.Println("update: hash mismatch from patched binary")
+		} else {
+			log.Println("update: patching binary,", err)
+		}
+		bin, err = u.fetchAndVerifyFullBin()
 		if err != nil {
+			if err == ErrHashMismatch {
+				log.Println("update: hash mismatch from full binary")
+			} else {
+				log.Println("update: fetching full binary,", err)
+			}
 			return err
 		}
-	}
-
-	h := sha256.New()
-	h.Write(bin)
-	if !bytes.Equal(h.Sum(nil), u.info.Sha256) {
-		return errors.New("new file hash mismatch after patch")
 	}
 
 	// close the old binary before installing because on windows
@@ -176,6 +182,17 @@ func (u *Updater) fetchInfo() error {
 	return nil
 }
 
+func (u *Updater) fetchAndVerifyPatch(old io.Reader) ([]byte, error) {
+	bin, err := u.fetchAndApplyPatch(old)
+	if err != nil {
+		return nil, err
+	}
+	if !verifySha(bin, u.info.Sha256) {
+		return nil, ErrHashMismatch
+	}
+	return bin, nil
+}
+
 func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
 	r, err := fetch(u.diffURL + u.cmdName + "/" + Version + "/" + u.info.Version + "/" + plat)
 	if err != nil {
@@ -185,6 +202,18 @@ func (u *Updater) fetchAndApplyPatch(old io.Reader) ([]byte, error) {
 	var buf bytes.Buffer
 	err = binarydist.Patch(old, &buf, r)
 	return buf.Bytes(), err
+}
+
+func (u *Updater) fetchAndVerifyFullBin() ([]byte, error) {
+	bin, err := u.fetchBin()
+	if err != nil {
+		return nil, err
+	}
+	verified := verifySha(bin, u.info.Sha256)
+	if !verified {
+		return nil, ErrHashMismatch
+	}
+	return bin, nil
 }
 
 func (u *Updater) fetchBin() ([]byte, error) {
@@ -234,6 +263,12 @@ func readTime(path string) time.Time {
 		return time.Now().Add(1000 * time.Hour)
 	}
 	return t
+}
+
+func verifySha(bin []byte, sha []byte) bool {
+	h := sha256.New()
+	h.Write(bin)
+	return bytes.Equal(h.Sum(nil), sha)
 }
 
 func writeTime(path string, t time.Time) bool {
