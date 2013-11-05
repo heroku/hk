@@ -16,6 +16,11 @@
 			"Rev": "28676070ab99a6a09739963c7857fc61553ff8a9"
 		},
 		{
+			"ImportPath": "code.google.com/p/go.crypto/cast5",
+			"Comment": "null-185",
+			"Rev": "6478cc9340cbbe6c04511280c5007722269108e9"
+		},
+		{
 			"ImportPath": "github.com/bmizerany/pat",
 			"Rev": "51b7af73e39f6dc59846b22d56ca886d105ef0c3"
 		},
