@@ -40,7 +40,8 @@ real	0m0.785s
 
 #### Focus on API
 
-We believe this is evidence that a first-class Heroku API trumps any particular client.
+We believe this is evidence that a first-class Heroku API trumps any particular
+client.
 
 #### Iterative Development
 
@@ -52,7 +53,8 @@ see the updates in a timely manner.
 #### The power of Go
 
 hk demonstrates the power of the Go language, runtime, systems access, and
-distribution story (a single, statically linked binary with no dependencies) which are all very appealing to Heroku.
+distribution story (a single, statically linked binary with no dependencies)
+which are all very appealing to Heroku.
 
 #### Unix
 
@@ -62,9 +64,27 @@ applicable.
 
 ### Installation
 
-Currently, you need to have a [Go development environment](http://golang.org/doc/install) to install hk.
-We intend to provide compiled binary forms of hk for easy installation and
-automatic updating, but this isn't ready yet.
+#### Mac OS X, Linux, BSD
+
+Pre-built binaries are available for Mac OS X, Linux, and BSD. Once installed,
+these binaries will automatically update themselves when new releases are
+available.
+
+To install a pre-built binary release, run the following one-liner:
+
+```bash
+$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
+```
+
+The URL [https://hk.heroku.com/hk.gz](https://hk.heroku.com/hk.gz) will attempt
+to detect your OS and CPU architecture based on the User-Agent, then redirect
+you to the latest release for your platform.
+
+#### Windows
+
+Currently, you need to have a [Go development environment][go-install] to
+install hk on Windows. Compiled binaries with automatic updating are available
+for Windows, but the installer is not ready yet.
 
 	$ go get github.com/heroku/hk
 
@@ -139,8 +159,13 @@ hk requires Go 1.1 or later.
 	$ godep go build
 	$ ./hk apps
 
+Please follow the [contribution guidelines](./CONTRIBUTING.md) before submitting
+a pull request.
+
 ### Release
 
 	$ cd hk
 	$ vim main.go # edit Version
 	$ godep go build
+
+[go-install]: http://golang.org/doc/install "Golang installation"
