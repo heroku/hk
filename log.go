@@ -63,9 +63,14 @@ func runLog(cmd *Command, args []string) {
 	}
 
 	v.Dyno = dyno
-	v.Lines = lines
 	v.Source = source
-	v.Tail = lines == -1
+
+	if lines == -1 {
+		v.Tail = true
+		v.Lines = 10
+	} else {
+		v.Lines = lines
+	}
 
 	var session struct {
 		Id         string `json:"id"`
