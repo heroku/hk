@@ -85,7 +85,7 @@ func addonMatch(m *mergedAddon, a []string) bool {
 		if s == strings.ToLower(m.Type) {
 			return true
 		}
-		if s == strings.ToLower(m.ID) {
+		if s == strings.ToLower(m.Id) {
 			return true
 		}
 	}
@@ -97,7 +97,7 @@ func listAddon(w io.Writer, m *mergedAddon) {
 		listRec(w,
 			m.Type,
 			abbrev(m.Owner, 10),
-			m.ID,
+			m.Id,
 		)
 	} else {
 		fmt.Fprintln(w, m.String())
@@ -107,7 +107,7 @@ func listAddon(w io.Writer, m *mergedAddon) {
 type mergedAddon struct {
 	Type  string
 	Owner string
-	ID    string
+	Id    string
 }
 
 func (m *mergedAddon) String() string {
@@ -137,7 +137,7 @@ func mergeAddons(app *App, addons []*Addon) (ms []*mergedAddon) {
 		ms = append(ms, m)
 		m.Type = a.Plan.Name
 		m.Owner = app.Owner.Email
-		m.ID = a.ID
+		m.Id = a.Id
 	}
 
 	sort.Sort(mergedAddonsByType(ms))

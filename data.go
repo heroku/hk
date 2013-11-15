@@ -8,9 +8,12 @@ import (
 
 // See https://github.com/heroku/api-doc#apps
 type App struct {
-	ID     string
+	Id     string
 	Name   string
-	Stack  string
+	Stack  struct {
+		Id   string
+		Name string
+	}
 	WebURL string `json:"web_url"`
 	GitURL string `json:"git_url"`
 	Owner  struct {
@@ -18,7 +21,7 @@ type App struct {
 		Email string
 	}
 	Region struct {
-		ID   string
+		Id   string
 		Name string
 	}
 	RepoSize    *int       `json:"repo_size"`
@@ -33,12 +36,12 @@ type App struct {
 
 type Dyno struct {
 	Name    string
-	ID      string
+	Id      string
 	Type    string
 	Command string
 	AppName string `json:"app_name"`
 	Release struct {
-		ID      string
+		Id      string
 		Version int
 	}
 	Size      string
@@ -58,13 +61,13 @@ func (d *Dyno) Seq() int {
 }
 
 type Release struct {
-	ID   string
+	Id   string
 	User struct {
-		ID    string
+		Id    string
 		Email string
 	}
 	Slug struct {
-		ID string
+		Id string
 	}
 	Description string
 	Version     int
@@ -76,9 +79,9 @@ type Release struct {
 }
 
 type Addon struct {
-	ID   string
+	Id   string
 	Plan struct {
-		ID   string
+		Id   string
 		Name string
 	}
 	CreatedAt time.Time `json:"created_at"`
@@ -109,18 +112,18 @@ type Attachment struct {
 	ConfigVar string `json:"config_var"`
 	App       struct {
 		Owner string
-		ID    string
+		Id    string
 		Name  string
 	}
 	Resource struct {
 		Name       string
 		Type       string
-		ID         string
+		Id         string
 		Value      string
 		SSOURL     *NullString `json:"sso_url"`
 		BillingApp struct {
 			Name  string
-			ID    string
+			Id    string
 			Owner string
 		} `json:"billing_app"`
 	}
