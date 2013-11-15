@@ -8,9 +8,9 @@ import (
 
 // See https://github.com/heroku/api-doc#apps
 type App struct {
-	Id     string
-	Name   string
-	Stack  struct {
+	Id    string
+	Name  string
+	Stack struct {
 		Id   string
 		Name string
 	}
