@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/heroku/hk",
-	"GoVersion": "go1.1.2",
+	"GoVersion": "go1.2rc4",
 	"Packages": [
 		"./..."
 	],
@@ -14,6 +14,15 @@
 			"ImportPath": "code.google.com/p/go-netrc/netrc",
 			"Comment": "null-9",
 			"Rev": "28676070ab99a6a09739963c7857fc61553ff8a9"
+		},
+		{
+			"ImportPath": "code.google.com/p/go-uuid/uuid",
+			"Comment": "null-10",
+			"Rev": "5fac954758f5aa282478dc07fbb8709fe9575184"
+		},
+		{
+			"ImportPath": "github.com/bgentry/heroku-go",
+			"Rev": "07b5a9ac3de0993880edf1d1f6c4d61b17a6589e"
 		},
 		{
 			"ImportPath": "github.com/bmizerany/pat",

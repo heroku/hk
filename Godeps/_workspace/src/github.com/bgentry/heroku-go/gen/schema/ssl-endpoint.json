@@ -1,0 +1,123 @@
+{
+  "description":  "[SSL Endpoint](https://devcenter.heroku.com/articles/ssl-endpoint) is a public address serving custom SSL cert for HTTPS traffic to a Heroku app. Note that an app must have the `ssl:endpoint` addon installed before it can provision an SSL Endpoint using these APIs.",
+  "id":           "schema/ssl-endpoint",
+  "title":        "Heroku Platform API - SSL Endpoint",
+  "type":         ["object"],
+
+  "definitions": {
+    "certificate_chain": {
+      "description":  "raw contents of the public certificate chain (eg: .crt or .pem file)",
+      "example":      "-----BEGIN CERTIFICATE----- ...",
+      "type":         ["string"]
+    },
+    "cname": {
+      "description":  "canonical name record, the address to point a domain at",
+      "example":      "example.herokussl.com",
+      "type":         ["string"]
+    },
+    "created_at": {
+      "description":  "when endpoint was created",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "id": {
+      "description":  "unique identifier of this SSL endpoint",
+      "example":      "01234567-89ab-cdef-0123-456789abcdef",
+      "format":       "uuid",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "identity": {
+      "anyOf": [
+        { "$ref": "/schema/ssl-endpoint#/definitions/id" },
+        { "$ref": "/schema/ssl-endpoint#/definitions/name" }
+      ]
+    },
+    "name": {
+      "description":  "unique name for SSL endpoint",
+      "example":      "example",
+      "pattern":      "^[a-z][a-z0-9-]{3,30}$",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "private_key": {
+      "description":  "contents of the private key (eg .key file)",
+      "example":      "-----BEGIN RSA PRIVATE KEY----- ...",
+      "type":         ["string"]
+    },
+    "rollback": {
+      "default":      false,
+      "description":  "indicates that a rollback should be performed",
+      "example":      false,
+      "type":         ["boolean"]
+    },
+    "updated_at": {
+      "description":  "when endpoint was updated",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    }
+  },
+  "links": [
+    {
+      "description":  "Create a new SSL endpoint.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/ssl-endpoints",
+      "method":       "POST",
+      "rel":          "create",
+      "schema":       {
+        "properties": {
+          "certificate_chain": { "$ref": "/schema/ssl-endpoint#/definitions/certificate_chain" },
+          "private_key":       { "$ref": "/schema/ssl-endpoint#/definitions/private_key" }
+        },
+        "required": ["certificate_chain", "private_key"]
+      },
+      "title":        "Create"
+    },
+    {
+      "description":  "Delete existing SSL endpoint.",
+      "href":          "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/ssl-endpoints/{(%2Fschema%2Fssl-endpoint%23%2Fdefinitions%2Fidentity)}",
+      "method":       "DELETE",
+      "rel":          "destroy",
+      "title":        "Delete"
+    },
+    {
+      "description":  "Info for existing SSL endpoint.",
+      "href":          "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/ssl-endpoints/{(%2Fschema%2Fssl-endpoint%23%2Fdefinitions%2Fidentity)}",
+      "method":       "GET",
+      "rel":          "self",
+      "title":        "Info"
+    },
+    {
+      "description":  "List existing SSL endpoints.",
+      "href":          "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/ssl-endpoints",
+      "method":       "GET",
+      "rel":          "instances",
+      "title":        "List"
+    },
+    {
+      "description":  "Update an existing SSL endpoint.",
+      "href":          "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/ssl-endpoints/{(%2Fschema%2Fssl-endpoint%23%2Fdefinitions%2Fidentity)}",
+      "method":       "PATCH",
+      "rel":          "update",
+      "schema":       {
+        "properties": {
+          "certificate_chain": { "$ref": "/schema/ssl-endpoint#/definitions/certificate_chain" },
+          "private_key":       { "$ref": "/schema/ssl-endpoint#/definitions/private_key" },
+          "rollback":          { "$ref": "/schema/ssl-endpoint#/definitions/rollback" }
+        }
+      },
+      "title":        "Update"
+    }
+  ],
+  "properties": {
+    "certificate_chain":  { "$ref": "/schema/ssl-endpoint#/definitions/certificate_chain" },
+    "cname":              { "$ref": "/schema/ssl-endpoint#/definitions/cname" },
+    "created_at":         { "$ref": "/schema/ssl-endpoint#/definitions/created_at" },
+    "id":                 { "$ref": "/schema/ssl-endpoint#/definitions/id" },
+    "name":               { "$ref": "/schema/ssl-endpoint#/definitions/name" },
+    "updated_at":         { "$ref": "/schema/ssl-endpoint#/definitions/updated_at" }
+  }
+}

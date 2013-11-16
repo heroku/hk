@@ -3,14 +3,18 @@ package main
 import (
 	"bufio"
 	"code.google.com/p/go-netrc/netrc"
+	"crypto/tls"
 	"flag"
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -106,21 +110,20 @@ var commands = []*Command{
 }
 
 var (
-	flagApp  string
-	flagLong bool
+	flagApp   string
+	flagLong  bool
+	client    heroku.Client
+	hkAgent   = "hk/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
+	userAgent = hkAgent + " " + heroku.DefaultUserAgent
 )
 
 func main() {
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		apiURL = strings.TrimRight(s, "/")
-	}
 	if updater != nil {
 		defer updater.backgroundRun() // doesn't run if os.Exit is called
 	}
 	log.SetFlags(0)
 
 	args := os.Args[1:]
-
 	if len(args) >= 2 && "-a" == args[0] {
 		flagApp = args[1]
 		args = args[2:]
@@ -132,6 +135,37 @@ func main() {
 
 	if len(args) < 1 {
 		usage()
+	}
+
+	apiURL = heroku.DefaultAPIURL
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		apiURL = s
+	}
+	user, pass := getCreds(apiURL)
+	debug := os.Getenv("HKDEBUG") != ""
+	client = heroku.Client{
+		URL:       apiURL,
+		Username:  user,
+		Password:  pass,
+		UserAgent: userAgent,
+		Debug:     debug,
+	}
+	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		client.URL = s
+	}
+	client.AdditionalHeaders = http.Header{}
+	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
+		if i := strings.Index(h, ":"); i >= 0 {
+			client.AdditionalHeaders.Set(
+				strings.TrimSpace(h[:i]),
+				strings.TrimSpace(h[i+1:]),
+			)
+		}
 	}
 
 	for _, cmd := range commands {
@@ -156,15 +190,19 @@ func main() {
 	log.Fatal("exec error: ", err)
 }
 
-func getCreds(u *url.URL) (user, pass string) {
-	if u.User != nil {
-		pw, _ := u.User.Password()
-		return u.User.Username(), pw
+func getCreds(u string) (user, pass string) {
+	apiURL, err := url.Parse(u)
+	if err != nil {
+		log.Fatalf("invalid API URL: %s", err)
+	}
+	if apiURL.User != nil {
+		pw, _ := apiURL.User.Password()
+		return apiURL.User.Username(), pw
 	}
 
-	m, err := netrc.FindMachine(netrcPath, u.Host)
+	m, err := netrc.FindMachine(netrcPath, apiURL.Host)
 	if err != nil {
-		log.Fatalf("netrc error (%s): %v", u.Host, err)
+		log.Fatalf("netrc error (%s): %v", apiURL.Host, err)
 	}
 
 	return m.Login, m.Password

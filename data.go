@@ -6,34 +6,6 @@ import (
 	"time"
 )
 
-// See https://github.com/heroku/api-doc#apps
-type App struct {
-	Id    string
-	Name  string
-	Stack struct {
-		Id   string
-		Name string
-	}
-	WebURL string `json:"web_url"`
-	GitURL string `json:"git_url"`
-	Owner  struct {
-		Id    string
-		Email string
-	}
-	Region struct {
-		Id   string
-		Name string
-	}
-	RepoSize    *int       `json:"repo_size"`
-	SlugSize    *int       `json:"slug_size"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	ReleasedAt  *time.Time `json:"released_at"`
-	Maintenance bool
-
-	BuildpackProvidedDescription *NullString `json:"buildpack_provided_description"`
-}
-
 type Dyno struct {
 	Name    string
 	Id      string

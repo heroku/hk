@@ -1,0 +1,107 @@
+{
+  "description":  "Add-ons represent add-ons that have been provisioned for an app.",
+  "id":           "schema/addon",
+  "$schema":      "http://json-schema.org/draft-04/hyper-schema",
+  "title":        "Heroku Platform API - Add-on",
+  "type":         ["object"],
+
+  "definitions": {
+    "created_at": {
+      "description":  "when add-on was updated",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "id": {
+      "description":  "unique identifier of add-on",
+      "example":      "01234567-89ab-cdef-0123-456789abcdef",
+      "format":       "uuid",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "identity": {
+      "anyOf": [
+        { "$ref": "/schema/addon#/definitions/id" }
+      ]
+    },
+    "updated_at": {
+      "description":  "when add-on was updated",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    }
+  },
+  "links": [
+    {
+      "description":  "Create a new add-on.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/addons",
+      "method":       "POST",
+      "rel":          "create",
+      "schema":       {
+        "properties": {
+          "config": {
+            "additionalProperties": false,
+            "description": "custom add-on provisioning options",
+            "example": { "db-version": "1.2.3" },
+            "patternProperties": {
+              "^\\w+$": {"type": ["string"]}
+            },
+            "type": ["object"]
+          },
+          "plan":   { "$ref": "/schema/plan#/definitions/identity" }
+        },
+        "required": ["plan"]
+      },
+      "title":        "Create"
+    },
+    {
+      "description":  "Delete an existing add-on.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/addons/{(%2Fschema%2Faddon%23%2Fdefinitions%2Fidentity)}",
+      "method":       "DELETE",
+      "rel":          "destroy",
+      "title":        "Delete"
+    },
+    {
+      "description":  "Info for an existing add-on.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/addons/{(%2Fschema%2Faddon%23%2Fdefinitions%2Fidentity)}",
+      "method":       "GET",
+      "rel":          "self",
+      "title":        "Info"
+    },
+    {
+      "description":  "List existing add-ons.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/addons",
+      "method":       "GET",
+      "rel":          "instances",
+      "title":        "List"
+    },
+    {
+      "description":  "Update an existing add-on.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/addons/{(%2Fschema%2Faddon%23%2Fdefinitions%2Fidentity)}",
+      "method":       "PATCH",
+      "rel":          "update",
+      "schema":       {
+        "properties": {
+          "plan":   { "$ref": "/schema/plan#/definitions/identity" }
+        },
+        "required": ["plan"]
+      },
+      "title":        "Update"
+    }
+  ],
+  "properties": {
+    "created_at": { "$ref": "/schema/addon#/definitions/created_at" },
+    "id":         { "$ref": "/schema/addon#/definitions/id" },
+    "plan": {
+      "description":  "identity of add-on plan",
+      "properties": {
+        "id":   { "$ref": "/schema/plan#/definitions/id" },
+        "name": { "$ref": "/schema/plan#/definitions/name" }
+      },
+      "type":         ["object"]
+    },
+    "updated_at": { "$ref": "/schema/addon#/definitions/updated_at" }
+  }
+}

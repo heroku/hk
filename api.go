@@ -11,11 +11,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"runtime"
 	"strings"
 )
-
-const userAgent = "hk " + Version + " " + runtime.GOOS + " " + runtime.GOARCH
 
 func init() {
 	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
@@ -74,7 +71,7 @@ func NewRequest(method, path string, body interface{}) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.SetBasicAuth(getCreds(req.URL))
+	req.SetBasicAuth(getCreds(req.URL.String()))
 	req.Header.Set("User-Agent", userAgent)
 	if ctype != "" {
 		req.Header.Set("Content-Type", ctype)

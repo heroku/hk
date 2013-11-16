@@ -1,0 +1,140 @@
+{
+  "description":  "OAuth tokens provide access for authorized clients to act on behalf of a Heroku user to automate, customize or extend their usage of the platform. For more information please refer to the [Heroku OAuth documentation](https://devcenter.heroku.com/articles/oauth)",
+  "id":           "schema/oauth-token",
+  "$schema":      "http://json-schema.org/draft-04/hyper-schema",
+  "title":        "Heroku Platform API - OAuth Token",
+  "type":         ["object"],
+
+  "definitions": {
+    "created_at": {
+      "description":  "when OAuth token was created",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "expires_in": {
+      "description":  "seconds until OAuth token expires; may be `null` for tokens with indefinite lifetime",
+      "example":      2592000,
+      "readOnly":     true,
+      "type":         ["null", "integer"]
+    },
+    "id": {
+      "description":  "unique identifier of OAuth token",
+      "example":      "01234567-89ab-cdef-0123-456789abcdef",
+      "format":       "uuid",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "identity": {
+      "anyOf": [
+        { "$ref": "/schema/oauth-token#/definitions/id" }
+      ]
+    },
+    "token": {
+      "description":  "contents of the token to be used for authorization",
+      "example":      "01234567-89ab-cdef-0123-456789abcdef",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "updated_at": {
+      "description":  "when OAuth token was updated",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    }
+  },
+  "links":        [
+    {
+      "description":  "Create a new OAuth token.",
+      "href":         "/oauth/tokens",
+      "method":       "POST",
+      "rel":          "create",
+      "schema":       {
+        "properties": {
+          "client": {
+            "type": ["object"],
+            "properties": {
+              "secret": { "$ref": "/schema/oauth-client#/definitions/secret" }
+            }
+          },
+          "grant": {
+            "type": ["object"],
+            "properties": {
+              "code": { "$ref": "/schema/oauth-grant#/definitions/code" },
+              "type": { "$ref": "/schema/oauth-grant#/definitions/type" }
+            }
+          },
+          "refresh_token": {
+            "type": ["object"],
+            "properties": {
+              "token": { "$ref": "/schema/oauth-token#/definitions/token" }
+            }
+          }
+        },
+        "required":     ["grant", "client", "refresh_token"]
+      },
+      "title":        "Create"
+    }
+  ],
+  "properties":   {
+    "access_token": {
+      "description":  "current access token",
+      "properties": {
+        "expires_in": { "$ref":  "/schema/oauth-token#/definitions/expires_in" },
+        "id":         { "$ref":  "/schema/oauth-token#/definitions/id" },
+        "token":      { "$ref":  "/schema/oauth-token#/definitions/token" }
+      },
+      "type":         ["object"]
+    },
+    "authorization": {
+      "description":  "authorization for this set of tokens",
+      "properties": {
+        "id":         { "$ref":  "/schema/oauth-authorization#/definitions/id" }
+      },
+      "type":         ["object"]
+    },
+    "client": {
+      "description":  "OAuth client secret used to obtain token",
+      "properties": {
+        "secret":       { "$ref":  "/schema/oauth-client#/definitions/secret" }
+      },
+      "type":         ["null", "object"]
+    },
+    "created_at": { "$ref": "/schema/oauth-token#/definitions/created_at" },
+    "grant": {
+      "description":  "grant used on the underlying authorization",
+      "properties": {
+        "code":         { "$ref":  "/schema/oauth-grant#/definitions/code" },
+        "type":         { "$ref":  "/schema/oauth-grant#/definitions/type" }
+      },
+      "type":         ["object"]
+    },
+    "id":         { "$ref": "/schema/oauth-token#/definitions/id" },
+    "refresh_token": {
+      "description":  "refresh token for this authorization",
+      "properties": {
+        "expires_in": { "$ref":  "/schema/oauth-token#/definitions/expires_in" },
+        "id":         { "$ref":  "/schema/oauth-token#/definitions/id" },
+        "token":      { "$ref":  "/schema/oauth-token#/definitions/token" }
+      },
+      "type":         ["object"]
+    },
+    "session": {
+      "description":  "OAuth session using this token",
+      "properties": {
+        "id":         { "$ref":  "/schema/oauth-token#/definitions/id" }
+      },
+      "type":         ["object"]
+    },
+    "updated_at": { "$ref": "/schema/oauth-token#/definitions/updated_at" },
+    "user": {
+      "description":  "Reference to the user associated with this token",
+      "properties": {
+        "id":         { "$ref": "/schema/account#/definitions/id" }
+      },
+      "type":         ["object"]
+    }
+  }
+}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"os/exec"
 )
 
@@ -19,16 +20,15 @@ func init() {
 }
 
 func runCreate(cmd *Command, args []string) {
-	var app App
-	var v struct {
-		Name   string `json:"name,omitempty"`
-		Region string `json:"region,omitempty"`
+	var opts heroku.AppCreateOpts
+	if flagRegion != "" {
+		opts.Region = &flagRegion
 	}
-	v.Region = flagRegion
 	if len(args) > 0 {
-		v.Name = args[0]
+		opts.Name = &args[0]
 	}
-	must(Post(&app, "/apps", v))
+	app, err := client.AppCreate(opts)
+	must(err)
 	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
 	fmt.Println(app.Name)
 }
