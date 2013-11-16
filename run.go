@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
+	"github.com/bgentry/heroku-go"
 	"github.com/heroku/hk/term"
 	"io"
 	"log"
@@ -38,28 +39,26 @@ func runRun(cmd *Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	data := make(map[string]interface{})
-	data["command"] = strings.Join(args, " ")
-	if !detachedRun {
-		data["attach"] = true
-		data["env"] = map[string]interface{}{
+
+	attached := !detachedRun
+	opts := heroku.DynoCreateOpts{Attach: &attached}
+	if attached {
+		env := map[string]string{
 			"COLUMNS": strconv.Itoa(cols),
 			"LINES":   strconv.Itoa(lines),
 			"TERM":    os.Getenv("TERM"),
 		}
+		opts.Env = &env
 	}
 
-	resp := struct {
-		Url *string `json:"attach_url,omitempty"`
-	}{}
-
-	must(Post(&resp, "/apps/"+mustApp()+"/dynos", data))
+	dyno, err := client.DynoCreate(mustApp(), strings.Join(args, " "), opts)
+	must(err)
 
 	if detachedRun {
 		return
 	}
 
-	u, err := url.Parse(*resp.Url)
+	u, err := url.Parse(*dyno.AttachURL)
 	if err != nil {
 		log.Fatal(err)
 	}

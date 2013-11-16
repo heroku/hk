@@ -24,11 +24,9 @@ func runRestart(cmd *Command, args []string) {
 		log.Fatal("Invalid usage. See 'hk help restart'")
 	}
 
-	path := "/apps/" + mustApp() + "/dynos"
-
 	if len(args) == 1 {
-		path += "/" + args[0]
+		must(client.DynoRestart(mustApp(), args[0]))
+	} else {
+		must(client.DynoRestartAll(mustApp()))
 	}
-
-	must(Delete(path))
 }

@@ -1,36 +1,8 @@
 package main
 
 import (
-	"strconv"
-	"strings"
 	"time"
 )
-
-type Dyno struct {
-	Name    string
-	Id      string
-	Type    string
-	Command string
-	AppName string `json:"app_name"`
-	Release struct {
-		Id      string
-		Version int
-	}
-	Size      string
-	State     string
-	AttachURL *string   `json:"attach_url"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
-func (d *Dyno) Age() time.Duration {
-	return time.Now().Sub(d.UpdatedAt)
-}
-
-func (d *Dyno) Seq() int {
-	i, _ := strconv.Atoi(strings.TrimPrefix(d.Name, d.Type+"."))
-	return i
-}
 
 type Release struct {
 	Id   string
