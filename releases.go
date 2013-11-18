@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"io"
 	"os"
 	"sort"
@@ -50,33 +51,47 @@ func runReleases(cmd *Command, versions []string) {
 }
 
 func listReleases(w io.Writer, versions []string) {
-	var rels []*Release
-
+	appname := mustApp()
 	if len(versions) == 0 {
-		must(Get(&rels, "/apps/"+mustApp()+"/releases"))
+		hrels, err := client.ReleaseList(appname, nil)
+		must(err)
+		rels := make([]*Release, len(hrels))
+		for i := range hrels {
+			rels[i] = newRelease(&hrels[i])
+		}
+		sort.Sort(releasesByVersion(rels))
 		gitDescribe(rels)
 		abbrevEmailReleases(rels)
-		sort.Sort(releasesByVersion(rels))
 		for _, r := range rels {
 			listRelease(w, r)
 		}
 		return
 	}
 
-	app := mustApp()
-	ch := make(chan error, len(versions))
+	var rels []*Release
+	relch := make(chan *heroku.Release, len(versions))
+	errch := make(chan error, len(versions))
 	for _, name := range versions {
 		if name == "" {
-			ch <- nil
+			relch <- nil
 		} else {
-			r, url := new(Release), "/apps/"+app+"/releases/"+name
-			rels = append(rels, r)
-			go func() { ch <- Get(r, url) }()
+			go func(relname string) {
+				if rel, err := client.ReleaseInfo(appname, relname); err != nil {
+					errch <- err
+				} else {
+					relch <- rel
+				}
+			}(name)
 		}
 	}
 	for _ = range versions {
-		if err := <-ch; err != nil {
+		select {
+		case err := <-errch:
 			fmt.Fprintln(os.Stderr, err)
+		case rel := <-relch:
+			if rel != nil {
+				rels = append(rels, newRelease(rel))
+			}
 		}
 	}
 	sort.Sort(releasesByVersion(rels))
@@ -127,3 +142,7 @@ type releasesByVersion []*Release
 func (a releasesByVersion) Len() int           { return len(a) }
 func (a releasesByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a releasesByVersion) Less(i, j int) bool { return a[i].Version < a[j].Version }
+
+func newRelease(rel *heroku.Release) *Release {
+	return &Release{*rel, "", ""}
+}

@@ -1,25 +1,15 @@
 package main
 
 import (
+	"github.com/bgentry/heroku-go"
 	"time"
 )
 
 type Release struct {
-	Id   string
-	User struct {
-		Id    string
-		Email string
-	}
-	Slug struct {
-		Id string
-	}
-	Description string
-	Version     int
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	heroku.Release
 
-	Who    string // same as User.Email or abbreviated
 	Commit string // deduced from Description, if possible
+	Who    string // who created the release
 }
 
 type Addon struct {
