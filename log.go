@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"net/http"
@@ -55,28 +56,24 @@ func init() {
 }
 
 func runLog(cmd *Command, args []string) {
-	var v struct {
-		Dyno   string `json:"dyno,omitempty"`
-		Lines  int    `json:"lines,omitempty"`
-		Source string `json:"source,omitempty"`
-		Tail   bool   `json:"tail,omitempty"`
+	opts := heroku.LogSessionCreateOpts{}
+	if dyno != "" {
+		opts.Dyno = &dyno
+	}
+	if source != "" {
+		opts.Source = &source
 	}
 
-	v.Dyno = dyno
-	v.Source = source
-
-	if lines == -1 {
-		v.Tail = true
-		v.Lines = 10
+	if lines != -1 {
+		opts.Lines = &lines
 	} else {
-		v.Lines = lines
+		tailopt := true
+		lineopt := 10
+		opts.Tail = &tailopt
+		opts.Lines = &lineopt
 	}
 
-	var session struct {
-		Id         string `json:"id"`
-		LogplexURL string `json:"logplex_url"`
-	}
-	err := APIReq(&session, "POST", "/apps/"+mustApp()+"/log-sessions", v)
+	session, err := client.LogSessionCreate(mustApp(), opts)
 	if err != nil {
 		log.Fatal(err)
 	}
