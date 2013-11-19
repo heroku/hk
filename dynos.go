@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"io"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -53,13 +55,13 @@ func runDynos(cmd *Command, names []string) {
 }
 
 func listDynos(w io.Writer, names []string) {
-	var dynos []*Dyno
-	must(Get(&dynos, "/apps/"+mustApp()+"/dynos"))
+	dynos, err := client.DynoList(mustApp(), nil)
+	must(err)
 	sort.Sort(DynosByName(dynos))
 
 	if len(names) == 0 {
 		for _, d := range dynos {
-			listDyno(w, d)
+			listDyno(w, &d)
 		}
 		return
 	}
@@ -68,23 +70,23 @@ func listDynos(w io.Writer, names []string) {
 		for _, d := range dynos {
 			if !strings.Contains(name, ".") {
 				if strings.HasPrefix(d.Name, name+".") {
-					listDyno(w, d)
+					listDyno(w, &d)
 				}
 			} else {
 				if d.Name == name {
-					listDyno(w, d)
+					listDyno(w, &d)
 				}
 			}
 		}
 	}
 }
 
-func listDyno(w io.Writer, d *Dyno) {
+func listDyno(w io.Writer, d *heroku.Dyno) {
 	if flagLong {
 		listRec(w,
 			d.Name,
 			d.State,
-			prettyDuration{d.Age()},
+			prettyDuration{dynoAge(d)},
 			maybeQuote(d.Command),
 		)
 	} else {
@@ -110,16 +112,25 @@ func quote(s string) string {
 	return string(b)
 }
 
-type DynosByName []*Dyno
+type DynosByName []heroku.Dyno
 
 func (p DynosByName) Len() int      { return len(p) }
 func (p DynosByName) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 func (p DynosByName) Less(i, j int) bool {
-	return p[i].Type < p[j].Type || (p[i].Type == p[j].Type && p[i].Seq() < p[j].Seq())
+	return p[i].Type < p[j].Type || (p[i].Type == p[j].Type && dynoSeq(&p[i]) < dynoSeq(&p[j]))
 }
 
 type prettyDuration struct {
 	time.Duration
+}
+
+func dynoAge(d *heroku.Dyno) time.Duration {
+	return time.Now().Sub(d.UpdatedAt)
+}
+
+func dynoSeq(d *heroku.Dyno) int {
+	i, _ := strconv.Atoi(strings.TrimPrefix(d.Name, d.Type+"."))
+	return i
 }
 
 func (a prettyDuration) String() string {

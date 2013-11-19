@@ -92,7 +92,7 @@ func execPlugin(path string, args []string) error {
 		log.Fatal(err)
 	}
 
-	hkuser, hkpass := getCreds(u)
+	hkuser, hkpass := getCreds(apiURL)
 	u.User = url.UserPassword(hkuser, hkpass)
 	hkapp, _ := app()
 	env := []string{

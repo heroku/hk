@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"os"
@@ -115,12 +116,20 @@ func (m *mergedAddon) String() string {
 }
 
 func getMergedAddons(appname string) []*mergedAddon {
-	var addons []*Addon
-	app := new(App)
+	var addons []heroku.Addon
+	app := new(heroku.App)
 	app.Name = appname
 	ch := make(chan error)
-	go func() { ch <- Get(&addons, "/apps/"+app.Name+"/addons") }()
-	go func() { ch <- Get(app, "/apps/"+app.Name) }()
+	go func() {
+		var err error
+		addons, err = client.AddonList(app.Name, nil)
+		ch <- err
+	}()
+	go func() {
+		var err error
+		app, err = client.AppInfo(app.Name)
+		ch <- err
+	}()
 	if err := <-ch; err != nil {
 		log.Fatal(err)
 	}
@@ -130,7 +139,7 @@ func getMergedAddons(appname string) []*mergedAddon {
 	return mergeAddons(app, addons)
 }
 
-func mergeAddons(app *App, addons []*Addon) (ms []*mergedAddon) {
+func mergeAddons(app *heroku.App, addons []heroku.Addon) (ms []*mergedAddon) {
 	// Type, Name, Owner
 	for _, a := range addons {
 		m := new(mergedAddon)

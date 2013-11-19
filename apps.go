@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"io"
 	"os"
 	"sort"
@@ -46,30 +47,42 @@ func init() {
 func runApps(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
-	var apps []*App
+	var apps []heroku.App
 	if len(names) == 0 {
-		must(Get(&apps, "/apps"))
+		var err error
+		apps, err = client.AppList(nil)
+		must(err)
 	} else {
-		ch := make(chan error, len(names))
+		appch := make(chan *heroku.App, len(names))
+		errch := make(chan error, len(names))
 		for _, name := range names {
 			if name == "" {
-				ch <- nil
+				appch <- nil
 			} else {
-				v, url := new(App), "/apps/"+name
-				apps = append(apps, v)
-				go func() { ch <- Get(v, url) }()
+				go func(appname string) {
+					if app, err := client.AppInfo(appname); err != nil {
+						errch <- err
+					} else {
+						appch <- app
+					}
+				}(name)
 			}
 		}
 		for _ = range names {
-			if err := <-ch; err != nil {
+			select {
+			case err := <-errch:
 				fmt.Fprintln(os.Stderr, err)
+			case app := <-appch:
+				if app != nil {
+					apps = append(apps, *app)
+				}
 			}
 		}
 	}
 	printAppList(w, apps)
 }
 
-func printAppList(w io.Writer, apps []*App) {
+func printAppList(w io.Writer, apps []heroku.App) {
 	sort.Sort(appsByName(apps))
 	abbrevEmailApps(apps)
 	for _, a := range apps {
@@ -79,7 +92,7 @@ func printAppList(w io.Writer, apps []*App) {
 	}
 }
 
-func abbrevEmailApps(apps []*App) {
+func abbrevEmailApps(apps []heroku.App) {
 	domains := make(map[string]int)
 	for _, a := range apps {
 		parts := strings.SplitN(a.Owner.Email, "@", 2)
@@ -101,7 +114,7 @@ func abbrevEmailApps(apps []*App) {
 	}
 }
 
-func listApp(w io.Writer, a *App) {
+func listApp(w io.Writer, a heroku.App) {
 	if flagLong {
 		size := 0
 		if a.SlugSize != nil {
@@ -123,7 +136,7 @@ func listApp(w io.Writer, a *App) {
 	}
 }
 
-type appsByName []*App
+type appsByName []heroku.App
 
 func (a appsByName) Len() int           { return len(a) }
 func (a appsByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

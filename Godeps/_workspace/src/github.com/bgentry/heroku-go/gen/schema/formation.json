@@ -1,0 +1,111 @@
+{
+  "description":  "The formation of processes that should be maintained for an app. Update the formation to scale processes or change dyno sizes. Commands and types are defined by the Procfile uploaded with an app.",
+  "id":           "schema/formation",
+  "$schema":      "http://json-schema.org/draft-04/hyper-schema",
+  "title":        "Heroku Platform API - Formation",
+  "type":         ["object"],
+
+  "definitions": {
+    "command": {
+      "description":  "command to use to launch this process",
+      "example":      "bundle exec rails server -p $PORT",
+      "type":         ["string"]
+    },
+    "created_at": {
+      "description":  "when process type was created",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "id": {
+      "description":  "unique identifier of this process type",
+      "example":      "01234567-89ab-cdef-0123-456789abcdef",
+      "format":       "uuid",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "identity": {
+      "anyOf": [
+        { "$ref": "/schema/formation#/definitions/id" },
+        { "$ref": "/schema/formation#/definitions/type" }
+      ]
+    },
+    "quantity": {
+      "description":  "number of processes to maintain",
+      "example":      1,
+      "type":         ["integer"]
+    },
+    "size": {
+      "description":  "dyno size (default: \"1\")",
+      "example":      "1",
+      "type":         ["string"]
+    },
+    "type": {
+      "description":  "type of process to maintain",
+      "example":      "web",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "updated_at": {
+      "description":  "when dyno type was updated",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    }
+  },
+  "links":        [
+    {
+      "description":  "Info for a process type",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/formation/{(%2Fschema%2Fformation%23%2Fdefinitions%2Fidentity)}",
+      "method":       "GET",
+      "rel":          "self",
+      "title":        "Info"
+    },
+    {
+      "description":  "List process type formation",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/formation",
+      "method":       "GET",
+      "rel":          "instances",
+      "title":        "List"
+    },
+    {
+      "description":  "Update process types",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/formation",
+      "method":       "PATCH",
+      "rel":          "update",
+      "schema":       {
+        "description": "hash of process types mapped to formation information",
+        "example": { "web": { "quantity":1, "size":"1" } },
+        "patternProperties": {
+          "^\\w+$": {"type": ["object"]}
+         },
+        "type": ["object"]
+      },
+      "title":        "Update all"
+    },
+    {
+      "description":  "Update process type",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/formation/{(%2Fschema%2Fformation%23%2Fdefinitions%2Fidentity)}",
+      "method":       "PATCH",
+      "rel":          "update",
+      "schema":       {
+        "properties": {
+          "quantity":  { "$ref": "/schema/formation#/definitions/quantity" },
+          "size":      { "$ref": "/schema/formation#/definitions/size" }
+        }
+      },
+      "title":        "Update"
+    }
+  ],
+  "properties":   {
+    "command":                        { "$ref": "/schema/formation#/definitions/command" },
+    "created_at":                     { "$ref": "/schema/formation#/definitions/created_at" },
+    "id":                             { "$ref": "/schema/formation#/definitions/id" },
+    "quantity":                       { "$ref": "/schema/formation#/definitions/quantity" },
+    "size":                           { "$ref": "/schema/formation#/definitions/size" },
+    "type":                           { "$ref": "/schema/formation#/definitions/type" },
+    "updated_at":                     { "$ref": "/schema/formation#/definitions/updated_at" }
+  }
+}

@@ -15,8 +15,8 @@ var cmdEnv = &Command{
 }
 
 func runEnv(cmd *Command, args []string) {
-	var config map[string]string
-	must(Get(&config, "/apps/"+mustApp()+"/config-vars"))
+	config, err := client.ConfigVarInfo(mustApp())
+	must(err)
 	var configKeys []string
 	for k := range config {
 		configKeys = append(configKeys, k)
@@ -45,8 +45,8 @@ func runGet(cmd *Command, args []string) {
 	if len(args) != 1 {
 		log.Fatal("Invalid usage. See 'hk help get'")
 	}
-	var config map[string]string
-	must(Get(&config, "/apps/"+mustApp()+"/config-vars"))
+	config, err := client.ConfigVarInfo(mustApp())
+	must(err)
 	value, found := config[args[0]]
 	if !found {
 		log.Fatalf("No such key as '%s'", args[0])
@@ -71,15 +71,17 @@ func runSet(cmd *Command, args []string) {
 	if len(args) < 1 {
 		log.Fatal("Invalid usage. See 'hk help set'")
 	}
-	config := make(map[string]string)
+	config := make(map[string]*string)
 	for _, arg := range args {
 		i := strings.Index(arg, "=")
 		if i < 0 {
 			log.Fatalf("bad format: %#q. See 'hk help set'", arg)
 		}
-		config[arg[:i]] = arg[i+1:]
+		val := arg[i+1:]
+		config[arg[:i]] = &val
 	}
-	must(Patch(nil, "/apps/"+mustApp()+"/config-vars", config))
+	_, err := client.ConfigVarUpdate(mustApp(), config)
+	must(err)
 }
 
 var cmdUnset = &Command{
@@ -103,5 +105,6 @@ func runUnset(cmd *Command, args []string) {
 	for _, key := range args {
 		config[key] = nil
 	}
-	must(Patch(nil, "/apps/"+mustApp()+"/config-vars", config))
+	_, err := client.ConfigVarUpdate(mustApp(), config)
+	must(err)
 }
