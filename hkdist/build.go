@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"github.com/bgentry/heroku-go"
 	"io"
 	"io/ioutil"
 	"log"
@@ -34,7 +35,12 @@ var allPlatforms = []string{
 	"windows-amd64",
 }
 
-var hkuser, hkpass, identityToken string
+var (
+	hkuser string
+	hkpass string
+	identityToken string
+	client heroku.Client
+)
 
 func mustHaveEnv(name string) {
 	if os.Getenv(name) == "" {
@@ -91,6 +97,8 @@ func build(args []string) {
 	// TODO(kr): verify signature
 
 	hkuser, hkpass = getCreds("api.heroku.com")
+	client.Username = hkuser
+	client.Password = hkpass
 	desc := fmt.Sprintf("%s release %s", buildName, ver)
 	// get Heroku OAuth token to provide to the hkdist API
 	identityToken, err = identityauthreq(desc, []string{"identity"})
@@ -404,7 +412,8 @@ func (d *diff) Generate() {
 }
 
 func (d *diff) runGen(deadline time.Time) {
-	err := runreq(hkgenAppName, "hkdist gen "+d.Cmd+" "+d.Platform+" "+d.From+" "+d.To)
+	command := "hkdist gen "+d.Cmd+" "+d.Platform+" "+d.From+" "+d.To
+	_, err := client.DynoCreate(hkgenAppName, command, heroku.DynoCreateOpts{})
 	if err != nil {
 		log.Printf("diff.runGen %s -> %s: %s", d.From, d.To, err)
 		return
@@ -438,73 +447,21 @@ func getCreds(host string) (user, pass string) {
 	return m.Login, m.Password
 }
 
-// wish this was all using a proper API client
-
-func apireq(method, urlstr string, body interface{}) (*http.Response, error) {
-	var rbody io.Reader
-	switch body.(type) {
-	case nil:
-	default:
-		j, err := json.Marshal(body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		rbody = bytes.NewReader(j)
-	}
-	req, err := http.NewRequest(method, urlstr, rbody)
-	if err != nil {
-		return nil, err
-	}
-	req.SetBasicAuth(hkuser, hkpass)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
-
-	return http.DefaultClient.Do(req)
-}
-
 func runreq(appname, command string) error {
-	var v struct {
-		Command string `json:"command"`
-	}
-	v.Command = command
-	res, err := apireq("POST", "https://api.heroku.com/apps/"+appname+"/dynos", v)
-	defer res.Body.Close()
-	if err != nil {
-		return err
-	}
-	if res.StatusCode/100 != 2 {
-		return fmt.Errorf("unexpected response code: %d", res.StatusCode)
-	}
-
-	return nil
+	_, err := client.DynoCreate(appname, command, heroku.DynoCreateOpts{})
+	return err
 }
 
 func identityauthreq(desc string, scopes []string) (string, error) {
-	var v struct {
-		Scope       []string `json:"scope"`
-		Description string   `json:"description"`
-		ExpiresIn   int      `json:"expires_in"`
+	expires := 600
+	opts := heroku.OAuthAuthorizationCreateOpts{
+		Description: &desc,
+		ExpiresIn:   &expires,
 	}
-	v.Scope = scopes
-	v.Description = desc
-	v.ExpiresIn = 600
-
-	resp, err := apireq("POST", "https://api.heroku.com/oauth/authorizations", v)
-	defer resp.Body.Close()
+	auth, err := client.OAuthAuthorizationCreate(scopes, opts)
 	if err != nil {
 		return "", err
-	} else if resp.StatusCode != 201 {
-		return "", fmt.Errorf("unexpected status: %d", resp.StatusCode)
 	}
 
-	var r struct {
-		AccessToken struct {
-			Token string `json:"token"`
-		} `json:"access_token"`
-		Scope []string `json:"scope"`
-	}
-	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {
-		return "", err
-	}
-	return r.AccessToken.Token, nil
+	return auth.AccessToken.Token, nil
 }
