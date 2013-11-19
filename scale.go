@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bgentry/heroku-go"
 	"log"
 	"os"
 	"strconv"
@@ -49,6 +50,6 @@ func runScale(cmd *Command, args []string) {
 }
 
 func scale(app, ps string, n int, ch chan error) {
-	data := map[string]int{"quantity": n}
-	ch <- Patch(nil, "/apps/"+app+"/formation/"+ps, data)
+	_, err := client.FormationUpdate(app, ps, heroku.FormationUpdateOpts{Quantity: &n})
+	ch <- err
 }
