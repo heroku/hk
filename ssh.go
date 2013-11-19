@@ -43,8 +43,8 @@ func runSSHAuth(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 
-	data := map[string]string{"public_key": string(keys)}
-	must(Post(nil, "/account/keys", data))
+	_, err = client.KeyCreate(string(keys))
+	must(err)
 }
 
 func findSSHKeys() ([]byte, error) {
