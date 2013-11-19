@@ -81,7 +81,13 @@ func runLog(cmd *Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	must(checkResp(resp))
+	if resp.StatusCode/100 != 2 {
+		if resp.StatusCode/100 == 4 {
+			log.Fatal("Unauthorized")
+		} else {
+			log.Fatal("Unexpected error: " + resp.Status)
+		}
+	}
 	if _, err = io.Copy(os.Stdout, resp.Body); err != nil {
 		log.Fatal(err)
 	}
