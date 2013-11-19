@@ -54,10 +54,7 @@ type App struct {
 	SlugSize *int `json:"slug_size"`
 
 	// identity of app stack
-	Stack struct {
-		Id   string `json:"id"`
-		Name string `json:"name"`
-	} `json:"stack"`
+	Stack string `json:"stack"`
 
 	// when app was updated
 	UpdatedAt time.Time `json:"updated_at"`
