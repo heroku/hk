@@ -36,10 +36,10 @@ var allPlatforms = []string{
 }
 
 var (
-	hkuser string
-	hkpass string
+	hkuser        string
+	hkpass        string
 	identityToken string
-	client heroku.Client
+	client        heroku.Client
 )
 
 func mustHaveEnv(name string) {
@@ -412,7 +412,7 @@ func (d *diff) Generate() {
 }
 
 func (d *diff) runGen(deadline time.Time) {
-	command := "hkdist gen "+d.Cmd+" "+d.Platform+" "+d.From+" "+d.To
+	command := "hkdist gen " + d.Cmd + " " + d.Platform + " " + d.From + " " + d.To
 	_, err := client.DynoCreate(hkgenAppName, command, heroku.DynoCreateOpts{})
 	if err != nil {
 		log.Printf("diff.runGen %s -> %s: %s", d.From, d.To, err)
