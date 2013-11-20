@@ -54,7 +54,7 @@ a:link, a:visited, a:active {
 
 <h1>hk</h1>
 
-<code>wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
+<code>curl -sL -A `uname -s` https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
 </code>
 
 </body>

@@ -73,7 +73,7 @@ available.
 To install a pre-built binary release, run the following one-liner:
 
 ```bash
-$ wget -qO- https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
+$ curl -sL -A `uname -s` https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
 ```
 
 The URL [https://hk.heroku.com/hk.gz](https://hk.heroku.com/hk.gz) will attempt
