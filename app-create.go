@@ -6,8 +6,8 @@ import (
 	"os/exec"
 )
 
-var cmdCreate = &Command{
-	Run:   runCreate,
+var cmdAppCreate = &Command{
+	Run:   runAppCreate,
 	Usage: "create [-r region] [app]",
 	Short: "create an app",
 	Long:  `Create creates a new heroku app.`,
@@ -16,10 +16,10 @@ var cmdCreate = &Command{
 var flagRegion string
 
 func init() {
-	cmdCreate.Flag.StringVar(&flagRegion, "r", "", "region name")
+	cmdAppCreate.Flag.StringVar(&flagRegion, "r", "", "region name")
 }
 
-func runCreate(cmd *Command, args []string) {
+func runAppCreate(cmd *Command, args []string) {
 	var opts heroku.AppCreateOpts
 	if flagRegion != "" {
 		opts.Region = &flagRegion

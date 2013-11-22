@@ -4,14 +4,14 @@ import (
 	"fmt"
 )
 
-var cmdInfo = &Command{
-	Run:   runInfo,
+var cmdAppInfo = &Command{
+	Run:   runAppInfo,
 	Usage: "info",
 	Short: "show app info",
 	Long:  `Info shows general information about the current app.`,
 }
 
-func runInfo(cmd *Command, args []string) {
+func runAppInfo(cmd *Command, args []string) {
 	app, err := client.AppInfo(mustApp())
 	must(err)
 	fmt.Printf("Name:     %s\n", app.Name)

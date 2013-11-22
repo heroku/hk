@@ -27,6 +27,20 @@ var (
 	stdin     = bufio.NewReader(os.Stdin)
 )
 
+type Namespace struct {
+	Name  string // single-word namespace
+	Short string // `hk help` output
+
+	// Commands that live in this namespace
+	Commands []*Command
+}
+
+func (n *Namespace) printUsage() {
+	for i := range n.Commands {
+		fmt.Printf("hk %s %s\n", n.Name, n.Commands[i].Usage)
+	}
+}
+
 type Command struct {
 	// args does not include the command name
 	Run  func(cmd *Command, args []string)
@@ -71,10 +85,12 @@ func (c *Command) ShortExtra() string {
 	return c.Short[:len(c.Short)-len(extra)]
 }
 
+var namespaces = []*Namespace{
+	nsApp,
+}
+
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
-	cmdCreate,
-	cmdApps,
 	cmdDynos,
 	cmdReleases,
 	cmdAddons,
@@ -85,10 +101,7 @@ var commands = []*Command{
 	cmdEnv,
 	cmdRun,
 	cmdLog,
-	cmdInfo,
 	cmdOpen,
-	cmdRename,
-	cmdDestroy,
 	cmdSSHAuth,
 	cmdVersion,
 	cmdHelp,
@@ -100,7 +113,6 @@ var commands = []*Command{
 
 	// listed by hk help more
 	cmdAPI,
-	cmdApp,
 	cmdGet,
 	cmdCreds,
 	cmdURL,
@@ -168,17 +180,18 @@ func main() {
 		}
 	}
 
-	for _, cmd := range commands {
-		if cmd.Name() == args[0] && cmd.Run != nil {
-			cmd.Flag.Usage = func() {
-				cmd.printUsage()
+	for _, ns := range namespaces {
+		if ns.Name == args[0] {
+			if len(args) >= 2 && runFromCmds(ns.Commands, args[1:]) {
+				return
 			}
-			if err := cmd.Flag.Parse(args[1:]); err != nil {
-				os.Exit(2)
-			}
-			cmd.Run(cmd, cmd.Flag.Args())
-			return
+			ns.printUsage()
+			os.Exit(2)
 		}
+	}
+
+	if runFromCmds(commands, args) {
+		return
 	}
 
 	path := findPlugin(args[0])
@@ -188,6 +201,23 @@ func main() {
 	}
 	err := execPlugin(path, args)
 	log.Fatal("exec error: ", err)
+}
+
+// returns whether the command ran
+func runFromCmds(commands []*Command, args []string) bool {
+	for _, cmd := range commands {
+		if cmd.Name() == args[0] && cmd.Run != nil {
+			cmd.Flag.Usage = func() {
+				cmd.printUsage()
+			}
+			if err := cmd.Flag.Parse(args[1:]); err != nil {
+				os.Exit(2)
+			}
+			cmd.Run(cmd, cmd.Flag.Args())
+			return true
+		}
+	}
+	return false
 }
 
 func getCreds(u string) (user, pass string) {

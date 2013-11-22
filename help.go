@@ -111,6 +111,8 @@ Usage: hk [-a app] [command] [options] [arguments]
 
 
 Commands:
+{{range .Namespaces}}
+    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}
 {{range .Commands}}{{if .Runnable}}{{if .List}}
     {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
 {{range .Plugins}}
@@ -157,10 +159,12 @@ func printUsage() {
 	}
 
 	usageTemplate.Execute(os.Stdout, struct {
-		Commands []*Command
-		Plugins  []plugin
-		Dev      bool
+		Namespaces []*Namespace
+		Commands   []*Command
+		Plugins    []plugin
+		Dev        bool
 	}{
+		namespaces,
 		commands,
 		plugins,
 		Version == "dev",

@@ -10,9 +10,9 @@ import (
 	"text/tabwriter"
 )
 
-var cmdApps = &Command{
-	Run:   runApps,
-	Usage: "apps [-l] [app...]",
+var cmdAppList = &Command{
+	Run:   runAppList,
+	Usage: "list [-l] [app...]",
 	Short: "list apps",
 	Long: `
 Lists all apps.
@@ -27,24 +27,24 @@ the app name.
 
 Examples:
 
-	$ hk apps
+	$ hk app list
 	myapp
 	myapp2
 
-	$ hk apps myapp
+	$ hk app list myapp
 	myapp
 
-	$ hk apps -l
+	$ hk app list -l
 	app  me  1234k  Jan 2 12:34  myapp
 	app  me  4567k  Jan 2 12:34  myapp2
 `,
 }
 
 func init() {
-	cmdApps.Flag.BoolVar(&flagLong, "l", false, "long listing")
+	cmdAppList.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
-func runApps(cmd *Command, names []string) {
+func runAppList(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 	var apps []heroku.App

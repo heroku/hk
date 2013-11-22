@@ -5,9 +5,9 @@ import (
 	"os/exec"
 )
 
-var cmdDestroy = &Command{
-	Run:   runDestroy,
-	Usage: "destroy app",
+var cmdAppDestroy = &Command{
+	Run:   runAppDestroy,
+	Usage: "destroy <app>",
 	Short: "destroy an app",
 	Long: `
 Destroy destroys a heroku app.
@@ -16,11 +16,11 @@ There is no going back, so be sure you mean it.
 
 Example:
 
-    $ hk destroy myapp
+    $ hk app destroy myapp
 `,
 }
 
-func runDestroy(cmd *Command, args []string) {
+func runAppDestroy(cmd *Command, args []string) {
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
