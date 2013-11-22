@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-var cmdDynos = &Command{
-	Run:   runDynos,
-	Usage: "dynos [-l] [name...]",
+var cmdDynoList = &Command{
+	Run:   runDynoList,
+	Usage: "list [-l] [name...]",
 	Short: "list dynos",
 	Long: `
 Lists dynos.
@@ -28,16 +28,16 @@ Long listing for shows the name, state, age, and command.
 
 Examples:
 
-    $ hk dynos
+    $ hk dyno list
     run.3794
     web.1
     web.2
 
-    $ hk dynos web
+    $ hk dyno list web
     web.1
     web.2
 
-    $ hk dynos -l
+    $ hk dyno list -l
     run.3794  up   1m  bash
     web.1     up  15h  "blog /app /tmp/dst"
     web.2     up   8h  "blog /app /tmp/dst"
@@ -45,10 +45,10 @@ Examples:
 }
 
 func init() {
-	cmdDynos.Flag.BoolVar(&flagLong, "l", false, "long listing")
+	cmdDynoList.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
-func runDynos(cmd *Command, names []string) {
+func runDynoList(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 	listDynos(w, names)

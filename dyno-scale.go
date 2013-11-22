@@ -8,21 +8,21 @@ import (
 	"strings"
 )
 
-var cmdScale = &Command{
-	Run:   runScale,
-	Usage: "scale type=n...",
+var cmdDynoScale = &Command{
+	Run:   runDynoScale,
+	Usage: "scale <type>=<count> ...",
 	Short: "change dyno counts",
 	Long: `
 Scale changes the number of dynos for each process type.
 
 Example:
 
-	$ hk scale web=2 worker=5
+	$ hk dyno scale web=2 worker=5
 `,
 }
 
 // takes args of the form "web=1", "worker=3", etc
-func runScale(cmd *Command, args []string) {
+func runDynoScale(cmd *Command, args []string) {
 	todo := make(map[string]int)
 	for _, arg := range args {
 		i := strings.IndexRune(arg, '=')
