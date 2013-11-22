@@ -19,18 +19,18 @@ var (
 	detachedRun bool
 )
 
-var cmdRun = &Command{
-	Run:   runRun,
-	Usage: "run command [arguments]",
+var cmdDynoRun = &Command{
+	Run:   runDynoRun,
+	Usage: "run <command> [arguments]",
 	Short: "run a process in a dyno",
 	Long:  `Run a process on Heroku`,
 }
 
 func init() {
-	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
+	cmdDynoRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
 }
 
-func runRun(cmd *Command, args []string) {
+func runDynoRun(cmd *Command, args []string) {
 	cols, err := term.Cols()
 	if err != nil {
 		log.Fatal(err)

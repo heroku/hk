@@ -4,8 +4,8 @@ import (
 	"log"
 )
 
-var cmdRestart = &Command{
-	Run:   runRestart,
+var cmdDynoRestart = &Command{
+	Run:   runDynoRestart,
 	Usage: "restart [type or name]",
 	Short: "restart dynos",
 	Long: `
@@ -13,15 +13,15 @@ Restart all app dynos, all dynos of a specific type, or a single dyno.
 
 Examples:
 
-  $ hk restart
-  $ hk restart web
-  $ hk restart web.1
+  $ hk dyno restart
+  $ hk dyno restart web
+  $ hk dyno restart web.1
 `,
 }
 
-func runRestart(cmd *Command, args []string) {
+func runDynoRestart(cmd *Command, args []string) {
 	if len(args) > 1 {
-		log.Fatal("Invalid usage. See 'hk help restart'")
+		log.Fatal("Invalid usage. See 'hk help dyno restart'")
 	}
 
 	if len(args) == 1 {
