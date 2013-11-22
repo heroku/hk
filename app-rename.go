@@ -6,20 +6,20 @@ import (
 	"os"
 )
 
-var cmdRename = &Command{
-	Run:   runRename,
-	Usage: "rename old new",
+var cmdAppRename = &Command{
+	Run:   runAppRename,
+	Usage: "rename <old> <new>",
 	Short: "rename an app",
 	Long: `
 Rename renames a heroku app.
 
 Example:
 
-  $ hk rename myapp myapp2
+  $ hk app rename myapp myapp2
 `,
 }
 
-func runRename(cmd *Command, args []string) {
+func runAppRename(cmd *Command, args []string) {
 	if len(args) != 2 {
 		cmd.printUsage()
 		os.Exit(2)
