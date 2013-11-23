@@ -88,15 +88,13 @@ func (c *Command) ShortExtra() string {
 var namespaces = []*Namespace{
 	nsApp,
 	nsDyno,
+	nsEnv,
 }
 
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
 	cmdReleases,
 	cmdAddons,
-	cmdSet,
-	cmdUnset,
-	cmdEnv,
 	cmdLog,
 	cmdOpen,
 	cmdSSHAuth,
@@ -110,7 +108,6 @@ var commands = []*Command{
 
 	// listed by hk help more
 	cmdAPI,
-	cmdGet,
 	cmdCreds,
 	cmdURL,
 
