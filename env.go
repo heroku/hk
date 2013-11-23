@@ -7,14 +7,25 @@ import (
 	"strings"
 )
 
-var cmdEnv = &Command{
-	Run:   runEnv,
-	Usage: "env",
+var nsEnv = &Namespace{
+	Name: "env",
+	Commands: []*Command{
+		cmdEnvList,
+		cmdEnvGet,
+		cmdEnvSet,
+		cmdEnvUnset,
+	},
+	Short: "manage app config",
+}
+
+var cmdEnvList = &Command{
+	Run:   runEnvList,
+	Usage: "list",
 	Short: "list config vars",
 	Long:  `Show all config vars.`,
 }
 
-func runEnv(cmd *Command, args []string) {
+func runEnvList(cmd *Command, args []string) {
 	config, err := client.ConfigVarInfo(mustApp())
 	must(err)
 	var configKeys []string
@@ -27,9 +38,9 @@ func runEnv(cmd *Command, args []string) {
 	}
 }
 
-var cmdGet = &Command{
-	Run:   runGet,
-	Usage: "get name",
+var cmdEnvGet = &Command{
+	Run:   runEnvGet,
+	Usage: "get <name>",
 	Short: "get config var" + extra,
 	Long: `
 Get the value of a config var.
@@ -41,9 +52,9 @@ Example:
 `,
 }
 
-func runGet(cmd *Command, args []string) {
+func runEnvGet(cmd *Command, args []string) {
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help get'")
+		log.Fatal("Invalid usage. See 'hk help env get'")
 	}
 	config, err := client.ConfigVarInfo(mustApp())
 	must(err)
@@ -54,9 +65,9 @@ func runGet(cmd *Command, args []string) {
 	fmt.Println(value)
 }
 
-var cmdSet = &Command{
-	Run:   runSet,
-	Usage: "set name=value ...",
+var cmdEnvSet = &Command{
+	Run:   runEnvSet,
+	Usage: "set <name>=<value> ...",
 	Short: "set config var",
 	Long: `
 Set the value of a config var.
@@ -67,15 +78,15 @@ Example:
 `,
 }
 
-func runSet(cmd *Command, args []string) {
+func runEnvSet(cmd *Command, args []string) {
 	if len(args) < 1 {
-		log.Fatal("Invalid usage. See 'hk help set'")
+		log.Fatal("Invalid usage. See 'hk help env set'")
 	}
 	config := make(map[string]*string)
 	for _, arg := range args {
 		i := strings.Index(arg, "=")
 		if i < 0 {
-			log.Fatalf("bad format: %#q. See 'hk help set'", arg)
+			log.Fatalf("bad format: %#q. See 'hk help env set'", arg)
 		}
 		val := arg[i+1:]
 		config[arg[:i]] = &val
@@ -84,9 +95,9 @@ func runSet(cmd *Command, args []string) {
 	must(err)
 }
 
-var cmdUnset = &Command{
-	Run:   runUnset,
-	Usage: "unset name ...",
+var cmdEnvUnset = &Command{
+	Run:   runEnvUnset,
+	Usage: "unset <name> ...",
 	Short: "unset config var",
 	Long: `
 Unset a config var.
@@ -97,9 +108,9 @@ Example:
 `,
 }
 
-func runUnset(cmd *Command, args []string) {
+func runEnvUnset(cmd *Command, args []string) {
 	if len(args) < 1 {
-		log.Fatal("Invalid usage. See 'hk help unset'")
+		log.Fatal("Invalid usage. See 'hk help env unset'")
 	}
 	config := make(map[string]*string)
 	for _, key := range args {
