@@ -123,15 +123,7 @@ func main() {
 	}
 	log.SetFlags(0)
 
-	args := os.Args[1:]
-	if len(args) >= 2 && "-a" == args[0] {
-		flagApp = args[1]
-		args = args[2:]
-
-		if gitRemoteApp, err := appFromGitRemote(flagApp); err == nil {
-			flagApp = gitRemoteApp
-		}
-	}
+	args := parseAppFromArgs(os.Args[1:])
 
 	if len(args) < 1 {
 		usage()
@@ -206,6 +198,26 @@ func getCreds(u string) (user, pass string) {
 	}
 
 	return m.Login, m.Password
+}
+
+func parseAppFromArgs(args []string) []string {
+	if len(args) >= 2 {
+		if i := stringsIndex(args[1:], "-a"); i != -1 {
+			if len(args[1:]) < i+2 {
+				log.Fatal("missing value for app param")
+			}
+			if strings.IndexRune(args[1:][i+1], '-') == 0 {
+				log.Fatalf("invalid value for app param: %s", args[1:][i+1])
+			}
+			flagApp = args[i+2]
+			args = append(args[:1], append(args[1:i+1], args[i+3:]...)...)
+
+			if gitRemoteApp, err := appFromGitRemote(flagApp); err == nil {
+				flagApp = gitRemoteApp
+			}
+		}
+	}
+	return args
 }
 
 func app() (string, error) {
@@ -287,4 +299,13 @@ func (s prettyTime) String() string {
 		return s.Local().Format("Jan _2 15:04")
 	}
 	return s.Local().Format("Jan _2  2006")
+}
+
+func stringsIndex(a []string, val string) int {
+	for i := range a {
+		if a[i] == val {
+			return i
+		}
+	}
+	return -1
 }
