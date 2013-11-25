@@ -156,14 +156,6 @@ func main() {
 	log.SetFlags(0)
 
 	args := os.Args[1:]
-	if len(args) >= 2 && "-a" == args[0] {
-		flagApp = args[1]
-		args = args[2:]
-
-		if gitRemoteApp, err := appFromGitRemote(flagApp); err == nil {
-			flagApp = gitRemoteApp
-		}
-	}
 
 	if len(args) < 1 {
 		usage()
@@ -205,8 +197,11 @@ func main() {
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()
 			}
-			if !cmd.NeedsApp && flagApp != "" {
-				log.Fatalf("flag provided but not defined: -a")
+			if cmd.NeedsApp {
+				cmd.Flag.StringVar(&flagApp, "a", "", "app name")
+			}
+			if err := cmd.Flag.Parse(args[1:]); err != nil {
+				os.Exit(2)
 			}
 			if cmd.NeedsApp {
 				if a, _ := app(); a == "" {
@@ -214,9 +209,6 @@ func main() {
 					cmd.printUsage()
 					os.Exit(2)
 				}
-			}
-			if err := cmd.Flag.Parse(args[1:]); err != nil {
-				os.Exit(2)
 			}
 			cmd.Run(cmd, cmd.Flag.Args())
 			return
