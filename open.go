@@ -5,10 +5,11 @@ import (
 )
 
 var cmdOpen = &Command{
-	Run:   runOpen,
-	Usage: "open",
-	Short: "open app in a web browser",
-	Long:  `Open opens the app in a web browser. (Assumes cedar.)`,
+	Run:      runOpen,
+	NeedsApp: true,
+	Usage:    "open",
+	Short:    "open app in a web browser",
+	Long:     `Open opens the app in a web browser. (Assumes cedar.)`,
 }
 
 func runOpen(cmd *Command, args []string) {

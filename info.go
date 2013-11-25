@@ -5,10 +5,11 @@ import (
 )
 
 var cmdAppInfo = &Command{
-	Run:   runAppInfo,
-	Usage: "info",
-	Short: "show app info",
-	Long:  `Info shows general information about the current app.`,
+	Run:      runAppInfo,
+	NeedsApp: true,
+	Usage:    "info",
+	Short:    "show app info",
+	Long:     `Info shows general information about the current app.`,
 }
 
 func runAppInfo(cmd *Command, args []string) {

@@ -14,9 +14,10 @@ import (
 )
 
 var cmdDynoList = &Command{
-	Run:   runDynoList,
-	Usage: "list [-l] [name...]",
-	Short: "list dynos",
+	Run:      runDynoList,
+	NeedsApp: true,
+	Usage:    "list [-l] [name...]",
+	Short:    "list dynos",
 	Long: `
 Lists dynos.
 
