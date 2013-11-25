@@ -5,9 +5,10 @@ import (
 )
 
 var cmdDynoRestart = &Command{
-	Run:   runDynoRestart,
-	Usage: "restart [type or name]",
-	Short: "restart dynos",
+	Run:      runDynoRestart,
+	NeedsApp: true,
+	Usage:    "restart [type or name]",
+	Short:    "restart dynos",
 	Long: `
 Restart all app dynos, all dynos of a specific type, or a single dyno.
 

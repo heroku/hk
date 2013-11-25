@@ -12,9 +12,10 @@ import (
 )
 
 var cmdAddons = &Command{
-	Run:   runAddons,
-	Usage: "addons [-l] [resource...]",
-	Short: "list addons",
+	Run:      runAddons,
+	NeedsApp: true,
+	Usage:    "addons [-l] [resource...]",
+	Short:    "list addons",
 	Long: `
 Lists addons.
 

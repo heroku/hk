@@ -19,10 +19,11 @@ var nsEnv = &Namespace{
 }
 
 var cmdEnvList = &Command{
-	Run:   runEnvList,
-	Usage: "list",
-	Short: "list config vars",
-	Long:  `Show all config vars.`,
+	Run:      runEnvList,
+	NeedsApp: true,
+	Usage:    "list",
+	Short:    "list config vars",
+	Long:     `Show all config vars.`,
 }
 
 func runEnvList(cmd *Command, args []string) {
@@ -39,9 +40,10 @@ func runEnvList(cmd *Command, args []string) {
 }
 
 var cmdEnvGet = &Command{
-	Run:   runEnvGet,
-	Usage: "get <name>",
-	Short: "get config var" + extra,
+	Run:      runEnvGet,
+	NeedsApp: true,
+	Usage:    "get <name>",
+	Short:    "get config var" + extra,
 	Long: `
 Get the value of a config var.
 
@@ -66,9 +68,10 @@ func runEnvGet(cmd *Command, args []string) {
 }
 
 var cmdEnvSet = &Command{
-	Run:   runEnvSet,
-	Usage: "set <name>=<value> ...",
-	Short: "set config var",
+	Run:      runEnvSet,
+	NeedsApp: true,
+	Usage:    "set <name>=<value> ...",
+	Short:    "set config var",
 	Long: `
 Set the value of a config var.
 
@@ -96,9 +99,10 @@ func runEnvSet(cmd *Command, args []string) {
 }
 
 var cmdEnvUnset = &Command{
-	Run:   runEnvUnset,
-	Usage: "unset <name> ...",
-	Short: "unset config var",
+	Run:      runEnvUnset,
+	NeedsApp: true,
+	Usage:    "unset <name> ...",
+	Short:    "unset config var",
 	Long: `
 Unset a config var.
 
