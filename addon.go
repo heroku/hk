@@ -11,10 +11,18 @@ import (
 	"text/tabwriter"
 )
 
-var cmdAddons = &Command{
-	Run:      runAddons,
+var nsAddon = &Namespace{
+	Name: "addon",
+	Commands: []*Command{
+		cmdAddonList,
+	},
+	Short: "manage addons",
+}
+
+var cmdAddonList = &Command{
+	Run:      runAddonList,
 	NeedsApp: true,
-	Usage:    "addons [-l] [resource...]",
+	Usage:    "list [-l] [resource...]",
 	Short:    "list addons",
 	Long: `
 Lists addons.
@@ -28,20 +36,20 @@ resource, and the config var it's attached to.
 
 Examples:
 
-		$ hk ls addons
+		$ hk addon list
 		DATABASE_URL
 		REDIS_URL
 
-		$ hk ls -l addons REDIS_URL
+		$ hk addon list -l REDIS_URL
 		redistogo:nano  me  soaring-ably-1234  REDIS_URL
 `,
 }
 
 func init() {
-	cmdAddons.Flag.BoolVar(&flagLong, "l", false, "long listing")
+	cmdAddonList.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
-func runAddons(cmd *Command, names []string) {
+func runAddonList(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 	listAddons(w, names)

@@ -10,10 +10,18 @@ import (
 	"text/tabwriter"
 )
 
-var cmdReleases = &Command{
-	Run:      runReleases,
+var nsRelease = &Namespace{
+	Name: "release",
+	Commands: []*Command{
+		cmdReleaseList,
+	},
+	Short: "manage releases",
+}
+
+var cmdReleaseList = &Command{
+	Run:      runReleaseList,
 	NeedsApp: true,
-	Usage:    "releases [-l] [name...]",
+	Usage:    "list [-l] [name...]",
 	Short:    "list releases",
 	Long: `
 Lists releases.
@@ -27,25 +35,25 @@ of the release, version of the release (e.g. 1), and description.
 
 Examples:
 
-    $ hk releases
+    $ hk release list
     v1
     v2
 
-    $ hk releases -l
+    $ hk release list -l
     3ae20c2  me  Jun 12 18:28  v1  Deploy 3ae20c2
     0fda0ae  me  Jun 13 18:14  v2  Deploy 0fda0ae
     ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
 
-    $ hk releases -l 3
+    $ hk release list -l 3
     ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
 `,
 }
 
 func init() {
-	cmdReleases.Flag.BoolVar(&flagLong, "l", false, "long listing")
+	cmdReleaseList.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
-func runReleases(cmd *Command, versions []string) {
+func runReleaseList(cmd *Command, versions []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 	listReleases(w, versions)
