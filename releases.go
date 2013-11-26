@@ -11,9 +11,10 @@ import (
 )
 
 var cmdReleases = &Command{
-	Run:   runReleases,
-	Usage: "releases [-l] [name...]",
-	Short: "list releases",
+	Run:      runReleases,
+	NeedsApp: true,
+	Usage:    "releases [-l] [name...]",
+	Short:    "list releases",
 	Long: `
 Lists releases.
 

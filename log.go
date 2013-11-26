@@ -15,9 +15,10 @@ var (
 )
 
 var cmdLog = &Command{
-	Run:   runLog,
-	Usage: "log [-n lines] [-s source] [-d dyno]",
-	Short: "stream app log lines",
+	Run:      runLog,
+	NeedsApp: true,
+	Usage:    "log [-n lines] [-s source] [-d dyno]",
+	Short:    "stream app log lines",
 	Long: `
 Log prints the streaming application log.
 

@@ -9,9 +9,10 @@ import (
 )
 
 var cmdScale = &Command{
-	Run:   runScale,
-	Usage: "scale type=n...",
-	Short: "change dyno counts",
+	Run:      runScale,
+	NeedsApp: true,
+	Usage:    "scale type=n...",
+	Short:    "change dyno counts",
 	Long: `
 Scale changes the number of dynos for each process type.
 
