@@ -90,12 +90,12 @@ var namespaces = []*Namespace{
 	nsApp,
 	nsDyno,
 	nsEnv,
+	nsRelease,
+	nsAddon,
 }
 
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
-	cmdReleases,
-	cmdAddons,
 	cmdLog,
 	cmdOpen,
 	cmdSSHAuth,
