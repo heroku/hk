@@ -24,7 +24,7 @@ Options:
 
     -l       long listing
 
-Long listing for shows the name, state, age, and command.
+Long listing shows the name, state, age, and command.
 
 Examples:
 
