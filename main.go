@@ -157,7 +157,8 @@ func main() {
 
 	args := os.Args[1:]
 
-	if len(args) < 1 {
+	// make sure command is specified, disallow global args
+	if len(args) < 1 || strings.IndexRune(args[0], '-') == 0 {
 		usage()
 	}
 
