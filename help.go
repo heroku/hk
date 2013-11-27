@@ -106,15 +106,24 @@ func runHelp(cmd *Command, args []string) {
 	os.Exit(2)
 }
 
+func maxStrLen(strs []string) (strlen int) {
+	for i := range strs {
+		if len(strs[i]) > strlen {
+			strlen = len(strs[i])
+		}
+	}
+	return
+}
+
 var usageTemplate = template.Must(template.New("usage").Parse(`
 Usage: hk [-a app] [command] [options] [arguments]
 
 
 Commands:
 {{range .Commands}}{{if .Runnable}}{{if .List}}
-    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
+    {{.Name | printf (print "%-" $.MaxRunListName "s")}}  {{.Short}}{{end}}{{end}}{{end}}
 {{range .Plugins}}
-    {{.Name | printf "%-8s"}}  {{.Short}} (plugin){{end}}
+    {{.Name | printf (print "%-" $.MaxRunListName "s")}}  {{.Short}} (plugin){{end}}
 
 Run 'hk help [command]' for details.
 
@@ -129,7 +138,7 @@ Additional help topics:
 var extraTemplate = template.Must(template.New("usage").Parse(`
 Additional commands:
 {{range .Commands}}{{if .Runnable}}{{if .ListAsExtra}}
-    {{.Name | printf "%-8s"}}  {{.ShortExtra}}{{end}}{{end}}{{end}}
+    {{.Name | printf (print "%-" $.MaxRunExtraName "s")}}  {{.ShortExtra}}{{end}}{{end}}{{end}}
 
 Run 'hk help [command]' for details.
 
@@ -156,22 +165,43 @@ func printUsage() {
 		}
 	}
 
+	var runListNames []string
+	for i := range commands {
+		if commands[i].Runnable() && commands[i].List() {
+			runListNames = append(runListNames, commands[i].Name())
+		}
+	}
+	for i := range plugins {
+		runListNames = append(runListNames, plugins[i].Name())
+	}
+
 	usageTemplate.Execute(os.Stdout, struct {
-		Commands []*Command
-		Plugins  []plugin
-		Dev      bool
+		Commands       []*Command
+		Plugins        []plugin
+		Dev            bool
+		MaxRunListName int
 	}{
 		commands,
 		plugins,
 		Version == "dev",
+		maxStrLen(runListNames),
 	})
 }
 
 func printExtra() {
+	var runExtraNames []string
+	for i := range commands {
+		if commands[i].Runnable() && commands[i].ListAsExtra() {
+			runExtraNames = append(runExtraNames, commands[i].Name())
+		}
+	}
+
 	extraTemplate.Execute(os.Stdout, struct {
-		Commands []*Command
+		Commands        []*Command
+		MaxRunExtraName int
 	}{
 		commands,
+		maxStrLen(runExtraNames),
 	})
 }
 
