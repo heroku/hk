@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
 	"io"
+	"log"
 	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
+	"time"
 )
 
 var cmdReleases = &Command{
@@ -145,4 +147,43 @@ func (a releasesByVersion) Less(i, j int) bool { return a[i].Version < a[j].Vers
 
 func newRelease(rel *heroku.Release) *Release {
 	return &Release{*rel, "", ""}
+}
+
+var cmdReleaseInfo = &Command{
+	Run:   runReleaseInfo,
+	Usage: "release-info",
+	Short: "show release info",
+	Long:  `release-info shows detailed information about a release.`,
+}
+
+func runReleaseInfo(cmd *Command, args []string) {
+	if len(args) != 1 {
+		log.Fatal("Invalid usage. See 'hk help release-info'")
+	}
+	ver := strings.TrimPrefix(args[0], "v")
+	rel, err := client.ReleaseInfo(mustApp(), ver)
+	must(err)
+
+	fmt.Printf("Version:  v%d\n", rel.Version)
+	fmt.Printf("By:       %s\n", rel.User.Email)
+	fmt.Printf("Change:   %s\n", rel.Description)
+	fmt.Printf("When:     %s\n", rel.CreatedAt.UTC().Format(time.RFC3339))
+	fmt.Printf("Id:       %s\n", rel.Id)
+	fmt.Printf("Slug:     %s\n", rel.Slug.Id)
+}
+
+var cmdRollback = &Command{
+	Run:   runRollback,
+	Usage: "rollback <version>",
+	Short: "rolback to a previous release",
+}
+
+func runRollback(cmd *Command, args []string) {
+	if len(args) != 1 {
+		log.Fatal("Invalid usage. See 'hk help rollback'")
+	}
+	ver := strings.TrimPrefix(args[0], "v")
+	rel, err := client.ReleaseRollback(mustApp(), ver)
+	must(err)
+	fmt.Printf("Rolled back to v%s as v%d.\n", ver, rel.Version)
 }

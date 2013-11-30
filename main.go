@@ -77,6 +77,8 @@ var commands = []*Command{
 	cmdApps,
 	cmdDynos,
 	cmdReleases,
+	cmdReleaseInfo,
+	cmdRollback,
 	cmdAddons,
 	cmdScale,
 	cmdRestart,
