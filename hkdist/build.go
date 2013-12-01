@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"sort"
@@ -394,9 +395,12 @@ type diff struct {
 
 func (d *diff) Exists() bool {
 	// Check if diff already exists
-	url := s3PatchURL + patchFilename(d.Cmd, d.Platform, d.From, d.To)
-	if resp, err := http.Head(url); err != nil {
-		log.Printf("diff.Exists name=%s platform=%s from=%s to=%s error=%q", d.Cmd, d.Platform, d.From, d.To, err)
+	urlstr := s3PatchURL + patchFilename(d.Cmd, d.Platform, d.From, d.To)
+	if resp, err := http.Head(urlstr); err != nil {
+		ue, ok := err.(*url.Error)
+		if !ok || ue.Err != io.EOF {
+			log.Printf("diff.Exists name=%s platform=%s from=%s to=%s error=%q", d.Cmd, d.Platform, d.From, d.To, ue.Err)
+		}
 		return false
 	} else {
 		return resp.StatusCode == 200
