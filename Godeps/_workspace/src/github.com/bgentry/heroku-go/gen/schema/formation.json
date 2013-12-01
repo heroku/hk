@@ -53,6 +53,16 @@
       "format":       "date-time",
       "readOnly":     true,
       "type":         ["string"]
+    },
+    "update": {
+      "additionalProperties" : false,
+      "properties": {
+        "process":  { "$ref": "/schema/formation#/definitions/identity" },
+        "quantity": { "$ref": "/schema/formation#/definitions/quantity" },
+        "size":     { "$ref": "/schema/formation#/definitions/size" }
+      },
+      "required":     ["process"],
+      "type":         ["object"]
     }
   },
   "links":        [
@@ -71,19 +81,22 @@
       "title":        "List"
     },
     {
-      "description":  "Update process types",
+      "description":  "Batch update process types",
       "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/formation",
       "method":       "PATCH",
       "rel":          "update",
       "schema":       {
-        "description": "hash of process types mapped to formation information",
-        "example": { "web": { "quantity":1, "size":"1" } },
-        "patternProperties": {
-          "^\\w+$": {"type": ["object"]}
-         },
-        "type": ["object"]
+        "properties": {
+          "updates": {
+            "type":        ["array"],
+            "items":       { "$ref": "/schema/formation#/definitions/update" },
+            "description": "Array with formation updates. Each element must have \"process\", the id or name of the process type to be updated, and can optionally update its \"quantity\" or \"size\".",
+            "example":     [{ "process": "web", "quantity": 1, "size": 2 }]
+          }
+        },
+        "required": ["updates"]
       },
-      "title":        "Update all"
+      "title":        "Batch update"
     },
     {
       "description":  "Update process type",

@@ -79,7 +79,7 @@ type OAuthAuthorizationCreateOpts struct {
 	Client *string `json:"client,omitempty"`
 	// human-friendly description of this OAuth authorization
 	Description *string `json:"description,omitempty"`
-	//
+	// seconds until OAuth token expires; may be `null` for tokens with indefinite lifetime
 	ExpiresIn *int `json:"expires_in,omitempty"`
 }
 

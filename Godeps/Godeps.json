@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/heroku/hk",
-	"GoVersion": "go1.2rc4",
+	"GoVersion": "go1.2rc5",
 	"Packages": [
 		"./..."
 	],
@@ -22,7 +22,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
-			"Rev": "07b5a9ac3de0993880edf1d1f6c4d61b17a6589e"
+			"Rev": "8b848518cb8ded30d6af15c03697574e7875ded3"
 		},
 		{
 			"ImportPath": "github.com/bmizerany/pat",

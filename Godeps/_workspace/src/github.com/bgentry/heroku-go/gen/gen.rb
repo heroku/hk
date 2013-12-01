@@ -90,7 +90,7 @@ import (
       return c.Delete(<%= path %>)
     <%- when "update" %>
       <%- if !required.empty? %>
-        <%= Erubis::Eruby.new(LINK_PARAMS_TEMPLATE).result({link: link, required: required, optional: optional}).strip %>
+        <%= Erubis::Eruby.new(LINK_PARAMS_TEMPLATE).result({modelname: key, link: link, required: required, optional: optional}).strip %>
       <%- end %>
       var <%= variablecase(key + '-res') %> <%= hasCustomType ? titlecase(key) : "map[string]string" %>
       return <%= "&" if hasCustomType%><%= variablecase(key + '-res') %>, c.Patch(&<%= variablecase(key + '-res') %>, <%= path %>, <%= postval %>)
@@ -111,7 +111,7 @@ import (
 
   <%- if %w{create update}.include?(link["rel"]) && link["schema"] && link["schema"]["properties"] %>
     <%- if !required.empty? %>
-      <%- structs = required.select {|p| resolve_typedef(link["schema"]["properties"][p]).include?("struct") } %>
+      <%- structs = required.select {|p| resolve_typedef(link["schema"]["properties"][p]) == "struct" } %>
       <%- structs.each do |propname| %>
         <%- typename = titlecase([key, link["title"], propname].join("-")) %>
         // <%= typename %> used in <%= func_name %> as the <%= definition["properties"][propname]["description"] %>
@@ -126,7 +126,25 @@ import (
 
           <%- end %>
         }
+      <%- end %>
+      <%- arr_structs = required.select {|p| resolve_typedef(link["schema"]["properties"][p]) == "[]struct" } %>
+      <%- arr_structs.each do |propname| %>
+        <%- # special case for arrays of structs (like FormationBulkUpdate) %>
+        <%- typename = titlecase([key, link["title"], "opts"].join("-")) %>
+        <%- typedef = resolve_propdef(link["schema"]["properties"][propname]["items"]) %>
 
+        type <%= typename %> struct {
+          <%- typedef["properties"].each do |subpropname, subref| %>
+            <%- propdef = resolve_propdef(subref) %>
+            <%- description = resolve_propdef(propdef)["description"] %>
+            <%- is_required = typedef["required"].include?(subpropname) %>
+            <%- word_wrap(description, line_width: 77).split("\n").each do |line| %>
+              // <%= line %>
+            <%- end %>
+            <%= titlecase(subpropname) %> <%= "*" unless is_required %><%= resolve_typedef(propdef) %> `json:"<%= subpropname %><%= ",omitempty" unless is_required %>"`
+
+          <%- end %>
+        }
       <%- end %>
     <%- end %>
     <%- if !optional.empty? %>
@@ -137,6 +155,8 @@ import (
             // <%= definition['properties'][propname]['description'] %>
           <%- elsif definition["definitions"][propname] %>
             // <%= definition["definitions"][propname]["description"] %>
+          <%- elsif link["schema"]["properties"][propname]["$ref"] %>
+            // <%= resolve_propdef(link["schema"]["properties"][propname])["description"] %>
           <%- else %>
             // <%= link["schema"]["properties"][propname]["description"] %>
           <%- end %>
@@ -153,7 +173,11 @@ LINK_PARAMS_TEMPLATE = <<-LINK_PARAMS_TEMPLATE
 params := struct {
 <%- required.each do |propname| %>
   <%- type = resolve_typedef(link["schema"]["properties"][propname]) %>
-  <%- type = titlecase([modelname, link["title"], propname].join("-")) if type.include?("struct") %>
+  <%- if type == "[]struct" %>
+    <%- type = type.gsub("struct", titlecase([modelname, link["title"], "opts"].join("-"))) %>
+  <%- elsif type == "struct" %>
+    <%- type = titlecase([modelname, link["title"], propname].join("-")) %>
+  <%- end %>
   <%= titlecase(propname) %> <%= type %> `json:"<%= propname %>"`
 <%- end %>
 <%- optional.each do |propname| %>
@@ -234,12 +258,21 @@ def resolve_typedef(propdef)
               format && format == "date-time" ? "time.Time" : "string"
             when "object"
               if propdef["additionalProperties"] == false
-                "map[string]string"
+                if propdef["patternProperties"]
+                  "map[string]string"
+                else
+                  # special case for arrays of structs (like FormationBulkUpdate)
+                  "struct"
+                end
               else
                 "struct"
               end
             when "array"
-              arraytype = propdef["items"]["type"]
+              arraytype = if propdef["items"]["$ref"]
+                resolve_typedef(propdef["items"])
+              else
+                propdef["items"]["type"]
+              end
               "[]#{arraytype}"
             else
               types.first
@@ -317,8 +350,10 @@ def func_args_from_model_and_link(definition, modelname, link)
     else
       required.each do |propname|
         type = type_for_link_opts_field(link, propname, false)
-        if type.include?("struct")
-          type = titlecase([modelname, link["title"], propname].join("-"))
+        if type == "[]struct"
+          type = type.gsub("struct", titlecase([modelname, link["title"], "Opts"].join("-")))
+        elsif type == "struct"
+          type = type.gsub("struct", titlecase([modelname, link["title"], propname].join("-")))
         end
         args << "#{variablecase(propname)} #{type}"
       end

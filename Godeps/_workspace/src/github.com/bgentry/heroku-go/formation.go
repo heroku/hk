@@ -62,6 +62,34 @@ func (c *Client) FormationList(appIdentity string, lr *ListRange) ([]Formation, 
 	return formationsRes, c.DoReq(req, &formationsRes)
 }
 
+// Batch update process types
+//
+// appIdentity is the unique identifier of the formation's app.
+// formationIdentity is the unique identifier of the Formation. updates is the
+// Array with formation updates. Each element must have "process", the id or
+// name of the process type to be updated, and can optionally update its
+// "quantity" or "size".
+func (c *Client) FormationBatchUpdate(appIdentity string, updates []FormationBatchUpdateOpts) (*Formation, error) {
+	params := struct {
+		Updates []FormationBatchUpdateOpts `json:"updates"`
+	}{
+		Updates: updates,
+	}
+	var formationRes Formation
+	return &formationRes, c.Patch(&formationRes, "/apps/"+appIdentity+"/formation", params)
+}
+
+type FormationBatchUpdateOpts struct {
+	// unique identifier of this process type
+	Process string `json:"process"`
+
+	// number of processes to maintain
+	Quantity *int `json:"quantity,omitempty"`
+
+	// dyno size (default: "1")
+	Size *string `json:"size,omitempty"`
+}
+
 // Update process type
 //
 // appIdentity is the unique identifier of the formation's app.

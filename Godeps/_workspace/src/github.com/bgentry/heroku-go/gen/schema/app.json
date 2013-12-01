@@ -174,14 +174,7 @@
     "released_at":                    { "$ref": "/schema/app#/definitions/released_at" },
     "repo_size":                      { "$ref": "/schema/app#/definitions/repo_size" },
     "slug_size":                      { "$ref": "/schema/app#/definitions/slug_size" },
-    "stack": {
-      "description": "identity of app stack",
-      "properties": {
-        "id":   { "$ref":  "/schema/stack#/definitions/id" },
-        "name": { "$ref":  "/schema/stack#/definitions/name" }
-      },
-      "type":         ["object"]
-    },
+    "stack":                          { "$ref": "/schema/stack#/definitions/name" },
     "updated_at":                     { "$ref": "/schema/app#/definitions/updated_at" },
     "web_url":                        { "$ref": "/schema/app#/definitions/web_url" }
   }
