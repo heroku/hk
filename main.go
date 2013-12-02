@@ -222,12 +222,21 @@ func app() (string, error) {
 		return app, nil
 	}
 
-	gitRemoteApp, err := appFromGitRemote("heroku")
+	gitRemote := remoteFromGit()
+	gitRemoteApp, err := appFromGitRemote(gitRemote)
 	if err != nil {
 		return "", err
 	}
 
 	return gitRemoteApp, nil
+}
+
+func remoteFromGit() string {
+	b, err := exec.Command("git", "config", "heroku.remote").Output()
+	if err != nil {
+		return "heroku"
+	}
+	return strings.Trim(string(b), "\r\n ")
 }
 
 func appFromGitRemote(remote string) (string, error) {
