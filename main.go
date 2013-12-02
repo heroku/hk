@@ -236,7 +236,7 @@ func remoteFromGit() string {
 	if err != nil {
 		return "heroku"
 	}
-	return strings.Trim(string(b), "\r\n ")
+	return strings.TrimSpace(string(b))
 }
 
 func appFromGitRemote(remote string) (string, error) {
@@ -249,7 +249,7 @@ func appFromGitRemote(remote string) (string, error) {
 		return "", err
 	}
 
-	out := strings.Trim(string(b), "\r\n ")
+	out := strings.TrimSpace(string(b))
 
 	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
 		return "", fmt.Errorf("could not find app name in " + remote + " git remote")
