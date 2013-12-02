@@ -30,10 +30,7 @@ const appMarshaled = `{
 	"released_at": "2012-01-01T12:00:00Z",
 	"repo_size": 1,
 	"slug_size": 1,
-	"stack": {
-		"id": "01234567-89ab-cdef-0123-456789abcdef",
-		"name": "cedar"
-	},
+	"stack": "cedar",
 	"updated_at": "2012-01-01T12:00:00Z",
 	"web_url": "http://example.herokuapp.com"
 }`
@@ -54,7 +51,7 @@ func TestAppUnmarshal(t *testing.T) {
 	testStringsEqual(t, "app.Name", "example", app.Name)
 	testStringsEqual(t, "app.Owner.Email", "username@example.com", app.Owner.Email)
 	testStringsEqual(t, "app.Region.Name", "us", app.Region.Name)
-	testStringsEqual(t, "app.Stack.Name", "cedar", app.Stack.Name)
+	testStringsEqual(t, "app.Stack", "cedar", app.Stack)
 }
 
 var appInfoResponse = testnet.TestResponse{

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"errors"
 	"github.com/bgentry/heroku-go"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -10,46 +10,93 @@ import (
 
 var cmdScale = &Command{
 	Run:   runScale,
-	Usage: "scale type=n...",
-	Short: "change dyno counts",
+	Usage: "scale <type>=[<qty>]:[<size>]...",
+	Short: "change dyno quantities and sizes",
 	Long: `
-Scale changes the number of dynos for each process type.
+Scale changes the quantity of dynos (horizontal scale) and/or the
+dyno size (vertical scale) for each process type. Note that
+changing dyno size will restart all dynos of that type.
 
 Example:
 
 	$ hk scale web=2 worker=5
+
+	$ hk scale web=2:1X worker=5:2X
+
+	$ hk scale web=2X worker=1X
 `,
 }
 
-// takes args of the form "web=1", "worker=3", etc
+// takes args of the form "web=1", "worker=3X", web=4:2X etc
 func runScale(cmd *Command, args []string) {
-	todo := make(map[string]int)
-	for _, arg := range args {
-		i := strings.IndexRune(arg, '=')
-		if i < 0 {
-			cmd.printUsage()
-			os.Exit(2)
-		}
-		val, err := strconv.Atoi(arg[i+1:])
+	todo := make([]heroku.FormationBatchUpdateOpts, len(args))
+	types := make(map[string]bool)
+	for i, arg := range args {
+		pstype, qty, size, err := parseScaleArg(arg)
 		if err != nil {
 			cmd.printUsage()
 			os.Exit(2)
 		}
-		todo[arg[:i]] = val
+		if _, exists := types[pstype]; exists {
+			// can only specify each process type once
+			cmd.printUsage()
+			os.Exit(2)
+		}
+		types[pstype] = true
+
+		opt := heroku.FormationBatchUpdateOpts{Process: pstype}
+		if qty != -1 {
+			opt.Quantity = &qty
+		}
+		if size != "" {
+			opt.Size = &size
+		}
+		todo[i] = opt
 	}
 
-	ch := make(chan error)
-	for ps, n := range todo {
-		go scale(mustApp(), ps, n, ch)
-	}
-	for _ = range todo {
-		if err := <-ch; err != nil {
-			log.Println(err)
-		}
-	}
+	_, err := client.FormationBatchUpdate(mustApp(), todo)
+	must(err)
 }
 
-func scale(app, ps string, n int, ch chan error) {
-	_, err := client.FormationUpdate(app, ps, heroku.FormationUpdateOpts{Quantity: &n})
-	ch <- err
+var errInvalidScaleArg = errors.New("invalid argument")
+
+func parseScaleArg(arg string) (pstype string, qty int, size string, err error) {
+	qty = -1
+	iEquals := strings.IndexRune(arg, '=')
+	if fields := strings.Fields(arg); len(fields) > 1 || iEquals == -1 {
+		err = errInvalidScaleArg
+		return
+	}
+	pstype = arg[:iEquals]
+
+	rem := strings.ToUpper(arg[iEquals+1:])
+	if len(rem) == 0 {
+		err = errInvalidScaleArg
+		return
+	}
+
+	if iColon := strings.IndexRune(rem, ':'); iColon == -1 {
+		if iX := strings.IndexRune(rem, 'X'); iX == -1 {
+			qty, err = strconv.Atoi(rem)
+			if err != nil {
+				return pstype, -1, "", errInvalidScaleArg
+			}
+		} else {
+			size = rem
+		}
+	} else {
+		if iColon > 0 {
+			qty, err = strconv.Atoi(rem[:iColon])
+			if err != nil {
+				return pstype, -1, "", errInvalidScaleArg
+			}
+		}
+		if len(rem) > iColon+1 {
+			size = rem[iColon+1:]
+		}
+	}
+	if err != nil || (qty == -1 && size == "") {
+		err = errInvalidScaleArg
+	}
+	return
 }
