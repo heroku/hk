@@ -11,14 +11,13 @@
 			"Rev": "364fb577de68fb646c4cb39cc0e09c887ee16376"
 		},
 		{
-			"ImportPath": "code.google.com/p/go-netrc/netrc",
-			"Comment": "null-9",
-			"Rev": "28676070ab99a6a09739963c7857fc61553ff8a9"
-		},
-		{
 			"ImportPath": "code.google.com/p/go-uuid/uuid",
 			"Comment": "null-10",
 			"Rev": "5fac954758f5aa282478dc07fbb8709fe9575184"
+		},
+		{
+			"ImportPath": "github.com/bgentry/go-netrc/netrc",
+			"Rev": "f001804ec3af0d1643dd182cdb7aa091fa1f8203"
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
