@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
-	"code.google.com/p/go-netrc/netrc"
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
 	"io"
 	"log"

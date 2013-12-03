@@ -10,6 +10,7 @@
 package netrc
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -27,16 +28,8 @@ const (
 	tkPassword
 	tkAccount
 	tkMacdef
+	tkComment
 )
-
-var tokenNames = []string{
-	"Machine",
-	"Default",
-	"Login",
-	"Password",
-	"Account",
-	"Macdef",
-}
 
 var keywords = map[string]int{
 	"machine":  tkMachine,
@@ -45,8 +38,10 @@ var keywords = map[string]int{
 	"password": tkPassword,
 	"account":  tkAccount,
 	"macdef":   tkMacdef,
+	"#":        tkComment,
 }
 
+// Machine contains information about a remote machine.
 type Machine struct {
 	Name     string
 	Login    string
@@ -54,6 +49,7 @@ type Machine struct {
 	Account  string
 }
 
+// Macros contains all the macro definitions in a netrc file.
 type Macros map[string]string
 
 type token struct {
@@ -67,41 +63,25 @@ type filePos struct {
 	line int
 }
 
+// Error represents a netrc file parse error.
 type Error struct {
 	Filename string
 	LineNum  int    // Line number
 	Msg      string // Error message
 }
 
+// Error returns a string representation of error e.
 func (e *Error) Error() string {
 	return fmt.Sprintf("%s:%d: %s", e.Filename, e.LineNum, e.Msg)
 }
 
-func getWord(b []byte, pos *filePos) (string, []byte) {
-	// Skip over leading whitespace
-	i := 0
-	for i < len(b) {
-		r, size := utf8.DecodeRune(b[i:])
-		if r == '\n' {
-			pos.line++
-		}
-		if !unicode.IsSpace(r) {
-			break
-		}
-		i += size
-	}
-	b = b[i:]
-
-	// Find end of word
-	i = bytes.IndexFunc(b, unicode.IsSpace)
-	if i < 0 {
-		i = len(b)
-	}
-	return string(b[0:i]), b[i:]
-}
-
 func getToken(b []byte, pos *filePos) ([]byte, *token, error) {
-	word, b := getWord(b, pos)
+	adv, wordb, err := bufio.ScanWords(b, true)
+	if err != nil {
+		return b, nil, err // should never happen
+	}
+	b = b[adv:]
+	word := string(wordb)
 	if word == "" {
 		return b, nil, nil // EOF reached
 	}
@@ -115,19 +95,38 @@ func getToken(b []byte, pos *filePos) ([]byte, *token, error) {
 	if t.kind == tkDefault {
 		return b, t, nil
 	}
+	if t.kind == tkComment {
+		t.value = word + " "
+		adv, wordb, err = bufio.ScanLines(b, true)
+		if err != nil {
+			return b, nil, err // should never happen
+		}
+		t.value = t.value + string(wordb)
+		return b[adv:], t, nil
+	}
 
-	word, b = getWord(b, pos)
 	if word == "" {
 		return b, nil, &Error{pos.name, pos.line, "word expected"}
 	}
 	if t.kind == tkMacdef {
+		adv, lineb, err := bufio.ScanLines(b, true)
+		if err != nil {
+			return b, nil, err // should never happen
+		}
+		b = b[adv:]
+		adv, wordb, err = bufio.ScanWords(lineb, true)
+		if err != nil {
+			return b, nil, err // should never happen
+		}
+		word = string(wordb)
 		t.macroName = word
+		lineb = lineb[adv:]
 
 		// Macro value starts on next line. The rest of current line
 		// should contain nothing but whitespace
 		i := 0
-		for i < len(b) {
-			r, size := utf8.DecodeRune(b[i:])
+		for i < len(lineb) {
+			r, size := utf8.DecodeRune(lineb[i:])
 			if r == '\n' {
 				i += size
 				pos.line++
@@ -138,7 +137,6 @@ func getToken(b []byte, pos *filePos) ([]byte, *token, error) {
 			}
 			i += size
 		}
-		b = b[i:]
 
 		// Find end of macro value
 		i = bytes.Index(b, []byte("\n\n"))
@@ -148,21 +146,16 @@ func getToken(b []byte, pos *filePos) ([]byte, *token, error) {
 		t.value = string(b[0:i])
 
 		return b[i:], t, nil
+	} else {
+		adv, wordb, err = bufio.ScanWords(b, true)
+		if err != nil {
+			return b, nil, err // should never happen
+		}
+		word = string(wordb)
+		b = b[adv:]
 	}
 	t.value = word
 	return b, t, nil
-}
-
-func appendMach(mach []*Machine, m *Machine) []*Machine {
-	n := len(mach)
-	if n+1 > cap(mach) {
-		mach1 := make([]*Machine, 2*cap(mach)+10)
-		copy(mach1[0:n], mach)
-		mach = mach1[0:n]
-	}
-	mach = mach[0 : n+1]
-	mach[n] = m
-	return mach
 }
 
 func parse(r io.Reader, pos *filePos) ([]*Machine, Macros, error) {
@@ -193,14 +186,14 @@ func parse(r io.Reader, pos *filePos) ([]*Machine, Macros, error) {
 				return nil, nil, &Error{pos.name, pos.line, "multiple default token"}
 			}
 			if m != nil {
-				mach, m = appendMach(mach, m), nil
+				mach, m = append(mach, m), nil
 			}
 			m = new(Machine)
 			m.Name = ""
 			defaultSeen = true
 		case tkMachine:
 			if m != nil {
-				mach, m = appendMach(mach, m), nil
+				mach, m = append(mach, m), nil
 			}
 			m = new(Machine)
 			m.Name = t.value
@@ -222,7 +215,7 @@ func parse(r io.Reader, pos *filePos) ([]*Machine, Macros, error) {
 		}
 	}
 	if m != nil {
-		mach, m = appendMach(mach, m), nil
+		mach, m = append(mach, m), nil
 	}
 	return mach, mac, nil
 }
@@ -243,10 +236,10 @@ func ParseFile(filename string) ([]*Machine, Macros, error) {
 	return parse(fd, &filePos{filename, 1})
 }
 
-// ParseFile parses the netrc file identified by filename and returns
+// FindMachine parses the netrc file identified by filename and returns
 // the Machine named by name. If no Machine with name name is found, the
 // ``default'' machine is returned.
-func FindMachine(filename string, name string) (*Machine, error) {
+func FindMachine(filename, name string) (*Machine, error) {
 	mach, _, err := ParseFile(filename)
 	if err != nil {
 		return nil, err

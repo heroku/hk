@@ -1,10 +1,9 @@
 // Copyright © 2010 Fazlul Shahriar <fshahriar@gmail.com>.
 // See LICENSE file for license details.
 
-package netrc_test
+package netrc
 
 import (
-	. "code.google.com/p/go-netrc/netrc"
 	"testing"
 )
 

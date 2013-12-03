@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
-	"code.google.com/p/go-netrc/netrc"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
 	"io"
 	"io/ioutil"
