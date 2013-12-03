@@ -352,7 +352,7 @@ func (b *Build) GenDiffs(dchan chan diff, dgroup *sync.WaitGroup) {
 }
 
 func (b *Build) getDiffs() ([]diff, error) {
-	versions, err := b.getOldVersions()
+	versions, err := b.getOldVersions(8)
 	if err != nil {
 		return nil, err
 	}
@@ -363,7 +363,7 @@ func (b *Build) getDiffs() ([]diff, error) {
 	return diffs, nil
 }
 
-func (b *Build) getOldVersions() ([]string, error) {
+func (b *Build) getOldVersions(limit int) ([]string, error) {
 	url := distURL + "release.json"
 	resp, err := http.Get(url)
 	if err != nil {
@@ -383,7 +383,10 @@ func (b *Build) getOldVersions() ([]string, error) {
 	}
 
 	sort.Sort(sort.Reverse(versions))
-	return versions, nil
+	if len(versions) < limit {
+		limit = len(versions)
+	}
+	return versions[:limit], nil
 }
 
 type diff struct {
