@@ -81,6 +81,7 @@ var commands = []*Command{
 	cmdRollback,
 	cmdAddons,
 	cmdAddonAdd,
+	cmdAddonRemove,
 	cmdScale,
 	cmdRestart,
 	cmdSet,

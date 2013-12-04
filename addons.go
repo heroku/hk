@@ -215,3 +215,33 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 	}
 	return &conf, nil
 }
+
+var cmdAddonRemove = &Command{
+	Run:   runAddonRemove,
+	Usage: "addon-remove <provider>:<plan>",
+	Short: "remove an addon",
+	Long: `
+Removes an addon from an app.
+
+Examples:
+
+    $ hk addon-remove heroku-postgresql:basic-dev
+
+    $ hk addon-remove heroku-postgresql:standard-tengu
+`,
+}
+
+func runAddonRemove(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	plan := args[0]
+	if strings.IndexRune(plan, ':') == -1 {
+		// has provider name, but missing plan name
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	err := client.AddonDelete(mustApp(), plan)
+	must(err)
+}
