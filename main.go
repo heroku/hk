@@ -106,6 +106,7 @@ var commands = []*Command{
 	helpAbout,
 
 	// listed by hk help more
+	cmdAddonOpen,
 	cmdAPI,
 	cmdApp,
 	cmdGet,
@@ -303,4 +304,12 @@ func (s prettyTime) String() string {
 		return s.Local().Format("Jan _2 15:04")
 	}
 	return s.Local().Format("Jan _2  2006")
+}
+
+func openURL(url string) error {
+	command := "open"
+	if _, err := exec.LookPath("xdg-open"); err == nil {
+		command = "xdg-open"
+	}
+	return exec.Command(command, url).Start()
 }
