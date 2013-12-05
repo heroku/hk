@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -23,9 +24,19 @@ import (
 var (
 	apiURL    = "https://api.heroku.com"
 	hkHome    = filepath.Join(homePath, ".hk")
-	netrcPath = filepath.Join(os.Getenv("HOME"), ".netrc")
 	stdin     = bufio.NewReader(os.Stdin)
 )
+
+func netrcPath() string {
+	u, err := user.Current()
+	if err != nil {
+		panic("couldn't determine user: " + err.Error())
+	}
+	if runtime.GOOS == "windows" {
+		return u.HomeDir + "/_netrc"
+	}
+	return u.HomeDir + "/.netrc"
+}
 
 type Command struct {
 	// args does not include the command name
@@ -208,7 +219,7 @@ func getCreds(u string) (user, pass string) {
 		return apiURL.User.Username(), pw
 	}
 
-	m, err := netrc.FindMachine(netrcPath, apiURL.Host)
+	m, err := netrc.FindMachine(netrcPath(), apiURL.Host)
 	if err != nil {
 		log.Fatalf("netrc error (%s): %v", apiURL.Host, err)
 	}
