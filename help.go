@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
+	"text/tabwriter"
 	"text/template"
 )
 
@@ -67,6 +69,12 @@ var helpMore = &Command{
 	Long:  "(not displayed; see special case in runHelp)",
 }
 
+var helpCommands = &Command{
+	Usage: "commands",
+	Short: "list all commands with usage",
+	Long:  "(not displayed; see special case in runHelp)",
+}
+
 var cmdHelp = &Command{
 	Usage: "help [topic]",
 	Long:  `Help shows usage for a command or other topic.`,
@@ -84,8 +92,12 @@ func runHelp(cmd *Command, args []string) {
 	if len(args) != 1 {
 		log.Fatal("too many arguments")
 	}
-	if args[0] == helpMore.Name() {
+	switch args[0] {
+	case helpMore.Name():
 		printExtra()
+		return
+	case helpCommands.Name():
+		printAllUsage()
 		return
 	}
 
@@ -204,6 +216,24 @@ func printExtra() {
 		maxStrLen(runExtraNames),
 	})
 }
+
+func printAllUsage() {
+	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
+	cl := commandList(commands)
+	sort.Sort(cl)
+	for i := range cl {
+		if cl[i].Runnable() {
+			listRec(w, "hk "+cl[i].Usage, "# "+cl[i].Short)
+		}
+	}
+}
+
+type commandList []*Command
+
+func (cl commandList) Len() int           { return len(cl) }
+func (cl commandList) Swap(i, j int)      { cl[i], cl[j] = cl[j], cl[i] }
+func (cl commandList) Less(i, j int) bool { return cl[i].Name() < cl[j].Name() }
 
 func usage() {
 	printUsage()
