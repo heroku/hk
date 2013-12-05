@@ -7,7 +7,7 @@ import (
 
 var cmdDestroy = &Command{
 	Run:   runDestroy,
-	Usage: "destroy app",
+	Usage: "destroy <name>",
 	Short: "destroy an app",
 	Long: `
 Destroy destroys a heroku app.

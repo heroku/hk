@@ -151,7 +151,7 @@ func newRelease(rel *heroku.Release) *Release {
 
 var cmdReleaseInfo = &Command{
 	Run:   runReleaseInfo,
-	Usage: "release-info",
+	Usage: "release-info <version>",
 	Short: "show release info",
 	Long:  `release-info shows detailed information about a release.`,
 }

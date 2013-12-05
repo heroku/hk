@@ -9,7 +9,7 @@ import (
 
 var cmdAPI = &Command{
 	Run:   runAPI,
-	Usage: "api method path",
+	Usage: "api <method> <path>",
 	Short: "make a single API request" + extra,
 	Long: `
 The api command is a convenient but low-level way to send requests
