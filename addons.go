@@ -248,7 +248,7 @@ func runAddonRemove(cmd *Command, args []string) {
 
 var cmdAddonOpen = &Command{
 	Run:   runAddonOpen,
-	Usage: "addon-open <provider>:<plan>",
+	Usage: "addon-open <provider>[:<plan>]",
 	Short: "open an addon" + extra,
 	Long: `
 Open the addon's management page in your default web browser.
@@ -261,11 +261,5 @@ func runAddonOpen(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	plan := args[0]
-	if strings.IndexRune(plan, ':') == -1 {
-		// has provider name, but missing plan name
-		cmd.printUsage()
-		os.Exit(2)
-	}
-	must(openURL("https://addons-sso.heroku.com/apps/" + app + "/addons/" + plan))
+	must(openURL("https://addons-sso.heroku.com/apps/" + app + "/addons/" + args[0]))
 }
