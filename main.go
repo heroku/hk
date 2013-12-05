@@ -307,8 +307,17 @@ func (s prettyTime) String() string {
 }
 
 func openURL(url string) error {
-	command := "open"
-	if _, err := exec.LookPath("xdg-open"); err == nil {
+	var command string
+	switch runtime.GOOS {
+	case "darwin":
+		command = "open"
+	case "windows":
+		command = "start"
+	default:
+		if _, err := exec.LookPath("xdg-open"); err != nil {
+			fmt.Println("xdg-open is required to open web pages on " + runtime.GOOS)
+			os.Exit(2)
+		}
 		command = "xdg-open"
 	}
 	return exec.Command(command, url).Start()
