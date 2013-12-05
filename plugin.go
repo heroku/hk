@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 )
 
 var (
@@ -104,7 +103,7 @@ func execPlugin(path string, args []string) error {
 		"HKVERSION=" + Version,
 	}
 
-	return syscall.Exec(path, args, append(env, os.Environ()...))
+	return sysExec(path, args, append(env, os.Environ()...))
 }
 
 func findPlugin(name string) (path string) {
