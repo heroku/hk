@@ -61,7 +61,7 @@ func findSSHKeys() ([]byte, error) {
 		return out, nil
 	}
 
-	key, err := sshReadPubKey(homePath + "/.ssh/id_rsa.pub")
+	key, err := sshReadPubKey(filepath.Join(homePath(), ".ssh", "id_rsa.pub"))
 	switch err {
 	case syscall.ENOENT:
 		return nil, errors.New("No SSH keys found")

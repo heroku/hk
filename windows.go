@@ -7,12 +7,8 @@ import (
 	"os/exec"
 )
 
-var (
-	homePath = os.Getenv("%HOMEPATH%")
-)
-
 func sysExec(path string, args []string, env []string) error {
-	cmd := exec.Command(path, args[1:]...)
+	cmd := exec.Command(path, args...)
 	cmd.Env = env
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
