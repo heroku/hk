@@ -249,7 +249,7 @@ func runAddonRemove(cmd *Command, args []string) {
 var cmdAddonOpen = &Command{
 	Run:   runAddonOpen,
 	Usage: "addon-open <provider>:<plan>",
-	Short: "open an addon",
+	Short: "open an addon" + extra,
 	Long: `
 Open the addon's management page in your default web browser.
 `,

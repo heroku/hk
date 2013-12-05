@@ -108,7 +108,6 @@ var commands = []*Command{
 	cmdRun,
 	cmdLog,
 	cmdInfo,
-	cmdOpen,
 	cmdRename,
 	cmdDestroy,
 	cmdDomains,
@@ -129,6 +128,7 @@ var commands = []*Command{
 	cmdApp,
 	cmdGet,
 	cmdCreds,
+	cmdOpen,
 	cmdURL,
 
 	// unlisted
