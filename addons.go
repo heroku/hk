@@ -20,19 +20,19 @@ Lists addons.
 
 Options:
 
-		-l       long listing
+    -l       long listing
 
 Long listing shows the type of the addon, owner, name of the
 resource, and the config var it's attached to.
 
 Examples:
 
-		$ hk ls addons
-		DATABASE_URL
-		REDIS_URL
+    $ hk addons
+    DATABASE_URL
+    REDIS_URL
 
-		$ hk ls -l addons REDIS_URL
-		redistogo:nano  me  soaring-ably-1234  REDIS_URL
+    $ hk addons -l REDIS_URL
+    redistogo:nano  me  soaring-ably-1234  REDIS_URL
 `,
 }
 
@@ -158,3 +158,114 @@ type mergedAddonsByType []*mergedAddon
 func (a mergedAddonsByType) Len() int           { return len(a) }
 func (a mergedAddonsByType) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
+
+var cmdAddonAdd = &Command{
+	Run:   runAddonAdd,
+	Usage: "addon-add <provider>:<plan> [<config>=<value>...]",
+	Short: "add an addon",
+	Long: `
+Adds an addon to an app.
+
+Examples:
+
+    $ hk addon-add heroku-postgresql:hobby-basic
+
+    $ hk addon-add heroku-postgresql:standard-tengu
+`,
+}
+
+func runAddonAdd(cmd *Command, args []string) {
+	if len(args) == 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	plan := args[0]
+	if strings.IndexRune(plan, ':') == -1 {
+		// has provider name, but missing plan name
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	var opts heroku.AddonCreateOpts
+	if len(args) > 1 {
+		config, err := parseAddonAddConfig(args[1:])
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(2)
+		}
+		opts = heroku.AddonCreateOpts{Config: config}
+	}
+	_, err := client.AddonCreate(mustApp(), plan, opts)
+	must(err)
+}
+
+func parseAddonAddConfig(config []string) (*map[string]string, error) {
+	conf := make(map[string]string, len(config))
+	for _, kv := range config {
+		iEq := strings.IndexRune(kv, '=')
+		if iEq < 1 || len(kv) < iEq+2 {
+			return nil, fmt.Errorf("Invalid option '%s', must be of form 'key=value'", kv)
+		}
+		val := kv[iEq+1:]
+		if val[0] == '\'' {
+			val = strings.Trim(val, "'")
+		} else if val[0] == '"' {
+			val = strings.Trim(val, "\"")
+		}
+		conf[kv[:iEq]] = val
+	}
+	return &conf, nil
+}
+
+var cmdAddonRemove = &Command{
+	Run:   runAddonRemove,
+	Usage: "addon-remove <provider>:<plan>",
+	Short: "remove an addon",
+	Long: `
+Removes an addon from an app.
+
+Examples:
+
+    $ hk addon-remove heroku-postgresql:basic-dev
+
+    $ hk addon-remove heroku-postgresql:standard-tengu
+`,
+}
+
+func runAddonRemove(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	plan := args[0]
+	if strings.IndexRune(plan, ':') == -1 {
+		// has provider name, but missing plan name
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	err := client.AddonDelete(mustApp(), plan)
+	must(err)
+}
+
+var cmdAddonOpen = &Command{
+	Run:   runAddonOpen,
+	Usage: "addon-open <provider>:<plan>",
+	Short: "open an addon",
+	Long: `
+Open the addon's management page in your default web browser.
+`,
+}
+
+func runAddonOpen(cmd *Command, args []string) {
+	app := mustApp()
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	plan := args[0]
+	if strings.IndexRune(plan, ':') == -1 {
+		// has provider name, but missing plan name
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	must(openURL("https://addons-sso.heroku.com/apps/" + app + "/addons/" + plan))
+}

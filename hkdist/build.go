@@ -228,7 +228,7 @@ var updater = &Updater{
 	apiURL:  %q,
 	binURL:  %q,
 	diffURL: %q,
-	dir:     hkHome + "/update/",
+	dir:     hkHome() + "/update/",
 	cmdName: %q,
 }
 `

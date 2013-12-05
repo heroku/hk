@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -21,11 +22,28 @@ import (
 )
 
 var (
-	apiURL    = "https://api.heroku.com"
-	hkHome    = filepath.Join(homePath, ".hk")
-	netrcPath = filepath.Join(os.Getenv("HOME"), ".netrc")
-	stdin     = bufio.NewReader(os.Stdin)
+	apiURL = "https://api.heroku.com"
+	stdin  = bufio.NewReader(os.Stdin)
 )
+
+func hkHome() string {
+	return filepath.Join(homePath(), ".hk")
+}
+
+func homePath() string {
+	u, err := user.Current()
+	if err != nil {
+		panic("couldn't determine user: " + err.Error())
+	}
+	return u.HomeDir
+}
+
+func netrcPath() string {
+	if runtime.GOOS == "windows" {
+		return filepath.Join(homePath(), "_netrc")
+	}
+	return filepath.Join(homePath(), ".netrc")
+}
 
 type Command struct {
 	// args does not include the command name
@@ -80,6 +98,8 @@ var commands = []*Command{
 	cmdReleaseInfo,
 	cmdRollback,
 	cmdAddons,
+	cmdAddonAdd,
+	cmdAddonRemove,
 	cmdScale,
 	cmdRestart,
 	cmdSet,
@@ -104,6 +124,7 @@ var commands = []*Command{
 	helpAbout,
 
 	// listed by hk help more
+	cmdAddonOpen,
 	cmdAPI,
 	cmdApp,
 	cmdGet,
@@ -205,7 +226,7 @@ func getCreds(u string) (user, pass string) {
 		return apiURL.User.Username(), pw
 	}
 
-	m, err := netrc.FindMachine(netrcPath, apiURL.Host)
+	m, err := netrc.FindMachine(netrcPath(), apiURL.Host)
 	if err != nil {
 		log.Fatalf("netrc error (%s): %v", apiURL.Host, err)
 	}
@@ -301,4 +322,33 @@ func (s prettyTime) String() string {
 		return s.Local().Format("Jan _2 15:04")
 	}
 	return s.Local().Format("Jan _2  2006")
+}
+
+func openURL(url string) error {
+	var command string
+	var args []string
+	switch runtime.GOOS {
+	case "darwin":
+		command = "open"
+		args = []string{command, url}
+	case "windows":
+		command = "cmd"
+		args = []string{"/c", "start " + url}
+	default:
+		if _, err := exec.LookPath("xdg-open"); err != nil {
+			fmt.Println("xdg-open is required to open web pages on " + runtime.GOOS)
+			os.Exit(2)
+		}
+		command = "xdg-open"
+		args = []string{command, url}
+	}
+	if runtime.GOOS != "windows" {
+		p, err := exec.LookPath(command)
+		if err != nil {
+			fmt.Printf("Error finding path to %q: %s\n", command, err)
+			os.Exit(2)
+		}
+		command = p
+	}
+	return sysExec(command, args, os.Environ())
 }
