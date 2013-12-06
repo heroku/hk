@@ -129,6 +129,11 @@ var commands = []*Command{
 	cmdGet,
 	cmdCreds,
 	cmdOpen,
+	cmdTransfer,
+	cmdTransfers,
+	cmdTransferAccept,
+	cmdTransferDecline,
+	cmdTransferCancel,
 	cmdURL,
 
 	// unlisted
