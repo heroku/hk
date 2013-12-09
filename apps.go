@@ -11,9 +11,10 @@ import (
 )
 
 var cmdApps = &Command{
-	Run:   runApps,
-	Usage: "apps [-l] [app...]",
-	Short: "list apps",
+	Run:      runApps,
+	Usage:    "apps [-l] [app...]",
+	Category: "app",
+	Short:    "list apps",
 	Long: `
 Lists all apps.
 

@@ -9,9 +9,10 @@ import (
 )
 
 var cmdDomains = &Command{
-	Run:   runDomains,
-	Usage: "domains [-l]",
-	Short: "list domains",
+	Run:      runDomains,
+	Usage:    "domains [-l]",
+	Category: "domain",
+	Short:    "list domains",
 	Long: `
 Lists domains.
 
@@ -62,9 +63,10 @@ func runDomains(cmd *Command, args []string) {
 }
 
 var cmdDomainAdd = &Command{
-	Run:   runDomainAdd,
-	Usage: "domain-add <domain>",
-	Short: "add a domain",
+	Run:      runDomainAdd,
+	Usage:    "domain-add <domain>",
+	Category: "domain",
+	Short:    "add a domain",
 }
 
 func runDomainAdd(cmd *Command, args []string) {
@@ -76,9 +78,10 @@ func runDomainAdd(cmd *Command, args []string) {
 }
 
 var cmdDomainRemove = &Command{
-	Run:   runDomainRemove,
-	Usage: "domain-remove <domain>",
-	Short: "remove a domain",
+	Run:      runDomainRemove,
+	Usage:    "domain-remove <domain>",
+	Category: "domain",
+	Short:    "remove a domain",
 }
 
 func runDomainRemove(cmd *Command, args []string) {

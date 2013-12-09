@@ -11,8 +11,9 @@ import (
 )
 
 var helpEnviron = &Command{
-	Usage: "environ",
-	Short: "environment variables used by hk",
+	Usage:    "environ",
+	Category: "hk",
+	Short:    "environment variables used by hk",
 	Long: `
 Several environment variables affect hk's behavior.
 
@@ -53,10 +54,11 @@ HKDEBUG
 }
 
 var cmdVersion = &Command{
-	Run:   runVersion,
-	Usage: "version",
-	Short: "show hk version",
-	Long:  `Version shows the hk client version string.`,
+	Run:      runVersion,
+	Usage:    "version",
+	Category: "hk",
+	Short:    "show hk version",
+	Long:     `Version shows the hk client version string.`,
 }
 
 func runVersion(cmd *Command, args []string) {
@@ -64,20 +66,23 @@ func runVersion(cmd *Command, args []string) {
 }
 
 var helpMore = &Command{
-	Usage: "more",
-	Short: "additional commands, less frequently used",
-	Long:  "(not displayed; see special case in runHelp)",
+	Usage:    "more",
+	Category: "hk",
+	Short:    "additional commands, less frequently used",
+	Long:     "(not displayed; see special case in runHelp)",
 }
 
 var helpCommands = &Command{
-	Usage: "commands",
-	Short: "list all commands with usage",
-	Long:  "(not displayed; see special case in runHelp)",
+	Usage:    "commands",
+	Category: "hk",
+	Short:    "list all commands with usage",
+	Long:     "(not displayed; see special case in runHelp)",
 }
 
 var cmdHelp = &Command{
-	Usage: "help [topic]",
-	Long:  `Help shows usage for a command or other topic.`,
+	Usage:    "help [topic]",
+	Category: "hk",
+	Long:     `Help shows usage for a command or other topic.`,
 }
 
 func init() {

@@ -20,10 +20,11 @@ var (
 )
 
 var cmdRun = &Command{
-	Run:   runRun,
-	Usage: "run <command> [arguments]",
-	Short: "run a process in a dyno",
-	Long:  `Run a process on Heroku`,
+	Run:      runRun,
+	Usage:    "run <command> [arguments]",
+	Category: "dyno",
+	Short:    "run a process in a dyno",
+	Long:     `Run a process on Heroku`,
 }
 
 func init() {
