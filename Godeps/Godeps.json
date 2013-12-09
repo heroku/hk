@@ -24,12 +24,16 @@
 			"Rev": "4eba41455a5707ef9af074aebf78d3c736fb362a"
 		},
 		{
-			"ImportPath": "github.com/bmizerany/pat",
-			"Rev": "51b7af73e39f6dc59846b22d56ca886d105ef0c3"
-		},
-		{
 			"ImportPath": "github.com/bmizerany/pq",
 			"Rev": "284a1d41dcc27fe8ccc413c339464698ab99f6d1"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "a08edd30ad9e104612741163dc087a613829a23c"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "9ede152210fa25c1377d33e867cb828c19316445"
 		},
 		{
 			"ImportPath": "github.com/inconshreveable/go-update",
