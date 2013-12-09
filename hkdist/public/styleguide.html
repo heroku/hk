@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>hk style guide</title>
+
+    <style>
+      body {
+        background: #282A36;
+        color: white;
+        font-family: Helvetica;
+      }
+
+      #viewing-options {
+        padding: 0;
+      }
+
+      #viewing-options li {
+        display: inline-block;
+        margin-right: 20px;
+      }
+
+      td {
+        font-family: monospace;
+        padding-right: 10px;
+      }
+
+      h2 {
+        color: #3A3D4E;
+      }
+
+      .prompt,
+      .comment {
+        color: #6272A4;
+      }
+
+      .command {
+        color: white;
+      }
+
+      .root {
+        color: #FF79C6;
+        font-weight: bold;
+      }
+
+      .arguments {
+        color: #66D9D0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script id="command-structure" type="text/x-handlebars-template">
+      {{#groups}}
+        <h2>{{title}}</h2>
+
+        <table>
+          {{#commands}}
+          <tr>
+            <td><span class='prompt'>$</span> <span class='command'>hk</span> <span class='root'>{{root}}</span> <span class='arguments'>{{arguments}}</span></td>
+            <td class='comment'># {{comment}}</td>
+          </tr>
+          {{/commands}}
+        </table>
+      {{/groups}}
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
+
+    <script>
+      var source = $('#command-structure').html();
+      var template = Handlebars.compile(source);
+
+      var data = [
+        {
+          title: 'App',
+          commands: [
+            {root: 'apps', arguments: '[-l] [app...]', comment: 'list apps'},
+            {root: 'app', arguments: '', comment: 'show current directory app, if any (extra)'},
+            {root: 'create', arguments: '[-r region] [app]', comment: 'create an app'},
+            {root: 'creds', arguments: '', comment: 'show credentials (extra)'},
+            {root: 'destroy', arguments: '<name>', comment: 'destroy an app'},
+            {root: 'domains', arguments: '[-l]', comment: 'list domains'},
+            {root: 'domain-add', arguments: '<domain>', comment: 'add domain'},
+            {root: 'domain-remove', arguments: '<domain>', comment: 'remove domain'},
+            {root: 'dynos', arguments: '[-l] [name...]', comment: 'list dynos'},
+            {root: 'restart', arguments: '[<type or name>]', comment: 'restart dynos'},
+            {root: 'env', arguments: '', comment: 'list config vars'},
+            {root: 'url', arguments: '', comment: 'show app url'},
+            {root: 'get', arguments: '<name>', comment: 'get config var (extra)'},
+            {root: 'open', arguments: '', comment: 'open app in a web browser (extra)'},
+            {root: 'info', arguments: '', comment: 'show app info'},
+            {root: 'log', arguments: '[-n lines] [-s source] [-d dyno]', comment: 'stream app log lines'},
+            {root: 'releases', arguments: '[-l] [name...]', comment: 'list releases'},
+            {root: 'release-info', arguments: '<version>', comment: 'show release info'},
+            {root: 'rename', arguments: '<oldname> <newname>', comment: 'rename an app'},
+            {root: 'rollback', arguments: '<version>', comment: 'rolback to a previous release'},
+            {root: 'run', arguments: '<command> [arguments]', comment: 'run a process in a dyno'},
+            {root: 'scale', arguments: '<type>=[<qty>]:[<size>]...', comment: 'change dyno quantities and sizes'},
+            {root: 'set', arguments: '<name>=<value> ...', comment: 'set config var'},
+            {root: 'transfer', arguments: '<email>', comment: 'transfer app ownership to a collaborator (extra)'},
+            {root: 'transfer-accept', arguments: '', comment: 'accept an inbound app transfer (extra)'},
+            {root: 'transfer-cancel', arguments: '', comment: 'cancel an outbound app transfer (extra)'},
+            {root: 'transfer-decline', arguments: '', comment: 'decline an inbound app transfer'},
+            {root: 'transfers', arguments: '[-l]', comment: 'list existing app transfers (extra)'},
+            {root: 'unset', arguments: '<name>', comment: 'unset config var'}
+
+          ]
+        },
+        {
+          title: 'Add-ons',
+          commands: [
+            {root: 'addons', arguments: '[-l] [resource...]', comment: 'list addons'},
+            {root: 'addon-add', arguments: '<provider>:<plan> [<config>=<value>...]', comment: 'add an addon'},
+            {root: 'addon-remove', arguments: '<provider>:<plan>', comment: 'remove an addon an addon (extra)'},
+            {root: 'addon-open', arguments: '<provider>[:<plan>]', comment: 'open an addon (extra)'}
+          ]
+        },
+        {
+          title: 'API',
+          commands: [
+            {root: 'api', arguments: '<method> <path>', comment: 'make a single API request (extra)'}
+          ]
+        },
+        {
+          title: 'Account',
+          commands: [
+            {root: 'sshauth', arguments: '[-i identity-file]', comment: 'authorize ssh public keys'}
+          ]
+        },
+        {
+          title: 'HK',
+          commands: [
+            {root: 'version', arguments: '', comment: 'show version'},
+            {root: 'update', arguments: '', comment: ''},
+            {root: 'help', arguments: '[topic]', comment: ''}
+          ]
+        }
+      ]
+
+      $('body').append(template({groups: data}));
+    </script>
+  </body>
+</html>

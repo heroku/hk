@@ -5,8 +5,8 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
-	"github.com/bmizerany/pat"
 	"github.com/bmizerany/pq"
+	"github.com/gorilla/mux"
 	"github.com/kr/secureheader"
 	"io"
 	"log"
@@ -33,15 +33,15 @@ var db *sql.DB
 func web(args []string) {
 	mustHaveEnv("DATABASE_URL")
 	initwebdb()
-	m := pat.New()
-	m.Get("/:cmd.gz", http.HandlerFunc(initial))
-	m.Get("/:cmd/current/:plat.json", http.HandlerFunc(curInfo))
-	m.Get("/:cmd/:ver/:plat.json", http.HandlerFunc(getHash))
-	m.Get("/release.json", http.HandlerFunc(listReleases))
-	m.Put("/:cmd/current/:plat.json", authenticate{herokaiOnly{http.HandlerFunc(setCur)}})
-	m.Put("/:cmd/:ver/:plat.json", authenticate{herokaiOnly{http.HandlerFunc(putVer)}})
-	m.Get("/", http.FileServer(http.Dir("hkdist/public")))
-	http.Handle("/", m)
+	r := mux.NewRouter()
+	r.HandleFunc("/{cmd}.gz", http.HandlerFunc(initial)).Methods("GET")
+	r.HandleFunc("/{cmd}/current/{plat}.json", http.HandlerFunc(curInfo)).Methods("GET")
+	r.HandleFunc("/{cmd}/{ver}/{plat}.json", http.HandlerFunc(getHash)).Methods("GET")
+	r.HandleFunc("/release.json", http.HandlerFunc(listReleases)).Methods("GET")
+	r.Path("/{cmd}/current/{plat}.json").Methods("PUT").Handler(authenticate{herokaiOnly{http.HandlerFunc(setCur)}})
+	r.Path("/{cmd}/{ver}/{plat}.json").Methods("PUT").Handler(authenticate{herokaiOnly{http.HandlerFunc(putVer)}})
+	r.PathPrefix("/").Methods("GET").Handler(http.FileServer(http.Dir("hkdist/public")))
+	http.Handle("/", r)
 	secureheader.DefaultConfig.PermitClearLoopback = true
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), secureheader.DefaultConfig)
 	if err != nil {
@@ -51,9 +51,9 @@ func web(args []string) {
 
 func setCur(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	q := r.URL.Query()
-	plat := q.Get(":plat")
-	cmd := q.Get(":cmd")
+	q := mux.Vars(r)
+	plat := q["plat"]
+	cmd := q["cmd"]
 	if strings.IndexFunc(plat, badIdentRune) >= 0 ||
 		strings.IndexFunc(cmd, badIdentRune) >= 0 {
 		http.Error(w, "bad character in path", 400)
@@ -115,7 +115,7 @@ func lookupCurRel(w http.ResponseWriter, r *http.Request, plat, cmd string) (v r
 }
 
 func initial(w http.ResponseWriter, r *http.Request) {
-	cmd := r.URL.Query().Get(":cmd")
+	cmd := mux.Vars(r)["cmd"]
 	plat := guessPlat(r.UserAgent())
 	if rel, ok := lookupCurRel(w, r, plat, cmd); ok {
 		url := s3DistURL + rel.Gzname()
@@ -124,17 +124,17 @@ func initial(w http.ResponseWriter, r *http.Request) {
 }
 
 func curInfo(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	if rel, ok := lookupCurRel(w, r, q.Get(":plat"), q.Get(":cmd")); ok {
+	q := mux.Vars(r)
+	if rel, ok := lookupCurRel(w, r, q["plat"], q["cmd"]); ok {
 		logErr(json.NewEncoder(w).Encode(rel))
 	}
 }
 
 func getHash(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
+	q := mux.Vars(r)
 	var info jsonsha
 	const s = `select sha256 from release where plat=$1 and cmd=$2 and ver=$3`
-	if scan(w, r, db.QueryRow(s, q.Get(":plat"), q.Get(":cmd"), q.Get(":ver")), &info.Sha256) {
+	if scan(w, r, db.QueryRow(s, q["plat"], q["cmd"], q["ver"]), &info.Sha256) {
 		logErr(json.NewEncoder(w).Encode(info))
 	}
 }
@@ -207,10 +207,10 @@ func guessPlat(ua string) string {
 
 func putVer(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	q := r.URL.Query()
-	plat := q.Get(":plat")
-	cmd := q.Get(":cmd")
-	ver := q.Get(":ver")
+	q := mux.Vars(r)
+	plat := q["plat"]
+	cmd := q["cmd"]
+	ver := q["ver"]
 	if strings.IndexFunc(plat, badIdentRune) >= 0 ||
 		strings.IndexFunc(cmd, badIdentRune) >= 0 ||
 		strings.IndexFunc(ver, badVersionRune) >= 0 {
