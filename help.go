@@ -390,7 +390,7 @@ var styleGuideTemplate = template.Must(template.New("styleguide").Delims("{{{", 
     </script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
 
     <script>
       var source = $('#command-structure').html();
