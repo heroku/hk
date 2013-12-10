@@ -340,6 +340,10 @@ var styleGuideTemplate = template.Must(template.New("styleguide").Delims("{{{", 
         padding-right: 10px;
       }
 
+      td:first-child {
+        width: 460px;
+      }
+
       h2 {
         color: #5A5D6E;
       }
