@@ -21,3 +21,14 @@ Please `go fmt` everything before submitting.
 
 We strive to write idiomatic Go code, and welcome any suggestions on how to
 better leverage the expressive nature of Go code.
+
+## Style Guide
+
+The style guide is available at [hk.heroku.com/styleguide.html][styleguide]. The
+style guide can be automatically generated using hk's help output:
+
+```bash
+$ ./hk help styleguide > hkdist/public/styleguide.html
+```
+
+[styleguide]: https://hk.heroku.com/styleguide.html
