@@ -84,23 +84,23 @@
         {
           "commands": [
             {
-              "root": "app",
+              "root": "which-app", // rename app to which-app
               "arguments": "",
               "comment": "show current directory app, if any (extra)"
             },
             {
               "root": "apps",
-              "arguments": "[-l] [app...]",
+              "arguments": "[app...]", // only verbose format
               "comment": "list apps"
             },
             {
-              "root": "create",
+              "root": "create", // without arguments start interactive prompt like npm init
               "arguments": "[-r region] [app]",
               "comment": "create an app"
             },
             {
-              "root": "destroy",
-              "arguments": "\u003cname\u003e",
+              "root": "destroy", // keep it like `heroku` (interactive wihout confirm)
+              "arguments": "<name>",
               "comment": "destroy an app"
             },
             {
@@ -109,7 +109,7 @@
               "comment": "show app info"
             },
             {
-              "root": "log",
+              "root": "log", // no one says check the log...other lists are plural
               "arguments": "[-n lines] [-s source] [-d dyno]",
               "comment": "stream app log lines"
             },
@@ -119,13 +119,13 @@
               "comment": "open app in a web browser (extra)"
             },
             {
-              "root": "rename",
-              "arguments": "\u003coldname\u003e \u003cnewname\u003e",
+              "root": "rename", // doesn't follow -a convention...
+              "arguments": "<oldname> <newname>",
               "comment": "rename an app"
             },
             {
               "root": "transfer",
-              "arguments": "\u003cemail\u003e",
+              "arguments": "<email>",
               "comment": "transfer app ownership to a collaborator (extra)"
             },
             {
@@ -145,7 +145,7 @@
             },
             {
               "root": "transfers",
-              "arguments": "[-l]",
+              "arguments": "", // default to verbose output
               "comment": "list existing app transfers (extra)"
             },
             {
@@ -160,22 +160,22 @@
           "commands": [
             {
               "root": "dynos",
-              "arguments": "[-l] [name...]",
+              "arguments": "[name...]", // default to verbose output
               "comment": "list dynos"
             },
             {
               "root": "restart",
-              "arguments": "[\u003ctype or name\u003e]",
+              "arguments": "[<type or name>]",
               "comment": "restart dynos"
             },
             {
               "root": "run",
-              "arguments": "\u003ccommand\u003e [arguments]",
+              "arguments": "<command> [arguments]", // add options to specify dyno size and detached option
               "comment": "run a process in a dyno"
             },
             {
               "root": "scale",
-              "arguments": "\u003ctype\u003e=[\u003cqty\u003e]:[\u003csize\u003e]...",
+              "arguments": "<type>=[<qty>]:[<size>]...",
               "comment": "change dyno quantities and sizes"
             }
           ],
@@ -185,17 +185,17 @@
           "commands": [
             {
               "root": "release-info",
-              "arguments": "\u003cversion\u003e",
+              "arguments": "<version>",
               "comment": "show release info"
             },
             {
               "root": "releases",
-              "arguments": "[-l] [name...]",
+              "arguments": "[version...]", // default to verbose output
               "comment": "list releases"
             },
             {
               "root": "rollback",
-              "arguments": "\u003cversion\u003e",
+              "arguments": "<version>",
               "comment": "rolback to a previous release"
             }
           ],
@@ -205,22 +205,22 @@
           "commands": [
             {
               "root": "addon-add",
-              "arguments": "\u003cprovider\u003e:\u003cplan\u003e [\u003cconfig\u003e=\u003cvalue\u003e...]",
+              "arguments": "<provider>[:<plan>] [<config>=<value>...]",
               "comment": "add an addon"
             },
             {
               "root": "addon-open",
-              "arguments": "\u003cprovider\u003e[:\u003cplan\u003e]",
+              "arguments": "<provider>[:<plan>]",
               "comment": "open an addon (extra)"
             },
             {
               "root": "addon-remove",
-              "arguments": "\u003cprovider\u003e:\u003cplan\u003e",
+              "arguments": "<provider>:<plan>",
               "comment": "remove an addon"
             },
             {
               "root": "addons",
-              "arguments": "[-l] [resource...]",
+              "arguments": "[resource...]", // default to verbose output
               "comment": "list addons"
             }
           ],
@@ -231,22 +231,22 @@
             {
               "root": "env",
               "arguments": "",
-              "comment": "list config vars"
+              "comment": "list env vars"
             },
             {
               "root": "get",
-              "arguments": "\u003cname\u003e",
-              "comment": "get config var (extra)"
+              "arguments": "<name>",
+              "comment": "get env var (extra)"
             },
             {
               "root": "set",
-              "arguments": "\u003cname\u003e=\u003cvalue\u003e ...",
-              "comment": "set config var"
+              "arguments": "<name>=<value> ...",
+              "comment": "set env var" // allow piping .env file
             },
             {
               "root": "unset",
-              "arguments": "\u003cname\u003e ...",
-              "comment": "unset config var"
+              "arguments": "<name> ...",
+              "comment": "unset env var"
             }
           ],
           "title": "config"
@@ -255,17 +255,17 @@
           "commands": [
             {
               "root": "domain-add",
-              "arguments": "\u003cdomain\u003e",
+              "arguments": "<domain>", // allow multiple domains at a time, allow piping
               "comment": "add a domain"
             },
             {
               "root": "domain-remove",
-              "arguments": "\u003cdomain\u003e",
+              "arguments": "<domain>",
               "comment": "remove a domain"
             },
             {
               "root": "domains",
-              "arguments": "[-l]",
+              "arguments": "", // remove verbose output and other column, in future perhaps show default domain
               "comment": "list domains"
             }
           ],
@@ -274,9 +274,29 @@
         {
           "commands": [
             {
-              "root": "sshauth",
-              "arguments": "[-i identity-file]",
-              "comment": "authorize ssh public keys"
+              "root": "sshkeys",
+              "arguments": "",
+              "comment": "list ssh public keys"
+            },
+            {
+              "root": "sshkey-add",
+              "arguments": "[<identity-file>]",
+              "comment": "add ssh public key"
+            },
+            {
+              "root": "sshkey-remove",
+              "arguments": "<name>",
+              "comment": "remove ssh public key"
+            },
+            {
+              "root": "login",
+              "arguments": "", // not sure how to make it non-interactive
+              "comment": "log in to heroku"
+            },
+            {
+              "root": "logout",
+              "arguments": "",
+              "comment": "log out of heroku"
             }
           ],
           "title": "account"
@@ -290,11 +310,11 @@
             },
             {
               "root": "api",
-              "arguments": "\u003cmethod\u003e \u003cpath\u003e",
+              "arguments": "<method> <path>",
               "comment": "make a single API request (extra)"
             },
             {
-              "root": "creds",
+              "root": "creds", // remove it?
               "arguments": "",
               "comment": "show credentials (extra)"
             },
