@@ -17,7 +17,7 @@ import (
 
 var (
 	detachedRun bool
-	dynoSize string
+	dynoSize    string
 )
 
 var cmdRun = &Command{
@@ -25,7 +25,7 @@ var cmdRun = &Command{
 	Usage:    "run [-s <size>] [-d] <command> [arguments]",
 	Category: "dyno",
 	Short:    "run a process in a dyno",
-	Long:     `
+	Long: `
 Run a process on Heroku
 
 Options:
