@@ -9,9 +9,10 @@ import (
 )
 
 var cmdScale = &Command{
-	Run:   runScale,
-	Usage: "scale <type>=[<qty>]:[<size>]...",
-	Short: "change dyno quantities and sizes",
+	Run:      runScale,
+	Usage:    "scale <type>=[<qty>]:[<size>]...",
+	Category: "dyno",
+	Short:    "change dyno quantities and sizes",
 	Long: `
 Scale changes the quantity of dynos (horizontal scale) and/or the
 dyno size (vertical scale) for each process type. Note that

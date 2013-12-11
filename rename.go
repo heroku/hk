@@ -7,9 +7,10 @@ import (
 )
 
 var cmdRename = &Command{
-	Run:   runRename,
-	Usage: "rename <oldname> <newname>",
-	Short: "rename an app",
+	Run:      runRename,
+	Usage:    "rename <oldname> <newname>",
+	Category: "app",
+	Short:    "rename an app",
 	Long: `
 Rename renames a heroku app.
 

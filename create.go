@@ -7,10 +7,11 @@ import (
 )
 
 var cmdCreate = &Command{
-	Run:   runCreate,
-	Usage: "create [-r region] [app]",
-	Short: "create an app",
-	Long:  `Create creates a new heroku app.`,
+	Run:      runCreate,
+	Usage:    "create [-r region] [app]",
+	Category: "app",
+	Short:    "create an app",
+	Long:     `Create creates a new heroku app.`,
 }
 
 var flagRegion string

@@ -1,18 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
-	"text/template"
 )
 
 var helpEnviron = &Command{
-	Usage: "environ",
-	Short: "environment variables used by hk",
+	Usage:    "environ",
+	Category: "hk",
+	Short:    "environment variables used by hk",
 	Long: `
 Several environment variables affect hk's behavior.
 
@@ -53,31 +55,42 @@ HKDEBUG
 }
 
 var cmdVersion = &Command{
-	Run:   runVersion,
-	Usage: "version",
-	Short: "show hk version",
-	Long:  `Version shows the hk client version string.`,
+	Run:      runVersion,
+	Usage:    "version",
+	Category: "hk",
+	Short:    "show hk version",
+	Long:     `Version shows the hk client version string.`,
 }
 
 func runVersion(cmd *Command, args []string) {
 	fmt.Println(Version)
 }
 
+var cmdHelp = &Command{
+	Usage:    "help [topic]",
+	Category: "hk",
+	Long:     `Help shows usage for a command or other topic.`,
+}
+
 var helpMore = &Command{
-	Usage: "more",
-	Short: "additional commands, less frequently used",
-	Long:  "(not displayed; see special case in runHelp)",
+	Usage:    "more",
+	Category: "hk",
+	Short:    "additional commands, less frequently used",
+	Long:     "(not displayed; see special case in runHelp)",
 }
 
 var helpCommands = &Command{
-	Usage: "commands",
-	Short: "list all commands with usage",
-	Long:  "(not displayed; see special case in runHelp)",
+	Usage:    "commands",
+	Category: "hk",
+	Short:    "list all commands with usage",
+	Long:     "(not displayed; see special case in runHelp)",
 }
 
-var cmdHelp = &Command{
-	Usage: "help [topic]",
-	Long:  `Help shows usage for a command or other topic.`,
+var helpStyleGuide = &Command{
+	Usage:    "styleguide",
+	Category: "hk",
+	Short:    "generate an html styleguide for all commands with usage",
+	Long:     "(not displayed; see special case in runHelp)",
 }
 
 func init() {
@@ -98,6 +111,9 @@ func runHelp(cmd *Command, args []string) {
 		return
 	case helpCommands.Name():
 		printAllUsage()
+		return
+	case helpStyleGuide.Name():
+		printStyleGuide()
 		return
 	}
 
@@ -229,13 +245,161 @@ func printAllUsage() {
 	}
 }
 
+func printStyleGuide() {
+	cmap := make(map[string]commandList)
+	// group by category
+	for i := range commands {
+		if _, exists := cmap[commands[i].Category]; !exists {
+			cmap[commands[i].Category] = commandList{commands[i]}
+		} else {
+			cmap[commands[i].Category] = append(cmap[commands[i].Category], commands[i])
+		}
+	}
+	// sort each category
+	for _, cl := range cmap {
+		sort.Sort(cl)
+	}
+	err := styleGuideTemplate.Execute(os.Stdout, struct {
+		CommandMap commandMap
+	}{
+		cmap,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (c *Command) UsageJSON() commandJSON {
+	return commandJSON{Root: c.Name(), Arguments: strings.TrimLeft(c.Usage, c.Name()+" "), Comment: c.Short}
+}
+
+type commandJSON struct {
+	Root      string `json:"root"`
+	Arguments string `json:"arguments"`
+	Comment   string `json:"comment"`
+}
+
 type commandList []*Command
 
 func (cl commandList) Len() int           { return len(cl) }
 func (cl commandList) Swap(i, j int)      { cl[i], cl[j] = cl[j], cl[i] }
 func (cl commandList) Less(i, j int) bool { return cl[i].Name() < cl[j].Name() }
 
+func (cl commandList) UsageJSON() []commandJSON {
+	a := make([]commandJSON, len(cl))
+	for i := range cl {
+		a[i] = cl[i].UsageJSON()
+	}
+	return a
+}
+
+type commandMap map[string]commandList
+
+func (cm commandMap) UsageJSON(prefix string) template.JS {
+	a := make([]map[string]interface{}, 0)
+	for k, cl := range cm {
+		m := map[string]interface{}{"title": k, "commands": cl.UsageJSON()}
+		a = append(a, m)
+	}
+	buf, err := json.MarshalIndent(a, prefix, "  ")
+	if err != nil {
+		return template.JS(fmt.Sprintf("{\"error\": %q}", err.Error))
+	}
+	return template.JS(buf)
+}
+
 func usage() {
 	printUsage()
 	os.Exit(2)
 }
+
+var styleGuideTemplate = template.Must(template.New("styleguide").Delims("{{{", "}}}").Parse(`
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>hk style guide</title>
+
+    <style>
+      body {
+        background: #282A36;
+        color: white;
+        font-family: Helvetica;
+      }
+
+      #viewing-options {
+        padding: 0;
+      }
+
+      #viewing-options li {
+        display: inline-block;
+        margin-right: 20px;
+      }
+
+      td {
+        font-family: monospace;
+        padding-right: 10px;
+      }
+
+      td:first-child {
+        width: 460px;
+      }
+
+      h2 {
+        color: #5A5D6E;
+      }
+
+      .prompt,
+      .comment {
+        color: #6272A4;
+      }
+
+      .command {
+        color: white;
+      }
+
+      .root {
+        color: #FF79C6;
+        font-weight: bold;
+      }
+
+      .arguments {
+        color: #66D9D0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script id="command-structure" type="text/x-handlebars-template">
+      {{#groups}}
+      <h2>{{title}}</h2>
+
+      <table>
+        {{#commands}}
+        <tr>
+          <td>
+            <span class='prompt'>$</span>
+            <span class='command'>hk</span>
+            <span class='root'>{{root}}</span>
+            <span class='arguments'>{{arguments}}</span>
+          </td>
+          <td class='comment'># {{comment}}</td>
+        </tr>
+        {{/commands}}
+      </table>
+      {{/groups}}
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.min.js"></script>
+
+    <script>
+      var source = $('#command-structure').html();
+      var template = Handlebars.compile(source);
+
+      var data = {{{.CommandMap.UsageJSON "      "}}}
+
+      $('body').append(template({groups: data}));
+    </script>
+  </body>
+</html>
+`[1:]))

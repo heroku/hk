@@ -16,9 +16,10 @@ var (
 )
 
 var cmdSSHAuth = &Command{
-	Run:   runSSHAuth,
-	Usage: "sshauth [-i identity-file]",
-	Short: "authorize ssh public keys",
+	Run:      runSSHAuth,
+	Usage:    "sshauth [-i identity-file]",
+	Category: "account",
+	Short:    "authorize ssh public keys",
 	Long: `
 Command sshauth installs your ssh public keys for authorized use on Heroku.
 

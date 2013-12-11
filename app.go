@@ -5,9 +5,10 @@ import (
 )
 
 var cmdApp = &Command{
-	Run:   runApp,
-	Usage: "app",
-	Short: "show current directory app, if any" + extra,
+	Run:      runApp,
+	Usage:    "app",
+	Category: "app",
+	Short:    "show current directory app, if any" + extra,
 	Long: `
 App looks for a git remote named "heroku" with a remote URL in the
 correct form. If successful, it prints the corresponding app name.

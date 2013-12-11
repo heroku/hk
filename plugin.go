@@ -13,8 +13,9 @@ var (
 )
 
 var helpPlugins = &Command{
-	Usage: "plugins",
-	Short: "interface to plugin commands",
+	Usage:    "plugins",
+	Category: "hk",
+	Short:    "interface to plugin commands",
 	Long: `
 Plugin commands extend hk's functionality.
 

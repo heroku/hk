@@ -12,9 +12,10 @@ import (
 )
 
 var cmdAddons = &Command{
-	Run:   runAddons,
-	Usage: "addons [-l] [resource...]",
-	Short: "list addons",
+	Run:      runAddons,
+	Usage:    "addons [-l] [resource...]",
+	Category: "add-on",
+	Short:    "list addons",
 	Long: `
 Lists addons.
 
@@ -160,9 +161,10 @@ func (a mergedAddonsByType) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 
 var cmdAddonAdd = &Command{
-	Run:   runAddonAdd,
-	Usage: "addon-add <provider>:<plan> [<config>=<value>...]",
-	Short: "add an addon",
+	Run:      runAddonAdd,
+	Usage:    "addon-add <provider>:<plan> [<config>=<value>...]",
+	Category: "add-on",
+	Short:    "add an addon",
 	Long: `
 Adds an addon to an app.
 
@@ -217,9 +219,10 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 }
 
 var cmdAddonRemove = &Command{
-	Run:   runAddonRemove,
-	Usage: "addon-remove <provider>:<plan>",
-	Short: "remove an addon",
+	Run:      runAddonRemove,
+	Usage:    "addon-remove <provider>:<plan>",
+	Category: "add-on",
+	Short:    "remove an addon",
 	Long: `
 Removes an addon from an app.
 
@@ -247,9 +250,10 @@ func runAddonRemove(cmd *Command, args []string) {
 }
 
 var cmdAddonOpen = &Command{
-	Run:   runAddonOpen,
-	Usage: "addon-open <provider>[:<plan>]",
-	Short: "open an addon" + extra,
+	Run:      runAddonOpen,
+	Usage:    "addon-open <provider>[:<plan>]",
+	Category: "add-on",
+	Short:    "open an addon" + extra,
 	Long: `
 Open the addon's management page in your default web browser.
 `,

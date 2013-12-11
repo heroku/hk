@@ -13,9 +13,10 @@ import (
 )
 
 var cmdReleases = &Command{
-	Run:   runReleases,
-	Usage: "releases [-l] [name...]",
-	Short: "list releases",
+	Run:      runReleases,
+	Usage:    "releases [-l] [name...]",
+	Category: "release",
+	Short:    "list releases",
 	Long: `
 Lists releases.
 
@@ -150,10 +151,11 @@ func newRelease(rel *heroku.Release) *Release {
 }
 
 var cmdReleaseInfo = &Command{
-	Run:   runReleaseInfo,
-	Usage: "release-info <version>",
-	Short: "show release info",
-	Long:  `release-info shows detailed information about a release.`,
+	Run:      runReleaseInfo,
+	Usage:    "release-info <version>",
+	Category: "release",
+	Short:    "show release info",
+	Long:     `release-info shows detailed information about a release.`,
 }
 
 func runReleaseInfo(cmd *Command, args []string) {
@@ -173,9 +175,10 @@ func runReleaseInfo(cmd *Command, args []string) {
 }
 
 var cmdRollback = &Command{
-	Run:   runRollback,
-	Usage: "rollback <version>",
-	Short: "rolback to a previous release",
+	Run:      runRollback,
+	Usage:    "rollback <version>",
+	Category: "release",
+	Short:    "rolback to a previous release",
 }
 
 func runRollback(cmd *Command, args []string) {
