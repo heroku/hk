@@ -17,18 +17,38 @@ import (
 
 var (
 	detachedRun bool
+	dynoSize string
 )
 
 var cmdRun = &Command{
 	Run:      runRun,
-	Usage:    "run <command> [arguments]",
+	Usage:    "run [-s <size>] [-d] <command> [arguments]",
 	Category: "dyno",
 	Short:    "run a process in a dyno",
-	Long:     `Run a process on Heroku`,
+	Long:     `
+Run a process on Heroku
+
+Options:
+
+    -s <size>  set the size for this dyno (e.g. 2X)
+    -d         run in detached mode instead of attached to terminal
+
+Examples:
+
+    $ hk run echo "hello"
+    "hello"
+
+    $ hk run -s 2X console
+    Loading production environment (Rails 3.2.14)
+    irb(main):001:0> ...
+
+    $ hk run -d bin/my_worker
+`,
 }
 
 func init() {
 	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
+	cmdRun.Flag.StringVar(&dynoSize, "s", "", "dyno size")
 }
 
 func runRun(cmd *Command, args []string) {
@@ -50,6 +70,13 @@ func runRun(cmd *Command, args []string) {
 			"TERM":    os.Getenv("TERM"),
 		}
 		opts.Env = &env
+	}
+	if dynoSize != "" {
+		if !strings.HasSuffix(dynoSize, "X") {
+			cmd.printUsage()
+			os.Exit(2)
+		}
+		opts.Size = &dynoSize
 	}
 
 	dyno, err := client.DynoCreate(mustApp(), strings.Join(args, " "), opts)
