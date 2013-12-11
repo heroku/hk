@@ -14,37 +14,25 @@ import (
 
 var cmdReleases = &Command{
 	Run:      runReleases,
-	Usage:    "releases [-l] [name...]",
+	Usage:    "releases [<name>...]",
 	Category: "release",
 	Short:    "list releases",
 	Long: `
-Lists releases.
-
-Options:
-
-    -l       long listing
-
-Long listing shows the git commit id, who made the release, time
-of the release, version of the release (e.g. 1), and description.
+Lists releases. Shows the version of the release (e.g. v1), who
+made the release, git commit id, time of the release, and
+description.
 
 Examples:
 
     $ hk releases
-    v1
-    v2
+    v1  bob@me.com   3ae20c2  Jun 12 18:28  Deploy 3ae20c2
+    v2  john@me.com  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
+    v3  john@me.com           Jun 13 18:31  Rollback to v2
 
-    $ hk releases -l
-    3ae20c2  me  Jun 12 18:28  v1  Deploy 3ae20c2
-    0fda0ae  me  Jun 13 18:14  v2  Deploy 0fda0ae
-    ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
-
-    $ hk releases -l 3
-    ed39b69  me  Jun 13 18:31  v3  Deploy ed39b69
+    $ hk releases 2 3
+    v2  john  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
+    v3  john           Jun 13 18:31  Rollback to v2
 `,
-}
-
-func init() {
-	cmdReleases.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
 func runReleases(cmd *Command, versions []string) {
@@ -84,7 +72,7 @@ func listReleases(w io.Writer, versions []string) {
 				} else {
 					relch <- rel
 				}
-			}(name)
+			}(strings.TrimPrefix(name, "v"))
 		}
 	}
 	for _ = range versions {
@@ -127,17 +115,13 @@ func abbrevEmailReleases(rels []*Release) {
 }
 
 func listRelease(w io.Writer, r *Release) {
-	if flagLong {
-		listRec(w,
-			abbrev(r.Commit, 10),
-			abbrev(r.Who, 10),
-			prettyTime{r.CreatedAt},
-			fmt.Sprintf("%d", r.Version),
-			r.Description,
-		)
-	} else {
-		fmt.Fprintln(w, fmt.Sprintf("v%d", r.Version))
-	}
+	listRec(w,
+		fmt.Sprintf("v%d", r.Version),
+		abbrev(r.Who, 10),
+		abbrev(r.Commit, 10),
+		prettyTime{r.CreatedAt},
+		r.Description,
+	)
 }
 
 type releasesByVersion []*Release

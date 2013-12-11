@@ -15,38 +15,23 @@ import (
 
 var cmdDynos = &Command{
 	Run:      runDynos,
-	Usage:    "dynos [-l] [name...]",
+	Usage:    "dynos [name...]",
 	Category: "dyno",
 	Short:    "list dynos",
 	Long: `
-Lists dynos.
-
-Options:
-
-    -l       long listing
-
-Long listing shows the name, state, age, and command.
+Lists dynos. Shows the name, state, age, and command.
 
 Examples:
 
     $ hk dynos
-    run.3794
-    web.1
-    web.2
-
-    $ hk dynos web
-    web.1
-    web.2
-
-    $ hk dynos -l
     run.3794  up   1m  bash
     web.1     up  15h  "blog /app /tmp/dst"
     web.2     up   8h  "blog /app /tmp/dst"
-`,
-}
 
-func init() {
-	cmdDynos.Flag.BoolVar(&flagLong, "l", false, "long listing")
+    $ hk dynos web
+    web.1     up  15h  "blog /app /tmp/dst"
+    web.2     up   8h  "blog /app /tmp/dst"
+`,
 }
 
 func runDynos(cmd *Command, names []string) {
@@ -83,16 +68,12 @@ func listDynos(w io.Writer, names []string) {
 }
 
 func listDyno(w io.Writer, d *heroku.Dyno) {
-	if flagLong {
-		listRec(w,
-			d.Name,
-			d.State,
-			prettyDuration{dynoAge(d)},
-			maybeQuote(d.Command),
-		)
-	} else {
-		fmt.Fprintln(w, d.Name)
-	}
+	listRec(w,
+		d.Name,
+		d.State,
+		prettyDuration{dynoAge(d)},
+		maybeQuote(d.Command),
+	)
 }
 
 // quotes s as a json string if it contains any weird chars
