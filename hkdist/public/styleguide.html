@@ -190,7 +190,7 @@
             },
             {
               "root": "releases",
-              "arguments": "[<name>...]",
+              "arguments": "[<version>...]",
               "comment": "list releases"
             },
             {
@@ -205,7 +205,7 @@
           "commands": [
             {
               "root": "addon-add",
-              "arguments": "<provider>:<plan> [<config>=<value>...]",
+              "arguments": "<provider>[:<plan>] [<config>=<value>...]",
               "comment": "add an addon"
             },
             {
@@ -231,22 +231,22 @@
             {
               "root": "env",
               "arguments": "",
-              "comment": "list config vars"
+              "comment": "list env vars"
             },
             {
               "root": "get",
               "arguments": "<name>",
-              "comment": "get config var (extra)"
+              "comment": "get env var (extra)"
             },
             {
               "root": "set",
               "arguments": "<name>=<value> ...",
-              "comment": "set config var"
+              "comment": "set env var"
             },
             {
               "root": "unset",
               "arguments": "<name> ...",
-              "comment": "unset config var"
+              "comment": "unset env var"
             }
           ],
           "title": "config"
