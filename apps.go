@@ -12,37 +12,23 @@ import (
 
 var cmdApps = &Command{
 	Run:      runApps,
-	Usage:    "apps [-l] [app...]",
+	Usage:    "apps [app...]",
 	Category: "app",
 	Short:    "list apps",
 	Long: `
-Lists all apps.
-
-Options:
-
-    -l       long listing
-
-Long listing for shows the owner, slug size, last release time
-(or time the app was created, if it's never been released), and
-the app name.
+Lists apps. Shows the app name, owner, slug size, and last
+release time (or time the app was created, if it's never been
+released).
 
 Examples:
 
-	$ hk apps
-	myapp
-	myapp2
+    $ hk apps
+    myapp   me  1234k  Jan 2 12:34
+    myapp2  me  4567k  Jan 2 12:34
 
-	$ hk apps myapp
-	myapp
-
-	$ hk apps -l
-	app  me  1234k  Jan 2 12:34  myapp
-	app  me  4567k  Jan 2 12:34  myapp2
+    $ hk apps myapp
+    myapp  me  1234k  Jan 2 12:34
 `,
-}
-
-func init() {
-	cmdApps.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
 func runApps(cmd *Command, names []string) {
@@ -116,25 +102,20 @@ func abbrevEmailApps(apps []heroku.App) {
 }
 
 func listApp(w io.Writer, a heroku.App) {
-	if flagLong {
-		size := 0
-		if a.SlugSize != nil {
-			size = *a.SlugSize
-		}
-		t := a.CreatedAt
-		if a.ReleasedAt != nil {
-			t = *a.ReleasedAt
-		}
-		listRec(w,
-			"app",
-			abbrev(a.Owner.Email, 10),
-			fmt.Sprintf("%6dk", (size+501)/(1000)),
-			prettyTime{t},
-			a.Name,
-		)
-	} else {
-		fmt.Fprintln(w, a.Name)
+	size := 0
+	if a.SlugSize != nil {
+		size = *a.SlugSize
 	}
+	t := a.CreatedAt
+	if a.ReleasedAt != nil {
+		t = *a.ReleasedAt
+	}
+	listRec(w,
+		a.Name,
+		abbrev(a.Owner.Email, 10),
+		fmt.Sprintf("%6dk", (size+501)/(1000)),
+		prettyTime{t},
+	)
 }
 
 type appsByName []heroku.App

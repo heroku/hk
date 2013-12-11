@@ -27,13 +27,9 @@ func runTransfer(cmd *Command, args []string) {
 
 var cmdTransfers = &Command{
 	Run:      runTransfers,
-	Usage:    "transfers [-l]",
+	Usage:    "transfers",
 	Category: "app",
 	Short:    "list existing app transfers" + extra,
-}
-
-func init() {
-	cmdTransfers.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
 func runTransfers(cmd *Command, args []string) {
@@ -48,17 +44,13 @@ func runTransfers(cmd *Command, args []string) {
 }
 
 func listTransfer(w io.Writer, t heroku.AppTransfer) {
-	if flagLong {
-		listRec(w,
-			t.App.Name,
-			abbrev(t.Owner.Email, 10),
-			abbrev(t.Recipient.Email, 10),
-			t.State,
-			prettyTime{t.UpdatedAt},
-		)
-	} else {
-		fmt.Fprintln(w, t.App.Name)
-	}
+	listRec(w,
+		t.App.Name,
+		abbrev(t.Owner.Email, 10),
+		abbrev(t.Recipient.Email, 10),
+		t.State,
+		prettyTime{t.UpdatedAt},
+	)
 }
 
 var cmdTransferAccept = &Command{

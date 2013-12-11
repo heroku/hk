@@ -13,32 +13,21 @@ import (
 
 var cmdAddons = &Command{
 	Run:      runAddons,
-	Usage:    "addons [-l] [resource...]",
+	Usage:    "addons [<provider>:<plan>...]",
 	Category: "add-on",
 	Short:    "list addons",
 	Long: `
 Lists addons.
 
-Options:
-
-    -l       long listing
-
-Long listing shows the type of the addon, owner, name of the
-resource, and the config var it's attached to.
-
 Examples:
 
     $ hk addons
-    DATABASE_URL
-    REDIS_URL
+    heroku-postgresql:crane
+    pgbackups:plus
 
-    $ hk addons -l REDIS_URL
-    redistogo:nano  me  soaring-ably-1234  REDIS_URL
+    $ hk addons pgbackups:plus
+    pgbackups:plus
 `,
-}
-
-func init() {
-	cmdAddons.Flag.BoolVar(&flagLong, "l", false, "long listing")
 }
 
 func runAddons(cmd *Command, names []string) {
@@ -95,15 +84,7 @@ func addonMatch(m *mergedAddon, a []string) bool {
 }
 
 func listAddon(w io.Writer, m *mergedAddon) {
-	if flagLong {
-		listRec(w,
-			m.Type,
-			abbrev(m.Owner, 10),
-			m.Id,
-		)
-	} else {
-		fmt.Fprintln(w, m.String())
-	}
+	fmt.Fprintln(w, m.String())
 }
 
 type mergedAddon struct {
@@ -141,7 +122,7 @@ func getMergedAddons(appname string) []*mergedAddon {
 }
 
 func mergeAddons(app *heroku.App, addons []heroku.Addon) (ms []*mergedAddon) {
-	// Type, Name, Owner
+	// Type, Owner, Id
 	for _, a := range addons {
 		m := new(mergedAddon)
 		ms = append(ms, m)

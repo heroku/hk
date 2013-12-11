@@ -143,7 +143,6 @@ var commands = []*Command{
 
 var (
 	flagApp   string
-	flagLong  bool
 	client    heroku.Client
 	hkAgent   = "hk/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	userAgent = hkAgent + " " + heroku.DefaultUserAgent
