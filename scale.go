@@ -96,7 +96,7 @@ func parseScaleArg(arg string) (pstype string, qty int, size string, err error) 
 			size = rem[iColon+1:]
 		}
 	}
-	if err != nil || (qty == -1 && size == "") {
+	if err != nil || qty == -1 && size == "" {
 		err = errInvalidScaleArg
 	}
 	return

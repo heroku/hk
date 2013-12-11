@@ -113,7 +113,7 @@ func listApp(w io.Writer, a heroku.App) {
 	listRec(w,
 		a.Name,
 		abbrev(a.Owner.Email, 10),
-		fmt.Sprintf("%6dk", (size+501)/(1000)),
+		fmt.Sprintf("%6dk", (size+501)/1000),
 		prettyTime{t},
 	)
 }

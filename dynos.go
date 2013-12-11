@@ -99,7 +99,7 @@ type DynosByName []heroku.Dyno
 func (p DynosByName) Len() int      { return len(p) }
 func (p DynosByName) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 func (p DynosByName) Less(i, j int) bool {
-	return p[i].Type < p[j].Type || (p[i].Type == p[j].Type && dynoSeq(&p[i]) < dynoSeq(&p[j]))
+	return p[i].Type < p[j].Type || p[i].Type == p[j].Type && dynoSeq(&p[i]) < dynoSeq(&p[j])
 }
 
 type prettyDuration struct {
