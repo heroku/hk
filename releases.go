@@ -14,7 +14,7 @@ import (
 
 var cmdReleases = &Command{
 	Run:      runReleases,
-	Usage:    "releases [<name>...]",
+	Usage:    "releases [<version>...]",
 	Category: "release",
 	Short:    "list releases",
 	Long: `

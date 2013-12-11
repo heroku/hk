@@ -11,8 +11,8 @@ var cmdEnv = &Command{
 	Run:      runEnv,
 	Usage:    "env",
 	Category: "config",
-	Short:    "list config vars",
-	Long:     `Show all config vars.`,
+	Short:    "list env vars",
+	Long:     `Show all env vars.`,
 }
 
 func runEnv(cmd *Command, args []string) {
@@ -32,9 +32,9 @@ var cmdGet = &Command{
 	Run:      runGet,
 	Usage:    "get <name>",
 	Category: "config",
-	Short:    "get config var" + extra,
+	Short:    "get env var" + extra,
 	Long: `
-Get the value of a config var.
+Get the value of an env var.
 
 Example:
 
@@ -60,9 +60,9 @@ var cmdSet = &Command{
 	Run:      runSet,
 	Usage:    "set <name>=<value> ...",
 	Category: "config",
-	Short:    "set config var",
+	Short:    "set env var",
 	Long: `
-Set the value of a config var.
+Set the value of a env var.
 
 Example:
 
@@ -91,9 +91,9 @@ var cmdUnset = &Command{
 	Run:      runUnset,
 	Usage:    "unset <name> ...",
 	Category: "config",
-	Short:    "unset config var",
+	Short:    "unset env var",
 	Long: `
-Unset a config var.
+Unset a env var.
 
 Example:
 

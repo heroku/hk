@@ -143,7 +143,7 @@ func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 
 var cmdAddonAdd = &Command{
 	Run:      runAddonAdd,
-	Usage:    "addon-add <provider>:<plan> [<config>=<value>...]",
+	Usage:    "addon-add <provider>[:<plan>] [<config>=<value>...]",
 	Category: "add-on",
 	Short:    "add an addon",
 	Long: `
