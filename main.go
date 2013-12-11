@@ -126,7 +126,6 @@ var commands = []*Command{
 	// listed by hk help more
 	cmdAddonOpen,
 	cmdAPI,
-	cmdApp,
 	cmdGet,
 	cmdCreds,
 	cmdOpen,
@@ -136,6 +135,7 @@ var commands = []*Command{
 	cmdTransferDecline,
 	cmdTransferCancel,
 	cmdURL,
+	cmdWhichApp,
 
 	// unlisted
 	cmdUpdate,
