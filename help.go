@@ -305,7 +305,9 @@ func (cm commandMap) UsageJSON(prefix string) template.JS {
 	if err != nil {
 		return template.JS(fmt.Sprintf("{\"error\": %q}", err.Error))
 	}
-	return template.JS(buf)
+	resp := strings.Replace(string(buf), "\\u003c", "<", -1)
+	resp = strings.Replace(resp, "\\u003e", ">", -1)
+	return template.JS(resp)
 }
 
 func usage() {

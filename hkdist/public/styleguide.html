@@ -100,7 +100,7 @@
             },
             {
               "root": "destroy",
-              "arguments": "\u003cname\u003e",
+              "arguments": "<name>",
               "comment": "destroy an app"
             },
             {
@@ -120,12 +120,12 @@
             },
             {
               "root": "rename",
-              "arguments": "\u003coldname\u003e \u003cnewname\u003e",
+              "arguments": "<oldname> <newname>",
               "comment": "rename an app"
             },
             {
               "root": "transfer",
-              "arguments": "\u003cemail\u003e",
+              "arguments": "<email>",
               "comment": "transfer app ownership to a collaborator (extra)"
             },
             {
@@ -165,17 +165,17 @@
             },
             {
               "root": "restart",
-              "arguments": "[\u003ctype or name\u003e]",
+              "arguments": "[<type or name>]",
               "comment": "restart dynos"
             },
             {
               "root": "run",
-              "arguments": "\u003ccommand\u003e [arguments]",
+              "arguments": "<command> [arguments]",
               "comment": "run a process in a dyno"
             },
             {
               "root": "scale",
-              "arguments": "\u003ctype\u003e=[\u003cqty\u003e]:[\u003csize\u003e]...",
+              "arguments": "<type>=[<qty>]:[<size>]...",
               "comment": "change dyno quantities and sizes"
             }
           ],
@@ -185,17 +185,17 @@
           "commands": [
             {
               "root": "release-info",
-              "arguments": "\u003cversion\u003e",
+              "arguments": "<version>",
               "comment": "show release info"
             },
             {
               "root": "releases",
-              "arguments": "[\u003cname\u003e...]",
+              "arguments": "[<name>...]",
               "comment": "list releases"
             },
             {
               "root": "rollback",
-              "arguments": "\u003cversion\u003e",
+              "arguments": "<version>",
               "comment": "rolback to a previous release"
             }
           ],
@@ -205,22 +205,22 @@
           "commands": [
             {
               "root": "addon-add",
-              "arguments": "\u003cprovider\u003e:\u003cplan\u003e [\u003cconfig\u003e=\u003cvalue\u003e...]",
+              "arguments": "<provider>:<plan> [<config>=<value>...]",
               "comment": "add an addon"
             },
             {
               "root": "addon-open",
-              "arguments": "\u003cprovider\u003e[:\u003cplan\u003e]",
+              "arguments": "<provider>[:<plan>]",
               "comment": "open an addon (extra)"
             },
             {
               "root": "addon-remove",
-              "arguments": "\u003cprovider\u003e:\u003cplan\u003e",
+              "arguments": "<provider>:<plan>",
               "comment": "remove an addon"
             },
             {
               "root": "addons",
-              "arguments": "[\u003cprovider\u003e:\u003cplan\u003e...]",
+              "arguments": "[<provider>:<plan>...]",
               "comment": "list addons"
             }
           ],
@@ -235,17 +235,17 @@
             },
             {
               "root": "get",
-              "arguments": "\u003cname\u003e",
+              "arguments": "<name>",
               "comment": "get config var (extra)"
             },
             {
               "root": "set",
-              "arguments": "\u003cname\u003e=\u003cvalue\u003e ...",
+              "arguments": "<name>=<value> ...",
               "comment": "set config var"
             },
             {
               "root": "unset",
-              "arguments": "\u003cname\u003e ...",
+              "arguments": "<name> ...",
               "comment": "unset config var"
             }
           ],
@@ -255,12 +255,12 @@
           "commands": [
             {
               "root": "domain-add",
-              "arguments": "\u003cdomain\u003e",
+              "arguments": "<domain>",
               "comment": "add a domain"
             },
             {
               "root": "domain-remove",
-              "arguments": "\u003cdomain\u003e",
+              "arguments": "<domain>",
               "comment": "remove a domain"
             },
             {
@@ -290,7 +290,7 @@
             },
             {
               "root": "api",
-              "arguments": "\u003cmethod\u003e \u003cpath\u003e",
+              "arguments": "<method> <path>",
               "comment": "make a single API request (extra)"
             },
             {
