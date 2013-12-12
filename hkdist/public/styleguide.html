@@ -89,12 +89,12 @@
               "comment": "list apps"
             },
             {
-              "root": "create",
+              "root": "create", // without arguments start interactive prompt like npm init
               "arguments": "[-r region] [name]",
               "comment": "create an app"
             },
             {
-              "root": "destroy",
+              "root": "destroy", // keep it like `heroku` (interactive wihout confirm)
               "arguments": "<name>",
               "comment": "destroy an app"
             },
@@ -104,7 +104,7 @@
               "comment": "show app info"
             },
             {
-              "root": "log",
+              "root": "log", // Change to 'logs'? no one says check the log...other lists are plural
               "arguments": "[-n lines] [-s source] [-d dyno]",
               "comment": "stream app log lines"
             },
@@ -114,7 +114,7 @@
               "comment": "open app in a web browser (extra)"
             },
             {
-              "root": "rename",
+              "root": "rename", // doesn't follow -a convention...
               "arguments": "<oldname> <newname>",
               "comment": "rename an app"
             },
@@ -241,7 +241,7 @@
             {
               "root": "set",
               "arguments": "<name>=<value> ...",
-              "comment": "set env var"
+              "comment": "set env var" // allow piping .env file
             },
             {
               "root": "unset",
@@ -255,7 +255,7 @@
           "commands": [
             {
               "root": "domain-add",
-              "arguments": "<domain>",
+              "arguments": "<domain>", // allow multiple domains at a time, allow piping
               "comment": "add a domain"
             },
             {
@@ -277,6 +277,26 @@
               "root": "sshkey-add",
               "arguments": "[<public-key-file>]",
               "comment": "add ssh public key"
+            },
+            {
+              "root": "sshkey-remove",
+              "arguments": "<name>",
+              "comment": "remove ssh public key"
+            },
+            {
+              "root": "sshkeys",
+              "arguments": "",
+              "comment": "list ssh public keys"
+            },
+            {
+              "root": "login",
+              "arguments": "", // not sure how to make it non-interactive
+              "comment": "log in to heroku"
+            },
+            {
+              "root": "logout",
+              "arguments": "",
+              "comment": "log out of heroku"
             }
           ],
           "title": "account"
@@ -294,7 +314,7 @@
               "comment": "make a single API request (extra)"
             },
             {
-              "root": "creds",
+              "root": "creds", // remove it?
               "arguments": "",
               "comment": "show credentials (extra)"
             },
