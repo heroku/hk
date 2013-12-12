@@ -14,6 +14,7 @@ import (
 var cmdAddons = &Command{
 	Run:      runAddons,
 	Usage:    "addons [<provider>:<plan>...]",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "list addons",
 	Long: `
@@ -144,6 +145,7 @@ func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 var cmdAddonAdd = &Command{
 	Run:      runAddonAdd,
 	Usage:    "addon-add <provider>[:<plan>] [<config>=<value>...]",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "add an addon",
 	Long: `
@@ -202,6 +204,7 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 var cmdAddonRemove = &Command{
 	Run:      runAddonRemove,
 	Usage:    "addon-remove <provider>:<plan>",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "remove an addon",
 	Long: `
@@ -233,6 +236,7 @@ func runAddonRemove(cmd *Command, args []string) {
 var cmdAddonOpen = &Command{
 	Run:      runAddonOpen,
 	Usage:    "addon-open <provider>[:<plan>]",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "open an addon" + extra,
 	Long: `

@@ -7,6 +7,7 @@ import (
 var cmdWhichApp = &Command{
 	Run:      runWhichApp,
 	Usage:    "which-app",
+	NeedsApp: true,
 	Category: "app",
 	Short:    "show which app is selected, if any" + extra,
 	Long: `

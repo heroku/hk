@@ -17,6 +17,7 @@ var (
 var cmdLog = &Command{
 	Run:      runLog,
 	Usage:    "log [-n <lines>] [-s <source>] [-d <dyno>]",
+	NeedsApp: true,
 	Category: "app",
 	Short:    "stream app log lines",
 	Long: `

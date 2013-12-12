@@ -7,6 +7,7 @@ import (
 var cmdURL = &Command{
 	Run:      runURL,
 	Usage:    "url",
+	NeedsApp: true,
 	Category: "app",
 	Short:    "show app url" + extra,
 	Long:     `Prints the web URL for the app.`,

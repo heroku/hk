@@ -15,6 +15,7 @@ import (
 var cmdReleases = &Command{
 	Run:      runReleases,
 	Usage:    "releases [<version>...]",
+	NeedsApp: true,
 	Category: "release",
 	Short:    "list releases",
 	Long: `
@@ -137,6 +138,7 @@ func newRelease(rel *heroku.Release) *Release {
 var cmdReleaseInfo = &Command{
 	Run:      runReleaseInfo,
 	Usage:    "release-info <version>",
+	NeedsApp: true,
 	Category: "release",
 	Short:    "show release info",
 	Long:     `release-info shows detailed information about a release.`,
@@ -161,6 +163,7 @@ func runReleaseInfo(cmd *Command, args []string) {
 var cmdRollback = &Command{
 	Run:      runRollback,
 	Usage:    "rollback <version>",
+	NeedsApp: true,
 	Category: "release",
 	Short:    "rolback to a previous release",
 }

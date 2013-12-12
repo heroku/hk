@@ -47,8 +47,9 @@ func netrcPath() string {
 
 type Command struct {
 	// args does not include the command name
-	Run  func(cmd *Command, args []string)
-	Flag flag.FlagSet
+	Run      func(cmd *Command, args []string)
+	Flag     flag.FlagSet
+	NeedsApp bool
 
 	Usage    string // first word is the command name
 	Category string // i.e. "App", "Account", etc.
@@ -203,6 +204,16 @@ func main() {
 		if cmd.Name() == args[0] && cmd.Run != nil {
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()
+			}
+			if !cmd.NeedsApp && flagApp != "" {
+				log.Fatalf("flag provided but not defined: -a")
+			}
+			if cmd.NeedsApp {
+				if a, _ := app(); a == "" {
+					log.Println("no app specified")
+					cmd.printUsage()
+					os.Exit(2)
+				}
 			}
 			if err := cmd.Flag.Parse(args[1:]); err != nil {
 				os.Exit(2)

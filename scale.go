@@ -11,6 +11,7 @@ import (
 var cmdScale = &Command{
 	Run:      runScale,
 	Usage:    "scale <type>=[<qty>]:[<size>]...",
+	NeedsApp: true,
 	Category: "dyno",
 	Short:    "change dyno quantities and sizes",
 	Long: `
