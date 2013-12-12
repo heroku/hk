@@ -6,7 +6,7 @@ import (
 
 var cmdCreds = &Command{
 	Run:      runCreds,
-	Usage:    "creds",
+	Name:     "creds",
 	Category: "hk",
 	Short:    "show credentials" + extra,
 	Long:     `Creds shows credentials that will be used for API calls.`,

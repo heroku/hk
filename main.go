@@ -50,26 +50,22 @@ type Command struct {
 	Run  func(cmd *Command, args []string)
 	Flag flag.FlagSet
 
-	Usage    string // first word is the command name
-	Category string // i.e. "App", "Account", etc.
+	// Name may not contain spaces, and must be unique among other commands.
+	// Examples: "create", "run", "domain-create".
+	Name string
+	// Usage is a description of options and arguments the command accepts,
+	// excluding the app flag.
+	Usage    string
+	Category string // i.e. "app", "account", etc.
 	Short    string // `hk help` output
 	Long     string // `hk help cmd` output
 }
 
 func (c *Command) printUsage() {
 	if c.Runnable() {
-		fmt.Printf("Usage: hk %s\n\n", c.Usage)
+		fmt.Printf("Usage: hk %s %s\n\n", c.Name, c.Usage)
 	}
 	fmt.Println(strings.Trim(c.Long, "\n"))
-}
-
-func (c *Command) Name() string {
-	name := c.Usage
-	i := strings.Index(name, " ")
-	if i >= 0 {
-		name = name[:i]
-	}
-	return name
 }
 
 func (c *Command) Runnable() bool {
@@ -200,7 +196,7 @@ func main() {
 	}
 
 	for _, cmd := range commands {
-		if cmd.Name() == args[0] && cmd.Run != nil {
+		if cmd.Name == args[0] && cmd.Run != nil {
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()
 			}

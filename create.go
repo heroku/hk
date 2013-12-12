@@ -8,7 +8,8 @@ import (
 
 var cmdCreate = &Command{
 	Run:      runCreate,
-	Usage:    "create [-r <region>] [<name>]",
+	Name:     "create",
+	Usage:    "[-r <region>] [<name>]",
 	Category: "app",
 	Short:    "create an app",
 	Long:     `Create creates a new heroku app.`,

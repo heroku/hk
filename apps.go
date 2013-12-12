@@ -12,7 +12,8 @@ import (
 
 var cmdApps = &Command{
 	Run:      runApps,
-	Usage:    "apps [<name>...]",
+	Name:     "apps",
+	Usage:    "[<name>...]",
 	Category: "app",
 	Short:    "list apps",
 	Long: `

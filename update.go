@@ -23,7 +23,7 @@ import (
 
 var cmdUpdate = &Command{
 	Run:      runUpdate,
-	Usage:    "update",
+	Name:     "update",
 	Category: "hk",
 	Long: `
 Update downloads and installs the next version of hk.

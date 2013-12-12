@@ -6,7 +6,8 @@ import (
 
 var cmdRestart = &Command{
 	Run:      runRestart,
-	Usage:    "restart [<type or name>]",
+	Name:     "restart",
+	Usage:    "[<type or name>]",
 	Category: "dyno",
 	Short:    "restart dynos",
 	Long: `

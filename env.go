@@ -9,7 +9,7 @@ import (
 
 var cmdEnv = &Command{
 	Run:      runEnv,
-	Usage:    "env",
+	Name:     "env",
 	Category: "config",
 	Short:    "list env vars",
 	Long:     `Show all env vars.`,
@@ -30,7 +30,8 @@ func runEnv(cmd *Command, args []string) {
 
 var cmdGet = &Command{
 	Run:      runGet,
-	Usage:    "get <name>",
+	Name:     "get",
+	Usage:    "<name>",
 	Category: "config",
 	Short:    "get env var" + extra,
 	Long: `
@@ -58,7 +59,8 @@ func runGet(cmd *Command, args []string) {
 
 var cmdSet = &Command{
 	Run:      runSet,
-	Usage:    "set <name>=<value>...",
+	Name:     "set",
+	Usage:    "<name>=<value>...",
 	Category: "config",
 	Short:    "set env var",
 	Long: `
@@ -89,7 +91,8 @@ func runSet(cmd *Command, args []string) {
 
 var cmdUnset = &Command{
 	Run:      runUnset,
-	Usage:    "unset <name>...",
+	Name:     "unset",
+	Usage:    "<name>...",
 	Category: "config",
 	Short:    "unset env var",
 	Long: `

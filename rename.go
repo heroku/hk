@@ -8,7 +8,8 @@ import (
 
 var cmdRename = &Command{
 	Run:      runRename,
-	Usage:    "rename <oldname> <newname>",
+	Name:     "rename",
+	Usage:    "<oldname> <newname>",
 	Category: "app",
 	Short:    "rename an app",
 	Long: `

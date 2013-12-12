@@ -17,7 +17,8 @@ var (
 
 var cmdSSHKeyAdd = &Command{
 	Run:      runSSHKeyAdd,
-	Usage:    "sshkey-add [<public-key-file>]",
+	Name:     "sshkey-add",
+	Usage:    "[<public-key-file>]",
 	Category: "account",
 	Short:    "add ssh public key",
 	Long: `

@@ -13,7 +13,7 @@ var (
 )
 
 var helpPlugins = &Command{
-	Usage:    "plugins",
+	Name:     "plugins",
 	Category: "hk",
 	Short:    "interface to plugin commands",
 	Long: `

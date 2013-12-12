@@ -6,7 +6,7 @@ import (
 
 var cmdInfo = &Command{
 	Run:      runInfo,
-	Usage:    "info",
+	Name:     "info",
 	Category: "app",
 	Short:    "show app info",
 	Long:     `Info shows general information about the current app.`,

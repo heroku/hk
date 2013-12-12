@@ -10,7 +10,8 @@ import (
 
 var cmdScale = &Command{
 	Run:      runScale,
-	Usage:    "scale <type>=[<qty>]:[<size>]...",
+	Name:     "scale",
+	Usage:    "<type>=[<qty>]:[<size>]...",
 	Category: "dyno",
 	Short:    "change dyno quantities and sizes",
 	Long: `

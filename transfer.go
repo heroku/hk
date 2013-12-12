@@ -10,7 +10,8 @@ import (
 
 var cmdTransfer = &Command{
 	Run:      runTransfer,
-	Usage:    "transfer <email>",
+	Name:     "transfer",
+	Usage:    "<email>",
 	Category: "app",
 	Short:    "transfer app ownership to a collaborator" + extra,
 }
@@ -27,7 +28,7 @@ func runTransfer(cmd *Command, args []string) {
 
 var cmdTransfers = &Command{
 	Run:      runTransfers,
-	Usage:    "transfers",
+	Name:     "transfers",
 	Category: "app",
 	Short:    "list existing app transfers" + extra,
 }
@@ -55,7 +56,7 @@ func listTransfer(w io.Writer, t heroku.AppTransfer) {
 
 var cmdTransferAccept = &Command{
 	Run:      runTransferAccept,
-	Usage:    "transfer-accept",
+	Name:     "transfer-accept",
 	Category: "app",
 	Short:    "accept an inbound app transfer" + extra,
 }
@@ -67,7 +68,7 @@ func runTransferAccept(cmd *Command, args []string) {
 
 var cmdTransferDecline = &Command{
 	Run:      runTransferDecline,
-	Usage:    "transfer-decline",
+	Name:     "transfer-decline",
 	Category: "app",
 	Short:    "decline an inbound app transfer" + extra,
 }
@@ -79,7 +80,7 @@ func runTransferDecline(cmd *Command, args []string) {
 
 var cmdTransferCancel = &Command{
 	Run:      runTransferCancel,
-	Usage:    "transfer-cancel",
+	Name:     "transfer-cancel",
 	Category: "app",
 	Short:    "cancel an outbound app transfer" + extra,
 }
