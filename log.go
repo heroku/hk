@@ -16,7 +16,7 @@ var (
 
 var cmdLog = &Command{
 	Run:      runLog,
-	Usage:    "log [-n lines] [-s source] [-d dyno]",
+	Usage:    "log [-n <lines>] [-s <source>] [-d <dyno>]",
 	Category: "app",
 	Short:    "stream app log lines",
 	Long: `
@@ -24,9 +24,9 @@ Log prints the streaming application log.
 
 Options:
 
-    -n N       print at most N log lines
-    -s source  filter log source
-    -d dyno    filter dyno or process type
+    -n <N>       print at most N log lines
+    -s <source>  filter log source
+    -d <dyno>    filter dyno or process type
 
 Examples:
 

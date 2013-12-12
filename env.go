@@ -58,7 +58,7 @@ func runGet(cmd *Command, args []string) {
 
 var cmdSet = &Command{
 	Run:      runSet,
-	Usage:    "set <name>=<value> ...",
+	Usage:    "set <name>=<value>...",
 	Category: "config",
 	Short:    "set env var",
 	Long: `
@@ -89,7 +89,7 @@ func runSet(cmd *Command, args []string) {
 
 var cmdUnset = &Command{
 	Run:      runUnset,
-	Usage:    "unset <name> ...",
+	Usage:    "unset <name>...",
 	Category: "config",
 	Short:    "unset env var",
 	Long: `
