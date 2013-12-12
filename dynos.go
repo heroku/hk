@@ -15,7 +15,7 @@ import (
 
 var cmdDynos = &Command{
 	Run:      runDynos,
-	Usage:    "dynos [name...]",
+	Usage:    "dynos [<name>...]",
 	Category: "dyno",
 	Short:    "list dynos",
 	Long: `

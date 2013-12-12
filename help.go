@@ -67,7 +67,7 @@ func runVersion(cmd *Command, args []string) {
 }
 
 var cmdHelp = &Command{
-	Usage:    "help [topic]",
+	Usage:    "help [<topic>]",
 	Category: "hk",
 	Long:     `Help shows usage for a command or other topic.`,
 }

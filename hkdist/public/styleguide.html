@@ -85,12 +85,12 @@
           "commands": [
             {
               "root": "apps",
-              "arguments": "[app...]",
+              "arguments": "[<name>...]",
               "comment": "list apps"
             },
             {
               "root": "create",
-              "arguments": "[-r region] [app]",
+              "arguments": "[-r region] [name]",
               "comment": "create an app"
             },
             {
@@ -160,7 +160,7 @@
           "commands": [
             {
               "root": "dynos",
-              "arguments": "[name...]",
+              "arguments": "[<name>...]",
               "comment": "list dynos"
             },
             {
@@ -170,7 +170,7 @@
             },
             {
               "root": "run",
-              "arguments": "[-s <size>] [-d] <command> [arguments]",
+              "arguments": "[-s <size>] [-d] <command> [<argument>...]",
               "comment": "run a process in a dyno"
             },
             {
@@ -305,7 +305,7 @@
             },
             {
               "root": "help",
-              "arguments": "[topic]",
+              "arguments": "[<topic>]",
               "comment": ""
             },
             {
