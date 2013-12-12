@@ -15,9 +15,9 @@ var (
 	sshPubKeyPath string
 )
 
-var cmdSSHAuth = &Command{
-	Run:      runSSHAuth,
-	Usage:    "sshauth [-i identity-file]",
+var cmdSSHKeyAdd = &Command{
+	Run:      runSSHKeyAdd,
+	Usage:    "sshkey-add [<public-key-file>]",
 	Category: "account",
 	Short:    "authorize ssh public keys",
 	Long: `
@@ -25,17 +25,20 @@ Command sshauth installs your ssh public keys for authorized use on Heroku.
 
 It tries these sources for keys, in order:
 
-1. flag -i, if present
+1. public-key-file argument, if present
 2. output of ssh-add -L, if any
 3. file $HOME/.ssh/id_rsa.pub
 `,
 }
 
-func init() {
-	cmdSSHAuth.Flag.StringVar(&sshPubKeyPath, "i", "", "ssh public key file")
-}
-
-func runSSHAuth(cmd *Command, args []string) {
+func runSSHKeyAdd(cmd *Command, args []string) {
+	if len(args) > 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	if len(args) == 1 {
+		sshPubKeyPath = args[0]
+	}
 	keys, err := findSSHKeys()
 	if err != nil {
 		if _, ok := err.(privKeyError); ok {

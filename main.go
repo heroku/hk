@@ -114,7 +114,7 @@ var commands = []*Command{
 	cmdDomains,
 	cmdDomainAdd,
 	cmdDomainRemove,
-	cmdSSHAuth,
+	cmdSSHKeyAdd,
 	cmdVersion,
 	cmdHelp,
 
