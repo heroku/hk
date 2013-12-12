@@ -19,9 +19,9 @@ var cmdSSHKeyAdd = &Command{
 	Run:      runSSHKeyAdd,
 	Usage:    "sshkey-add [<public-key-file>]",
 	Category: "account",
-	Short:    "authorize ssh public keys",
+	Short:    "add ssh public key",
 	Long: `
-Command sshauth installs your ssh public keys for authorized use on Heroku.
+Command sshkey-add adds an ssh public key to your Heroku account.
 
 It tries these sources for keys, in order:
 
