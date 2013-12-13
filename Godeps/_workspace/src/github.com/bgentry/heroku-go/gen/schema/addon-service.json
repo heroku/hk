@@ -2,7 +2,7 @@
   "description":  "Add-on services represent add-ons that may be provisioned for apps.",
   "id":           "schema/addon-service",
   "$schema":      "http://json-schema.org/draft-04/hyper-schema",
-  "title":        "Heroku Platform API - Addon Service",
+  "title":        "Heroku Platform API - Add-on Service",
   "type":         ["object"],
 
   "definitions": {

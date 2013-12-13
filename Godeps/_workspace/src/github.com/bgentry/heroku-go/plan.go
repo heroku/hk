@@ -14,6 +14,9 @@ type Plan struct {
 	// when plan was created
 	CreatedAt time.Time `json:"created_at"`
 
+	// whether this plan is the default for its addon service
+	Default bool `json:"default"`
+
 	// description of plan
 	Description string `json:"description"`
 

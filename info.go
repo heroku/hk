@@ -18,7 +18,7 @@ func runInfo(cmd *Command, args []string) {
 	fmt.Printf("Name:     %s\n", app.Name)
 	fmt.Printf("Owner:    %s\n", app.Owner.Email)
 	fmt.Printf("Region:   %s\n", app.Region.Name)
-	fmt.Printf("Stack:    %s\n", app.Stack)
+	fmt.Printf("Stack:    %s\n", app.Stack.Name)
 	fmt.Printf("Git URL:  %s\n", app.GitURL)
 	fmt.Printf("Web URL:  %s\n", app.WebURL)
 }

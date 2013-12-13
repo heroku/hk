@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bgentry/heroku-go",
-	"GoVersion": "go1.2rc5",
+	"GoVersion": "go1.2",
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go-uuid/uuid",

@@ -61,7 +61,7 @@
       "title":        "List"
     },
     {
-      "description":  "Create new release.",
+      "description":  "Create new release. The API cannot be used to create releases on Bamboo apps.",
       "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}/releases",
       "method":       "POST",
       "rel":          "create",
@@ -98,7 +98,7 @@
       "properties": {
         "id":   { "$ref": "/schema/slug#/definitions/id" }
       },
-      "type": ["object"]
+      "type": ["object","null"]
     },
     "user": {
       "description":  "user that created the release",

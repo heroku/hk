@@ -92,8 +92,8 @@
     }
   ],
   "properties": {
-    "created_at": { "$ref": "/schema/addon#/definitions/created_at" },
-    "id":         { "$ref": "/schema/addon#/definitions/id" },
+    "created_at":      { "$ref": "/schema/addon#/definitions/created_at" },
+    "id":              { "$ref": "/schema/addon#/definitions/id" },
     "plan": {
       "description":  "identity of add-on plan",
       "properties": {
@@ -102,6 +102,6 @@
       },
       "type":         ["object"]
     },
-    "updated_at": { "$ref": "/schema/addon#/definitions/updated_at" }
+    "updated_at":      { "$ref": "/schema/addon#/definitions/updated_at" }
   }
 }

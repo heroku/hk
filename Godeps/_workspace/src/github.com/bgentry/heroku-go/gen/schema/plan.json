@@ -13,6 +13,12 @@
             "readOnly":     true,
             "type":         ["string"]
         },
+        "default": {
+            "description":  "whether this plan is the default for its addon service",
+            "example":      false,
+            "readOnly":     true,
+            "type":         ["boolean"]
+        },
         "description": {
             "description":  "description of plan",
             "example":      "Heroku Postgres Dev",
@@ -82,6 +88,7 @@
     ],
     "properties": {
         "created_at":  { "$ref": "/schema/plan#/definitions/created_at" },
+        "default":  { "$ref": "/schema/plan#/definitions/default" },
         "description":  { "$ref": "/schema/plan#/definitions/description" },
         "id":  { "$ref": "/schema/plan#/definitions/id" },
         "name":  { "$ref": "/schema/plan#/definitions/name" },

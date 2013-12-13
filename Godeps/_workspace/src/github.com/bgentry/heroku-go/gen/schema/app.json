@@ -2,7 +2,7 @@
   "description":  "An app represents the program that you would like to deploy and run on Heroku.",
   "id":           "schema/app",
   "$schema":      "http://json-schema.org/draft-04/hyper-schema",
-  "title":        "Heroku Platform API - Apps",
+  "title":        "Heroku Platform API - App",
   "type":         ["object"],
 
   "definitions": {
@@ -174,7 +174,14 @@
     "released_at":                    { "$ref": "/schema/app#/definitions/released_at" },
     "repo_size":                      { "$ref": "/schema/app#/definitions/repo_size" },
     "slug_size":                      { "$ref": "/schema/app#/definitions/slug_size" },
-    "stack":                          { "$ref": "/schema/stack#/definitions/name" },
+    "stack": {
+      "description": "identity of app stack",
+      "properties": {
+        "id":   { "$ref": "/schema/stack#/definitions/id" },
+        "name": { "$ref": "/schema/stack#/definitions/name" }
+      },
+      "type": ["object"]
+    },
     "updated_at":                     { "$ref": "/schema/app#/definitions/updated_at" },
     "web_url":                        { "$ref": "/schema/app#/definitions/web_url" }
   }

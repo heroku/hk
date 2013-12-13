@@ -24,7 +24,7 @@ type Release struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	// slug running in this release
-	Slug struct {
+	Slug *struct {
 		Id string `json:"id"`
 	} `json:"slug"`
 
@@ -65,7 +65,7 @@ func (c *Client) ReleaseList(appIdentity string, lr *ListRange) ([]Release, erro
 	return releasesRes, c.DoReq(req, &releasesRes)
 }
 
-// Create new release.
+// Create new release. The API cannot be used to create releases on Bamboo apps.
 //
 // appIdentity is the unique identifier of the release's app. slug is the unique
 // identifier of slug. options is the struct of optional parameters for this

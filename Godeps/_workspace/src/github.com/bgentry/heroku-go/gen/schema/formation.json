@@ -91,7 +91,7 @@
             "type":        ["array"],
             "items":       { "$ref": "/schema/formation#/definitions/update" },
             "description": "Array with formation updates. Each element must have \"process\", the id or name of the process type to be updated, and can optionally update its \"quantity\" or \"size\".",
-            "example":     [{ "process": "web", "quantity": 1, "size": 2 }]
+            "example":     {"updates": [{ "process": "web", "quantity": 1, "size": 2 }]}
           }
         },
         "required": ["updates"]
