@@ -100,7 +100,7 @@
             },
             {
               "root": "info",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "show app info"
             },
             {
@@ -110,7 +110,7 @@
             },
             {
               "root": "open",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "open app in a web browser (extra)"
             },
             {
@@ -120,7 +120,7 @@
             },
             {
               "root": "transfer",
-              "arguments": "<email>",
+              "arguments": "[-a <app>] <email>",
               "comment": "transfer app ownership to a collaborator (extra)"
             },
             {
@@ -130,27 +130,27 @@
             },
             {
               "root": "transfer-cancel",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "cancel an outbound app transfer (extra)"
             },
             {
               "root": "transfer-decline",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "decline an inbound app transfer (extra)"
             },
             {
               "root": "transfers",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "list existing app transfers (extra)"
             },
             {
               "root": "url",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "show app url (extra)"
             },
             {
               "root": "which-app",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "show which app is selected, if any (extra)"
             }
           ],
@@ -160,22 +160,22 @@
           "commands": [
             {
               "root": "dynos",
-              "arguments": "[<name>...]",
+              "arguments": "[-a <app>] [<name>...]",
               "comment": "list dynos"
             },
             {
               "root": "restart",
-              "arguments": "[<type or name>]",
+              "arguments": "[-a <app>] [<type or name>]",
               "comment": "restart dynos"
             },
             {
               "root": "run",
-              "arguments": "[-s <size>] [-d] <command> [<argument>...]",
+              "arguments": "[-a <app>] [-s <size>] [-d] <command> [<argument>...]",
               "comment": "run a process in a dyno"
             },
             {
               "root": "scale",
-              "arguments": "<type>=[<qty>]:[<size>]...",
+              "arguments": "[-a <app>] <type>=[<qty>]:[<size>]...",
               "comment": "change dyno quantities and sizes"
             }
           ],
@@ -185,17 +185,17 @@
           "commands": [
             {
               "root": "release-info",
-              "arguments": "<version>",
+              "arguments": "[-a <app>] <version>",
               "comment": "show release info"
             },
             {
               "root": "releases",
-              "arguments": "[<version>...]",
+              "arguments": "[-a <app>] [<version>...]",
               "comment": "list releases"
             },
             {
               "root": "rollback",
-              "arguments": "<version>",
+              "arguments": "[-a <app>] <version>",
               "comment": "rolback to a previous release"
             }
           ],
@@ -205,22 +205,22 @@
           "commands": [
             {
               "root": "addon-add",
-              "arguments": "<service>[:<plan>] [<config>=<value>...]",
+              "arguments": "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
               "comment": "add an addon"
             },
             {
               "root": "addon-open",
-              "arguments": "<service>[:<plan>]",
+              "arguments": "[-a <app>] <service>[:<plan>]",
               "comment": "open an addon (extra)"
             },
             {
               "root": "addon-remove",
-              "arguments": "<service>:<plan>",
+              "arguments": "[-a <app>] <service>:<plan>",
               "comment": "remove an addon"
             },
             {
               "root": "addons",
-              "arguments": "[<service>:<plan>...]",
+              "arguments": "[-a <app>] [<service>:<plan>...]",
               "comment": "list addons"
             }
           ],
@@ -230,22 +230,22 @@
           "commands": [
             {
               "root": "env",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "list env vars"
             },
             {
               "root": "get",
-              "arguments": "<name>",
+              "arguments": "[-a <app>] <name>",
               "comment": "get env var (extra)"
             },
             {
               "root": "set",
-              "arguments": "<name>=<value>...",
+              "arguments": "[-a <app>] <name>=<value>...",
               "comment": "set env var"
             },
             {
               "root": "unset",
-              "arguments": "<name>...",
+              "arguments": "[-a <app>] <name>...",
               "comment": "unset env var"
             }
           ],
@@ -255,17 +255,17 @@
           "commands": [
             {
               "root": "domain-add",
-              "arguments": "<domain>",
+              "arguments": "[-a <app>] <domain>",
               "comment": "add a domain"
             },
             {
               "root": "domain-remove",
-              "arguments": "<domain>",
+              "arguments": "[-a <app>] <domain>",
               "comment": "remove a domain"
             },
             {
               "root": "domains",
-              "arguments": "",
+              "arguments": "[-a <app>]",
               "comment": "list domains"
             }
           ],

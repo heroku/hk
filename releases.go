@@ -15,7 +15,7 @@ import (
 var cmdReleases = &Command{
 	Run:      runReleases,
 	Name:     "releases",
-	Usage:    "[<version>...]",
+	Usage:    "[-a <app>] [<version>...]",
 	Category: "release",
 	Short:    "list releases",
 	Long: `
@@ -34,6 +34,10 @@ Examples:
     v2  john  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
     v3  john           Jun 13 18:31  Rollback to v2
 `,
+}
+
+func init() {
+	cmdReleases.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runReleases(cmd *Command, versions []string) {
@@ -138,10 +142,14 @@ func newRelease(rel *heroku.Release) *Release {
 var cmdReleaseInfo = &Command{
 	Run:      runReleaseInfo,
 	Name:     "release-info",
-	Usage:    "<version>",
+	Usage:    "[-a <app>] <version>",
 	Category: "release",
 	Short:    "show release info",
 	Long:     `release-info shows detailed information about a release.`,
+}
+
+func init() {
+	cmdReleaseInfo.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runReleaseInfo(cmd *Command, args []string) {
@@ -163,9 +171,13 @@ func runReleaseInfo(cmd *Command, args []string) {
 var cmdRollback = &Command{
 	Run:      runRollback,
 	Name:     "rollback",
-	Usage:    "<version>",
+	Usage:    "[-a <app>] <version>",
 	Category: "release",
 	Short:    "rolback to a previous release",
+}
+
+func init() {
+	cmdRollback.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runRollback(cmd *Command, args []string) {

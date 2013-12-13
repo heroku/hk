@@ -23,7 +23,7 @@ var (
 var cmdRun = &Command{
 	Run:      runRun,
 	Name:     "run",
-	Usage:    "[-s <size>] [-d] <command> [<argument>...]",
+	Usage:    "[-a <app>] [-s <size>] [-d] <command> [<argument>...]",
 	Category: "dyno",
 	Short:    "run a process in a dyno",
 	Long: `
@@ -31,6 +31,7 @@ Run a process on Heroku
 
 Options:
 
+    -a <app>   app name
     -s <size>  set the size for this dyno (e.g. 2X)
     -d         run in detached mode instead of attached to terminal
 
@@ -50,6 +51,7 @@ Examples:
 func init() {
 	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
 	cmdRun.Flag.StringVar(&dynoSize, "s", "", "dyno size")
+	cmdRun.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runRun(cmd *Command, args []string) {

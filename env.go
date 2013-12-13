@@ -10,9 +10,14 @@ import (
 var cmdEnv = &Command{
 	Run:      runEnv,
 	Name:     "env",
+	Usage:    "[-a <app>]",
 	Category: "config",
 	Short:    "list env vars",
 	Long:     `Show all env vars.`,
+}
+
+func init() {
+	cmdEnv.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runEnv(cmd *Command, args []string) {
@@ -31,7 +36,7 @@ func runEnv(cmd *Command, args []string) {
 var cmdGet = &Command{
 	Run:      runGet,
 	Name:     "get",
-	Usage:    "<name>",
+	Usage:    "[-a <app>] <name>",
 	Category: "config",
 	Short:    "get env var" + extra,
 	Long: `
@@ -42,6 +47,10 @@ Example:
   $ hk get BUILDPACK_URL
   http://github.com/kr/heroku-buildpack-inline.git
 `,
+}
+
+func init() {
+	cmdGet.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runGet(cmd *Command, args []string) {
@@ -60,7 +69,7 @@ func runGet(cmd *Command, args []string) {
 var cmdSet = &Command{
 	Run:      runSet,
 	Name:     "set",
-	Usage:    "<name>=<value>...",
+	Usage:    "[-a <app>] <name>=<value>...",
 	Category: "config",
 	Short:    "set env var",
 	Long: `
@@ -70,6 +79,10 @@ Example:
 
   $ hk set BUILDPACK_URL=http://github.com/kr/heroku-buildpack-inline.git
 `,
+}
+
+func init() {
+	cmdSet.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runSet(cmd *Command, args []string) {
@@ -92,7 +105,7 @@ func runSet(cmd *Command, args []string) {
 var cmdUnset = &Command{
 	Run:      runUnset,
 	Name:     "unset",
-	Usage:    "<name>...",
+	Usage:    "[-a <app>] <name>...",
 	Category: "config",
 	Short:    "unset env var",
 	Long: `
@@ -102,6 +115,10 @@ Example:
 
   $ hk unset BUILDPACK_URL
 `,
+}
+
+func init() {
+	cmdUnset.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runUnset(cmd *Command, args []string) {

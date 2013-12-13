@@ -11,9 +11,13 @@ import (
 var cmdTransfer = &Command{
 	Run:      runTransfer,
 	Name:     "transfer",
-	Usage:    "<email>",
+	Usage:    "[-a <app>] <email>",
 	Category: "app",
 	Short:    "transfer app ownership to a collaborator" + extra,
+}
+
+func init() {
+	cmdTransfer.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransfer(cmd *Command, args []string) {
@@ -29,8 +33,13 @@ func runTransfer(cmd *Command, args []string) {
 var cmdTransfers = &Command{
 	Run:      runTransfers,
 	Name:     "transfers",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "list existing app transfers" + extra,
+}
+
+func init() {
+	cmdTransfers.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransfers(cmd *Command, args []string) {
@@ -69,8 +78,13 @@ func runTransferAccept(cmd *Command, args []string) {
 var cmdTransferDecline = &Command{
 	Run:      runTransferDecline,
 	Name:     "transfer-decline",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "decline an inbound app transfer" + extra,
+}
+
+func init() {
+	cmdTransferDecline.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransferDecline(cmd *Command, args []string) {
@@ -81,8 +95,13 @@ func runTransferDecline(cmd *Command, args []string) {
 var cmdTransferCancel = &Command{
 	Run:      runTransferCancel,
 	Name:     "transfer-cancel",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "cancel an outbound app transfer" + extra,
+}
+
+func init() {
+	cmdTransferCancel.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransferCancel(cmd *Command, args []string) {

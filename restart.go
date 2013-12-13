@@ -7,7 +7,7 @@ import (
 var cmdRestart = &Command{
 	Run:      runRestart,
 	Name:     "restart",
-	Usage:    "[<type or name>]",
+	Usage:    "[-a <app>] [<type or name>]",
 	Category: "dyno",
 	Short:    "restart dynos",
 	Long: `
@@ -19,6 +19,10 @@ Examples:
   $ hk restart web
   $ hk restart web.1
 `,
+}
+
+func init() {
+	cmdRestart.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runRestart(cmd *Command, args []string) {

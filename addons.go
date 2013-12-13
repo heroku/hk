@@ -14,7 +14,7 @@ import (
 var cmdAddons = &Command{
 	Run:      runAddons,
 	Name:     "addons",
-	Usage:    "[<service>:<plan>...]",
+	Usage:    "[-a <app>] [<service>:<plan>...]",
 	Category: "add-on",
 	Short:    "list addons",
 	Long: `
@@ -29,6 +29,10 @@ Examples:
     $ hk addons pgbackups:plus
     pgbackups:plus
 `,
+}
+
+func init() {
+	cmdAddons.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runAddons(cmd *Command, names []string) {
@@ -145,7 +149,7 @@ func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 var cmdAddonAdd = &Command{
 	Run:      runAddonAdd,
 	Name:     "addon-add",
-	Usage:    "<service>[:<plan>] [<config>=<value>...]",
+	Usage:    "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
 	Category: "add-on",
 	Short:    "add an addon",
 	Long: `
@@ -157,6 +161,10 @@ Examples:
 
     $ hk addon-add heroku-postgresql:standard-tengu
 `,
+}
+
+func init() {
+	cmdAddonAdd.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runAddonAdd(cmd *Command, args []string) {
@@ -204,7 +212,7 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 var cmdAddonRemove = &Command{
 	Run:      runAddonRemove,
 	Name:     "addon-remove",
-	Usage:    "<service>:<plan>",
+	Usage:    "[-a <app>] <service>:<plan>",
 	Category: "add-on",
 	Short:    "remove an addon",
 	Long: `
@@ -216,6 +224,10 @@ Examples:
 
     $ hk addon-remove heroku-postgresql:standard-tengu
 `,
+}
+
+func init() {
+	cmdAddonRemove.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runAddonRemove(cmd *Command, args []string) {
@@ -236,12 +248,16 @@ func runAddonRemove(cmd *Command, args []string) {
 var cmdAddonOpen = &Command{
 	Run:      runAddonOpen,
 	Name:     "addon-open",
-	Usage:    "<service>[:<plan>]",
+	Usage:    "[-a <app>] <service>[:<plan>]",
 	Category: "add-on",
 	Short:    "open an addon" + extra,
 	Long: `
 Open the addon's management page in your default web browser.
 `,
+}
+
+func init() {
+	cmdAddonOpen.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runAddonOpen(cmd *Command, args []string) {

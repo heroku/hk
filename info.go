@@ -7,9 +7,14 @@ import (
 var cmdInfo = &Command{
 	Run:      runInfo,
 	Name:     "info",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "show app info",
 	Long:     `Info shows general information about the current app.`,
+}
+
+func init() {
+	cmdInfo.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runInfo(cmd *Command, args []string) {

@@ -11,6 +11,7 @@ import (
 var cmdDomains = &Command{
 	Run:      runDomains,
 	Name:     "domains",
+	Usage:    "[-a <app>]",
 	Category: "domain",
 	Short:    "list domains",
 	Long: `
@@ -22,6 +23,10 @@ Examples:
     test.herokuapp.com
     www.test.com
 `,
+}
+
+func init() {
+	cmdDomains.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runDomains(cmd *Command, args []string) {
@@ -43,9 +48,13 @@ func runDomains(cmd *Command, args []string) {
 var cmdDomainAdd = &Command{
 	Run:      runDomainAdd,
 	Name:     "domain-add",
-	Usage:    "<domain>",
+	Usage:    "[-a <app>] <domain>",
 	Category: "domain",
 	Short:    "add a domain",
+}
+
+func init() {
+	cmdDomainAdd.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runDomainAdd(cmd *Command, args []string) {
@@ -59,9 +68,13 @@ func runDomainAdd(cmd *Command, args []string) {
 var cmdDomainRemove = &Command{
 	Run:      runDomainRemove,
 	Name:     "domain-remove",
-	Usage:    "<domain>",
+	Usage:    "[-a <app>] <domain>",
 	Category: "domain",
 	Short:    "remove a domain",
+}
+
+func init() {
+	cmdDomainRemove.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runDomainRemove(cmd *Command, args []string) {
