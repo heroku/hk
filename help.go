@@ -240,7 +240,7 @@ func printAllUsage() {
 	sort.Sort(cl)
 	for i := range cl {
 		if cl[i].Runnable() {
-			listRec(w, "hk "+cl[i].Usage, "# "+cl[i].Short)
+			listRec(w, "hk "+cl[i].FullUsage(), "# "+cl[i].Short)
 		}
 	}
 }
@@ -270,7 +270,7 @@ func printStyleGuide() {
 }
 
 func (c *Command) UsageJSON() commandJSON {
-	return commandJSON{Root: c.Name(), Arguments: strings.TrimLeft(c.Usage, c.Name()+" "), Comment: c.Short}
+	return commandJSON{Root: c.Name(), Arguments: strings.TrimLeft(c.FullUsage(), c.Name()+" "), Comment: c.Short}
 }
 
 type commandJSON struct {
@@ -343,7 +343,7 @@ var styleGuideTemplate = template.Must(template.New("styleguide").Delims("{{{", 
       }
 
       td:first-child {
-        width: 460px;
+        width: 540px;
       }
 
       h2 {

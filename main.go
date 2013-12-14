@@ -59,9 +59,16 @@ type Command struct {
 
 func (c *Command) printUsage() {
 	if c.Runnable() {
-		fmt.Printf("Usage: hk %s\n\n", c.Usage)
+		fmt.Printf("Usage: hk %s\n\n", c.FullUsage())
 	}
 	fmt.Println(strings.Trim(c.Long, "\n"))
+}
+
+func (c *Command) FullUsage() string {
+	if c.NeedsApp {
+		return c.Name() + " [-a <app>]" + strings.TrimPrefix(c.Usage, c.Name())
+	}
+	return c.Usage
 }
 
 func (c *Command) Name() string {
