@@ -10,7 +10,8 @@ import (
 
 var cmdScale = &Command{
 	Run:      runScale,
-	Usage:    "scale <type>=[<qty>]:[<size>]...",
+	Name:     "scale",
+	Usage:    "[-a <app>] <type>=[<qty>]:[<size>]...",
 	Category: "dyno",
 	Short:    "change dyno quantities and sizes",
 	Long: `
@@ -26,6 +27,10 @@ Example:
 
 	$ hk scale web=2X worker=1X
 `,
+}
+
+func init() {
+	cmdScale.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 // takes args of the form "web=1", "worker=3X", web=4:2X etc

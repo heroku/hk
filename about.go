@@ -1,7 +1,7 @@
 package main
 
 var helpAbout = &Command{
-	Usage:    "about",
+	Name:     "about",
 	Category: "hk",
 	Short:    "information about hk (e.g. copyright, license, etc.)",
 	Long: userAgent + `

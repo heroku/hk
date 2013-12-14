@@ -15,7 +15,8 @@ import (
 
 var cmdDynos = &Command{
 	Run:      runDynos,
-	Usage:    "dynos [<name>...]",
+	Name:     "dynos",
+	Usage:    "[-a <app>] [<name>...]",
 	Category: "dyno",
 	Short:    "list dynos",
 	Long: `
@@ -32,6 +33,10 @@ Examples:
     web.1     up  15h  "blog /app /tmp/dst"
     web.2     up   8h  "blog /app /tmp/dst"
 `,
+}
+
+func init() {
+	cmdDynos.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runDynos(cmd *Command, names []string) {

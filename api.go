@@ -9,7 +9,8 @@ import (
 
 var cmdAPI = &Command{
 	Run:      runAPI,
-	Usage:    "api <method> <path>",
+	Name:     "api",
+	Usage:    "<method> <path>",
 	Category: "hk",
 	Short:    "make a single API request" + extra,
 	Long: `

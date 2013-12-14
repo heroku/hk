@@ -12,7 +12,7 @@ import (
 )
 
 var helpEnviron = &Command{
-	Usage:    "environ",
+	Name:     "environ",
 	Category: "hk",
 	Short:    "environment variables used by hk",
 	Long: `
@@ -56,7 +56,7 @@ HKDEBUG
 
 var cmdVersion = &Command{
 	Run:      runVersion,
-	Usage:    "version",
+	Name:     "version",
 	Category: "hk",
 	Short:    "show hk version",
 	Long:     `Version shows the hk client version string.`,
@@ -67,27 +67,28 @@ func runVersion(cmd *Command, args []string) {
 }
 
 var cmdHelp = &Command{
-	Usage:    "help [<topic>]",
+	Name:     "help",
+	Usage:    "[<topic>]",
 	Category: "hk",
 	Long:     `Help shows usage for a command or other topic.`,
 }
 
 var helpMore = &Command{
-	Usage:    "more",
+	Name:     "more",
 	Category: "hk",
 	Short:    "additional commands, less frequently used",
 	Long:     "(not displayed; see special case in runHelp)",
 }
 
 var helpCommands = &Command{
-	Usage:    "commands",
+	Name:     "commands",
 	Category: "hk",
 	Short:    "list all commands with usage",
 	Long:     "(not displayed; see special case in runHelp)",
 }
 
 var helpStyleGuide = &Command{
-	Usage:    "styleguide",
+	Name:     "styleguide",
 	Category: "hk",
 	Short:    "generate an html styleguide for all commands with usage",
 	Long:     "(not displayed; see special case in runHelp)",
@@ -106,19 +107,19 @@ func runHelp(cmd *Command, args []string) {
 		log.Fatal("too many arguments")
 	}
 	switch args[0] {
-	case helpMore.Name():
+	case helpMore.Name:
 		printExtra()
 		return
-	case helpCommands.Name():
+	case helpCommands.Name:
 		printAllUsage()
 		return
-	case helpStyleGuide.Name():
+	case helpStyleGuide.Name:
 		printStyleGuide()
 		return
 	}
 
 	for _, cmd := range commands {
-		if cmd.Name() == args[0] {
+		if cmd.Name == args[0] {
 			cmd.printUsage()
 			return
 		}
@@ -144,7 +145,7 @@ func maxStrLen(strs []string) (strlen int) {
 }
 
 var usageTemplate = template.Must(template.New("usage").Parse(`
-Usage: hk [-a app] [command] [options] [arguments]
+Usage: hk [-a <app>] [command] [options] [arguments]
 
 
 Commands:
@@ -196,7 +197,7 @@ func printUsage() {
 	var runListNames []string
 	for i := range commands {
 		if commands[i].Runnable() && commands[i].List() {
-			runListNames = append(runListNames, commands[i].Name())
+			runListNames = append(runListNames, commands[i].Name)
 		}
 	}
 	for i := range plugins {
@@ -220,7 +221,7 @@ func printExtra() {
 	var runExtraNames []string
 	for i := range commands {
 		if commands[i].Runnable() && commands[i].ListAsExtra() {
-			runExtraNames = append(runExtraNames, commands[i].Name())
+			runExtraNames = append(runExtraNames, commands[i].Name)
 		}
 	}
 
@@ -270,7 +271,11 @@ func printStyleGuide() {
 }
 
 func (c *Command) UsageJSON() commandJSON {
-	return commandJSON{Root: c.Name(), Arguments: strings.TrimLeft(c.Usage, c.Name()+" "), Comment: c.Short}
+	return commandJSON{
+		Root:      c.Name,
+		Arguments: c.Usage,
+		Comment:   c.Short,
+	}
 }
 
 type commandJSON struct {
@@ -283,7 +288,7 @@ type commandList []*Command
 
 func (cl commandList) Len() int           { return len(cl) }
 func (cl commandList) Swap(i, j int)      { cl[i], cl[j] = cl[j], cl[i] }
-func (cl commandList) Less(i, j int) bool { return cl[i].Name() < cl[j].Name() }
+func (cl commandList) Less(i, j int) bool { return cl[i].Name < cl[j].Name }
 
 func (cl commandList) UsageJSON() []commandJSON {
 	a := make([]commandJSON, len(cl))
@@ -343,7 +348,7 @@ var styleGuideTemplate = template.Must(template.New("styleguide").Delims("{{{", 
       }
 
       td:first-child {
-        width: 460px;
+        width: 540px;
       }
 
       h2 {

@@ -7,7 +7,8 @@ import (
 
 var cmdDestroy = &Command{
 	Run:      runDestroy,
-	Usage:    "destroy <name>",
+	Name:     "destroy",
+	Usage:    "<name>",
 	Category: "app",
 	Short:    "destroy an app",
 	Long: `

@@ -10,9 +10,14 @@ import (
 
 var cmdTransfer = &Command{
 	Run:      runTransfer,
-	Usage:    "transfer <email>",
+	Name:     "transfer",
+	Usage:    "[-a <app>] <email>",
 	Category: "app",
 	Short:    "transfer app ownership to a collaborator" + extra,
+}
+
+func init() {
+	cmdTransfer.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransfer(cmd *Command, args []string) {
@@ -27,9 +32,14 @@ func runTransfer(cmd *Command, args []string) {
 
 var cmdTransfers = &Command{
 	Run:      runTransfers,
-	Usage:    "transfers",
+	Name:     "transfers",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "list existing app transfers" + extra,
+}
+
+func init() {
+	cmdTransfers.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransfers(cmd *Command, args []string) {
@@ -55,7 +65,7 @@ func listTransfer(w io.Writer, t heroku.AppTransfer) {
 
 var cmdTransferAccept = &Command{
 	Run:      runTransferAccept,
-	Usage:    "transfer-accept",
+	Name:     "transfer-accept",
 	Category: "app",
 	Short:    "accept an inbound app transfer" + extra,
 }
@@ -67,9 +77,14 @@ func runTransferAccept(cmd *Command, args []string) {
 
 var cmdTransferDecline = &Command{
 	Run:      runTransferDecline,
-	Usage:    "transfer-decline",
+	Name:     "transfer-decline",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "decline an inbound app transfer" + extra,
+}
+
+func init() {
+	cmdTransferDecline.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransferDecline(cmd *Command, args []string) {
@@ -79,9 +94,14 @@ func runTransferDecline(cmd *Command, args []string) {
 
 var cmdTransferCancel = &Command{
 	Run:      runTransferCancel,
-	Usage:    "transfer-cancel",
+	Name:     "transfer-cancel",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "cancel an outbound app transfer" + extra,
+}
+
+func init() {
+	cmdTransferCancel.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runTransferCancel(cmd *Command, args []string) {

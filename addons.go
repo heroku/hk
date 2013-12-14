@@ -13,7 +13,8 @@ import (
 
 var cmdAddons = &Command{
 	Run:      runAddons,
-	Usage:    "addons [<provider>:<plan>...]",
+	Name:     "addons",
+	Usage:    "[-a <app>] [<service>:<plan>...]",
 	Category: "add-on",
 	Short:    "list addons",
 	Long: `
@@ -28,6 +29,10 @@ Examples:
     $ hk addons pgbackups:plus
     pgbackups:plus
 `,
+}
+
+func init() {
+	cmdAddons.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runAddons(cmd *Command, names []string) {
@@ -143,7 +148,8 @@ func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 
 var cmdAddonAdd = &Command{
 	Run:      runAddonAdd,
-	Usage:    "addon-add <provider>[:<plan>] [<config>=<value>...]",
+	Name:     "addon-add",
+	Usage:    "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
 	Category: "add-on",
 	Short:    "add an addon",
 	Long: `
@@ -157,6 +163,10 @@ Examples:
 `,
 }
 
+func init() {
+	cmdAddonAdd.Flag.StringVar(&flagApp, "a", "", "app name")
+}
+
 func runAddonAdd(cmd *Command, args []string) {
 	if len(args) == 0 {
 		cmd.printUsage()
@@ -164,7 +174,7 @@ func runAddonAdd(cmd *Command, args []string) {
 	}
 	plan := args[0]
 	if strings.IndexRune(plan, ':') == -1 {
-		// has provider name, but missing plan name
+		// has service name, but missing plan name
 		cmd.printUsage()
 		os.Exit(2)
 	}
@@ -201,7 +211,8 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 
 var cmdAddonRemove = &Command{
 	Run:      runAddonRemove,
-	Usage:    "addon-remove <provider>:<plan>",
+	Name:     "addon-remove",
+	Usage:    "[-a <app>] <service>:<plan>",
 	Category: "add-on",
 	Short:    "remove an addon",
 	Long: `
@@ -215,6 +226,10 @@ Examples:
 `,
 }
 
+func init() {
+	cmdAddonRemove.Flag.StringVar(&flagApp, "a", "", "app name")
+}
+
 func runAddonRemove(cmd *Command, args []string) {
 	if len(args) != 1 {
 		cmd.printUsage()
@@ -222,7 +237,7 @@ func runAddonRemove(cmd *Command, args []string) {
 	}
 	plan := args[0]
 	if strings.IndexRune(plan, ':') == -1 {
-		// has provider name, but missing plan name
+		// has service name, but missing plan name
 		cmd.printUsage()
 		os.Exit(2)
 	}
@@ -232,12 +247,17 @@ func runAddonRemove(cmd *Command, args []string) {
 
 var cmdAddonOpen = &Command{
 	Run:      runAddonOpen,
-	Usage:    "addon-open <provider>[:<plan>]",
+	Name:     "addon-open",
+	Usage:    "[-a <app>] <service>[:<plan>]",
 	Category: "add-on",
 	Short:    "open an addon" + extra,
 	Long: `
 Open the addon's management page in your default web browser.
 `,
+}
+
+func init() {
+	cmdAddonOpen.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runAddonOpen(cmd *Command, args []string) {

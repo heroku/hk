@@ -6,7 +6,8 @@ import (
 
 var cmdWhichApp = &Command{
 	Run:      runWhichApp,
-	Usage:    "which-app",
+	Name:     "which-app",
+	Usage:    "[-a <app>]",
 	Category: "app",
 	Short:    "show which app is selected, if any" + extra,
 	Long: `
@@ -17,6 +18,10 @@ status.
 
 To suppress the error message, run 'hk app 2>/dev/null'.
 `,
+}
+
+func init() {
+	cmdWhichApp.Flag.StringVar(&flagApp, "a", "", "app name")
 }
 
 func runWhichApp(cmd *Command, args []string) {
