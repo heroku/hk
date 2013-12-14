@@ -47,8 +47,9 @@ func netrcPath() string {
 
 type Command struct {
 	// args does not include the command name
-	Run  func(cmd *Command, args []string)
-	Flag flag.FlagSet
+	Run      func(cmd *Command, args []string)
+	Flag     flag.FlagSet
+	NeedsApp bool
 
 	Usage    string // first word is the command name
 	Category string // i.e. "App", "Account", etc.
@@ -58,9 +59,16 @@ type Command struct {
 
 func (c *Command) printUsage() {
 	if c.Runnable() {
-		fmt.Printf("Usage: hk %s\n\n", c.Usage)
+		fmt.Printf("Usage: hk %s\n\n", c.FullUsage())
 	}
 	fmt.Println(strings.Trim(c.Long, "\n"))
+}
+
+func (c *Command) FullUsage() string {
+	if c.NeedsApp {
+		return c.Name() + " [-a <app>]" + strings.TrimPrefix(c.Usage, c.Name())
+	}
+	return c.Usage
 }
 
 func (c *Command) Name() string {
@@ -155,16 +163,9 @@ func main() {
 	log.SetFlags(0)
 
 	args := os.Args[1:]
-	if len(args) >= 2 && "-a" == args[0] {
-		flagApp = args[1]
-		args = args[2:]
 
-		if gitRemoteApp, err := appFromGitRemote(flagApp); err == nil {
-			flagApp = gitRemoteApp
-		}
-	}
-
-	if len(args) < 1 {
+	// make sure command is specified, disallow global args
+	if len(args) < 1 || strings.IndexRune(args[0], '-') == 0 {
 		usage()
 	}
 
@@ -204,8 +205,18 @@ func main() {
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()
 			}
+			if cmd.NeedsApp {
+				cmd.Flag.StringVar(&flagApp, "a", "", "app name")
+			}
 			if err := cmd.Flag.Parse(args[1:]); err != nil {
 				os.Exit(2)
+			}
+			if cmd.NeedsApp {
+				if a, _ := app(); a == "" {
+					log.Println("no app specified")
+					cmd.printUsage()
+					os.Exit(2)
+				}
 			}
 			cmd.Run(cmd, cmd.Flag.Args())
 			return

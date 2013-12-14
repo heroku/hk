@@ -13,7 +13,8 @@ import (
 
 var cmdAddons = &Command{
 	Run:      runAddons,
-	Usage:    "addons [<provider>:<plan>...]",
+	Usage:    "addons [<service>:<plan>...]",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "list addons",
 	Long: `
@@ -143,7 +144,8 @@ func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 
 var cmdAddonAdd = &Command{
 	Run:      runAddonAdd,
-	Usage:    "addon-add <provider>[:<plan>] [<config>=<value>...]",
+	Usage:    "addon-add <service>[:<plan>] [<config>=<value>...]",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "add an addon",
 	Long: `
@@ -164,7 +166,7 @@ func runAddonAdd(cmd *Command, args []string) {
 	}
 	plan := args[0]
 	if strings.IndexRune(plan, ':') == -1 {
-		// has provider name, but missing plan name
+		// has service name, but missing plan name
 		cmd.printUsage()
 		os.Exit(2)
 	}
@@ -201,7 +203,8 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 
 var cmdAddonRemove = &Command{
 	Run:      runAddonRemove,
-	Usage:    "addon-remove <provider>:<plan>",
+	Usage:    "addon-remove <service>:<plan>",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "remove an addon",
 	Long: `
@@ -222,7 +225,7 @@ func runAddonRemove(cmd *Command, args []string) {
 	}
 	plan := args[0]
 	if strings.IndexRune(plan, ':') == -1 {
-		// has provider name, but missing plan name
+		// has service name, but missing plan name
 		cmd.printUsage()
 		os.Exit(2)
 	}
@@ -232,7 +235,8 @@ func runAddonRemove(cmd *Command, args []string) {
 
 var cmdAddonOpen = &Command{
 	Run:      runAddonOpen,
-	Usage:    "addon-open <provider>[:<plan>]",
+	Usage:    "addon-open <service>[:<plan>]",
+	NeedsApp: true,
 	Category: "add-on",
 	Short:    "open an addon" + extra,
 	Long: `

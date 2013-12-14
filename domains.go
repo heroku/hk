@@ -11,6 +11,7 @@ import (
 var cmdDomains = &Command{
 	Run:      runDomains,
 	Usage:    "domains",
+	NeedsApp: true,
 	Category: "domain",
 	Short:    "list domains",
 	Long: `
@@ -43,6 +44,7 @@ func runDomains(cmd *Command, args []string) {
 var cmdDomainAdd = &Command{
 	Run:      runDomainAdd,
 	Usage:    "domain-add <domain>",
+	NeedsApp: true,
 	Category: "domain",
 	Short:    "add a domain",
 }
@@ -58,6 +60,7 @@ func runDomainAdd(cmd *Command, args []string) {
 var cmdDomainRemove = &Command{
 	Run:      runDomainRemove,
 	Usage:    "domain-remove <domain>",
+	NeedsApp: true,
 	Category: "domain",
 	Short:    "remove a domain",
 }

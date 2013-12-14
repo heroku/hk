@@ -23,6 +23,7 @@ var (
 var cmdRun = &Command{
 	Run:      runRun,
 	Usage:    "run [-s <size>] [-d] <command> [<argument>...]",
+	NeedsApp: true,
 	Category: "dyno",
 	Short:    "run a process in a dyno",
 	Long: `

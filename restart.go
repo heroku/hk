@@ -7,6 +7,7 @@ import (
 var cmdRestart = &Command{
 	Run:      runRestart,
 	Usage:    "restart [<type or name>]",
+	NeedsApp: true,
 	Category: "dyno",
 	Short:    "restart dynos",
 	Long: `
