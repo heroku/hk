@@ -211,6 +211,11 @@ func main() {
 			if err := cmd.Flag.Parse(args[1:]); err != nil {
 				os.Exit(2)
 			}
+			if flagApp != "" {
+				if gitRemoteApp, err := appFromGitRemote(flagApp); err == nil {
+					flagApp = gitRemoteApp
+				}
+			}
 			if cmd.NeedsApp {
 				if a, _ := app(); a == "" {
 					log.Println("no app specified")
