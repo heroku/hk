@@ -234,7 +234,7 @@ var updater = &Updater{
 `
 
 func (b *Build) build() (err error) {
-	log.Printf("building release=%s os=%s arch=%s\n", b.Ver, b.OS, b.Arch)
+	log.Printf("building cmd=%s release=%s os=%s arch=%s\n", b.Name, b.Ver, b.OS, b.Arch)
 	f, err := os.Create("relver.go")
 	if err != nil {
 		return fmt.Errorf("writing relver.go: %s", err)
