@@ -84,6 +84,111 @@
         {
           "commands": [
             {
+              "root": "release-info",
+              "arguments": "[-a <app>] <version>",
+              "comment": "show release info"
+            },
+            {
+              "root": "releases",
+              "arguments": "[-a <app>] [<version>...]",
+              "comment": "list releases"
+            },
+            {
+              "root": "rollback",
+              "arguments": "[-a <app>] <version>",
+              "comment": "rolback to a previous release"
+            }
+          ],
+          "title": "release"
+        },
+        {
+          "commands": [
+            {
+              "root": "env",
+              "arguments": "[-a <app>]",
+              "comment": "list env vars"
+            },
+            {
+              "root": "get",
+              "arguments": "[-a <app>] <name>",
+              "comment": "get env var (extra)"
+            },
+            {
+              "root": "set",
+              "arguments": "[-a <app>] <name>=<value>...",
+              "comment": "set env var"
+            },
+            {
+              "root": "unset",
+              "arguments": "[-a <app>] <name>...",
+              "comment": "unset env var"
+            }
+          ],
+          "title": "config"
+        },
+        {
+          "commands": [
+            {
+              "root": "sshkey-add",
+              "arguments": "[<public-key-file>]",
+              "comment": "add ssh public key"
+            }
+          ],
+          "title": "account"
+        },
+        {
+          "commands": [
+            {
+              "root": "about",
+              "arguments": "",
+              "comment": "information about hk (e.g. copyright, license, etc.)"
+            },
+            {
+              "root": "api",
+              "arguments": "<method> <path>",
+              "comment": "make a single API request (extra)"
+            },
+            {
+              "root": "creds",
+              "arguments": "",
+              "comment": "show credentials (extra)"
+            },
+            {
+              "root": "environ",
+              "arguments": "",
+              "comment": "environment variables used by hk"
+            },
+            {
+              "root": "help",
+              "arguments": "[<topic>]",
+              "comment": ""
+            },
+            {
+              "root": "more",
+              "arguments": "",
+              "comment": "additional commands, less frequently used"
+            },
+            {
+              "root": "plugins",
+              "arguments": "",
+              "comment": "interface to plugin commands"
+            },
+            {
+              "root": "update",
+              "arguments": "",
+              "comment": ""
+            },
+            {
+              "root": "version",
+              "arguments": "",
+              "comment": "show hk version"
+            }
+          ],
+          "title": "hk"
+        },
+        {
+          "commands": [
+            {
               "root": "apps",
               "arguments": "[<name>...]",
               "comment": "list apps"
@@ -184,26 +289,6 @@
         {
           "commands": [
             {
-              "root": "release-info",
-              "arguments": "[-a <app>] <version>",
-              "comment": "show release info"
-            },
-            {
-              "root": "releases",
-              "arguments": "[-a <app>] [<version>...]",
-              "comment": "list releases"
-            },
-            {
-              "root": "rollback",
-              "arguments": "[-a <app>] <version>",
-              "comment": "rolback to a previous release"
-            }
-          ],
-          "title": "release"
-        },
-        {
-          "commands": [
-            {
               "root": "addon-add",
               "arguments": "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
               "comment": "add an addon"
@@ -229,31 +314,6 @@
         {
           "commands": [
             {
-              "root": "env",
-              "arguments": "[-a <app>]",
-              "comment": "list env vars"
-            },
-            {
-              "root": "get",
-              "arguments": "[-a <app>] <name>",
-              "comment": "get env var (extra)"
-            },
-            {
-              "root": "set",
-              "arguments": "[-a <app>] <name>=<value>...",
-              "comment": "set env var"
-            },
-            {
-              "root": "unset",
-              "arguments": "[-a <app>] <name>...",
-              "comment": "unset env var"
-            }
-          ],
-          "title": "config"
-        },
-        {
-          "commands": [
-            {
               "root": "domain-add",
               "arguments": "[-a <app>] <domain>",
               "comment": "add a domain"
@@ -274,62 +334,22 @@
         {
           "commands": [
             {
-              "root": "sshkey-add",
-              "arguments": "[<public-key-file>]",
-              "comment": "add ssh public key"
+              "root": "access",
+              "arguments": "[-a <app>]",
+              "comment": "list access permissions"
+            },
+            {
+              "root": "access-add",
+              "arguments": "[-a <app>] [-s] <email>",
+              "comment": "give a user access to an app"
+            },
+            {
+              "root": "access-remove",
+              "arguments": "[-a <app>] <email>",
+              "comment": "remove a user's access to an app"
             }
           ],
-          "title": "account"
-        },
-        {
-          "commands": [
-            {
-              "root": "about",
-              "arguments": "",
-              "comment": "information about hk (e.g. copyright, license, etc.)"
-            },
-            {
-              "root": "api",
-              "arguments": "<method> <path>",
-              "comment": "make a single API request (extra)"
-            },
-            {
-              "root": "creds",
-              "arguments": "",
-              "comment": "show credentials (extra)"
-            },
-            {
-              "root": "environ",
-              "arguments": "",
-              "comment": "environment variables used by hk"
-            },
-            {
-              "root": "help",
-              "arguments": "[<topic>]",
-              "comment": ""
-            },
-            {
-              "root": "more",
-              "arguments": "",
-              "comment": "additional commands, less frequently used"
-            },
-            {
-              "root": "plugins",
-              "arguments": "",
-              "comment": "interface to plugin commands"
-            },
-            {
-              "root": "update",
-              "arguments": "",
-              "comment": ""
-            },
-            {
-              "root": "version",
-              "arguments": "",
-              "comment": "show hk version"
-            }
-          ],
-          "title": "hk"
+          "title": "access"
         }
       ]
 

@@ -132,6 +132,9 @@ var commands = []*Command{
 	helpAbout,
 
 	// listed by hk help more
+	cmdAccess,
+	cmdAccessAdd,
+	cmdAccessRemove,
 	cmdAddonOpen,
 	cmdAPI,
 	cmdGet,
