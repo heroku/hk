@@ -197,15 +197,25 @@ func (c *Client) DoReq(req *http.Request, v interface{}) error {
 	return err
 }
 
+// An Error represents a Heroku API error.
+type Error struct {
+	error
+	Id string
+}
+
+type errorResp struct {
+	Message string
+	Id      string
+}
+
 func checkResp(res *http.Response) error {
-	if res.StatusCode == 401 {
-		return errors.New("Unauthorized")
-	}
-	if res.StatusCode == 403 {
-		return errors.New("Unauthorized")
-	}
 	if res.StatusCode/100 != 2 { // 200, 201, 202, etc
-		return errors.New("Unexpected error: " + res.Status)
+		var e errorResp
+		err := json.NewDecoder(res.Body).Decode(&e)
+		if err != nil {
+			return errors.New("Unexpected error: " + res.Status)
+		}
+		return Error{error: errors.New(e.Message), Id: e.Id}
 	}
 	if msg := res.Header.Get("X-Heroku-Warning"); msg != "" {
 		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))

@@ -1,9 +1,13 @@
 package heroku
 
 import (
+	"bytes"
+	"errors"
 	"github.com/bgentry/testnet"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -83,6 +87,52 @@ func TestGet(t *testing.T) {
 	}
 	if v.Omg != "wtf" {
 		t.Errorf("expected %q, got %q", "wtf", v.Omg)
+	}
+}
+
+type respTest struct {
+	Response http.Response
+	Expected error
+}
+
+func newTestResponse(statuscode int, body string) http.Response {
+	return http.Response{
+		StatusCode:    statuscode,
+		Status:        http.StatusText(statuscode),
+		ContentLength: int64(len(body)),
+		Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
+	}
+}
+
+var respTests = []respTest{
+	{newTestResponse(200, `{"code": "OK"}`), nil},
+	{newTestResponse(201, `{"code": "OK"}`), nil},
+	{
+		newTestResponse(403, `{"id": "forbidden", "message": "You do not have access to the app myapp."}`),
+		Error{
+			error: errors.New("You do not have access to the app myapp."),
+			Id:    "forbidden",
+		},
+	},
+	{
+		newTestResponse(401, `{"id": "unauthorized", "message": "Long error message."}`),
+		Error{
+			error: errors.New("Long error message."),
+			Id:    "unauthorized",
+		},
+	},
+	{
+		newTestResponse(500, `not valid json {} ""`),
+		errors.New("Unexpected error: Internal Server Error"),
+	},
+}
+
+func TestCheckResp(t *testing.T) {
+	for i, rt := range respTests {
+		resp := checkResp(&rt.Response)
+		if !reflect.DeepEqual(rt.Expected, resp) {
+			t.Errorf("checkResp respTests[%d] expected %v, got %v", i, rt.Expected, resp)
+		}
 	}
 }
 
