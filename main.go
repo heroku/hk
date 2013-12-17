@@ -157,16 +157,22 @@ var (
 )
 
 func main() {
-	if updater != nil {
-		defer updater.backgroundRun() // doesn't run if os.Exit is called
-	}
 	log.SetFlags(0)
 
-	args := os.Args[1:]
-
 	// make sure command is specified, disallow global args
+	args := os.Args[1:]
 	if len(args) < 1 || strings.IndexRune(args[0], '-') == 0 {
 		usage()
+	}
+
+	// Run the update command as early as possible to avoid the possibility of
+	// installations being stranded without updates due to errors in other code
+	if args[0] == cmdUpdate.Name() {
+		cmdUpdate.Run(cmdUpdate, args)
+	}
+
+	if updater != nil {
+		defer updater.backgroundRun() // doesn't run if os.Exit is called
 	}
 
 	apiURL = heroku.DefaultAPIURL
