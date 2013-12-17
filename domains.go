@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/bgentry/heroku-go"
-	"log"
 	"os"
 	"text/tabwriter"
 )
@@ -51,7 +50,8 @@ var cmdDomainAdd = &Command{
 
 func runDomainAdd(cmd *Command, args []string) {
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help domain-add'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	_, err := client.DomainCreate(mustApp(), args[0])
 	must(err)
@@ -67,7 +67,8 @@ var cmdDomainRemove = &Command{
 
 func runDomainRemove(cmd *Command, args []string) {
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help domain-remove'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	must(client.DomainDelete(mustApp(), args[0]))
 }
