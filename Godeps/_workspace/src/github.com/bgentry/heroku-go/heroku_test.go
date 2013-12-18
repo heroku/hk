@@ -11,6 +11,8 @@ import (
 	"testing"
 )
 
+// Tests
+
 func TestAdditionalHeaders(t *testing.T) {
 	multival := []string{"awesome", "multival"}
 	c := &Client{AdditionalHeaders: http.Header{
