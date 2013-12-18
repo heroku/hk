@@ -296,12 +296,19 @@ func (cl commandList) UsageJSON() []commandJSON {
 type commandMap map[string]commandList
 
 func (cm commandMap) UsageJSON(prefix string) template.JS {
-	a := make([]map[string]interface{}, 0)
-	for k, cl := range cm {
-		m := map[string]interface{}{"title": k, "commands": cl.UsageJSON()}
-		a = append(a, m)
+	all := make([]map[string]interface{}, 0)
+	categories := make([]string, len(cm))
+	iall := 0
+	for k := range cm {
+		categories[iall] = k
+		iall += 1
 	}
-	buf, err := json.MarshalIndent(a, prefix, "  ")
+	sort.Strings(categories)
+	for _, k := range categories {
+		m := map[string]interface{}{"title": k, "commands": cm[k].UsageJSON()}
+		all = append(all, m)
+	}
+	buf, err := json.MarshalIndent(all, prefix, "  ")
 	if err != nil {
 		return template.JS(fmt.Sprintf("{\"error\": %q}", err.Error))
 	}

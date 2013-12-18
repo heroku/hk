@@ -84,47 +84,22 @@
         {
           "commands": [
             {
-              "root": "release-info",
-              "arguments": "[-a <app>] <version>",
-              "comment": "show release info"
-            },
-            {
-              "root": "releases",
-              "arguments": "[-a <app>] [<version>...]",
-              "comment": "list releases"
-            },
-            {
-              "root": "rollback",
-              "arguments": "[-a <app>] <version>",
-              "comment": "rolback to a previous release"
-            }
-          ],
-          "title": "release"
-        },
-        {
-          "commands": [
-            {
-              "root": "env",
+              "root": "access",
               "arguments": "[-a <app>]",
-              "comment": "list env vars"
+              "comment": "list access permissions"
             },
             {
-              "root": "get",
-              "arguments": "[-a <app>] <name>",
-              "comment": "get env var (extra)"
+              "root": "access-add",
+              "arguments": "[-a <app>] [-s] <email>",
+              "comment": "give a user access to an app"
             },
             {
-              "root": "set",
-              "arguments": "[-a <app>] <name>=<value>...",
-              "comment": "set env var"
-            },
-            {
-              "root": "unset",
-              "arguments": "[-a <app>] <name>...",
-              "comment": "unset env var"
+              "root": "access-remove",
+              "arguments": "[-a <app>] <email>",
+              "comment": "remove a user's access to an app"
             }
           ],
-          "title": "config"
+          "title": "access"
         },
         {
           "commands": [
@@ -139,52 +114,27 @@
         {
           "commands": [
             {
-              "root": "about",
-              "arguments": "",
-              "comment": "information about hk (e.g. copyright, license, etc.)"
+              "root": "addon-add",
+              "arguments": "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
+              "comment": "add an addon"
             },
             {
-              "root": "api",
-              "arguments": "<method> <path>",
-              "comment": "make a single API request (extra)"
+              "root": "addon-open",
+              "arguments": "[-a <app>] <service>[:<plan>]",
+              "comment": "open an addon (extra)"
             },
             {
-              "root": "creds",
-              "arguments": "",
-              "comment": "show credentials (extra)"
+              "root": "addon-remove",
+              "arguments": "[-a <app>] <service>:<plan>",
+              "comment": "remove an addon"
             },
             {
-              "root": "environ",
-              "arguments": "",
-              "comment": "environment variables used by hk"
-            },
-            {
-              "root": "help",
-              "arguments": "[<topic>]",
-              "comment": ""
-            },
-            {
-              "root": "more",
-              "arguments": "",
-              "comment": "additional commands, less frequently used"
-            },
-            {
-              "root": "plugins",
-              "arguments": "",
-              "comment": "interface to plugin commands"
-            },
-            {
-              "root": "update",
-              "arguments": "",
-              "comment": ""
-            },
-            {
-              "root": "version",
-              "arguments": "",
-              "comment": "show hk version"
+              "root": "addons",
+              "arguments": "[-a <app>] [<service>:<plan>...]",
+              "comment": "list addons"
             }
           ],
-          "title": "hk"
+          "title": "add-on"
         },
         {
           "commands": [
@@ -264,6 +214,51 @@
         {
           "commands": [
             {
+              "root": "env",
+              "arguments": "[-a <app>]",
+              "comment": "list env vars"
+            },
+            {
+              "root": "get",
+              "arguments": "[-a <app>] <name>",
+              "comment": "get env var (extra)"
+            },
+            {
+              "root": "set",
+              "arguments": "[-a <app>] <name>=<value>...",
+              "comment": "set env var"
+            },
+            {
+              "root": "unset",
+              "arguments": "[-a <app>] <name>...",
+              "comment": "unset env var"
+            }
+          ],
+          "title": "config"
+        },
+        {
+          "commands": [
+            {
+              "root": "domain-add",
+              "arguments": "[-a <app>] <domain>",
+              "comment": "add a domain"
+            },
+            {
+              "root": "domain-remove",
+              "arguments": "[-a <app>] <domain>",
+              "comment": "remove a domain"
+            },
+            {
+              "root": "domains",
+              "arguments": "[-a <app>]",
+              "comment": "list domains"
+            }
+          ],
+          "title": "domain"
+        },
+        {
+          "commands": [
+            {
               "root": "dynos",
               "arguments": "[-a <app>] [<name>...]",
               "comment": "list dynos"
@@ -289,67 +284,72 @@
         {
           "commands": [
             {
-              "root": "addon-add",
-              "arguments": "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
-              "comment": "add an addon"
+              "root": "about",
+              "arguments": "",
+              "comment": "information about hk (e.g. copyright, license, etc.)"
             },
             {
-              "root": "addon-open",
-              "arguments": "[-a <app>] <service>[:<plan>]",
-              "comment": "open an addon (extra)"
+              "root": "api",
+              "arguments": "<method> <path>",
+              "comment": "make a single API request (extra)"
             },
             {
-              "root": "addon-remove",
-              "arguments": "[-a <app>] <service>:<plan>",
-              "comment": "remove an addon"
+              "root": "creds",
+              "arguments": "",
+              "comment": "show credentials (extra)"
             },
             {
-              "root": "addons",
-              "arguments": "[-a <app>] [<service>:<plan>...]",
-              "comment": "list addons"
+              "root": "environ",
+              "arguments": "",
+              "comment": "environment variables used by hk"
+            },
+            {
+              "root": "help",
+              "arguments": "[<topic>]",
+              "comment": ""
+            },
+            {
+              "root": "more",
+              "arguments": "",
+              "comment": "additional commands, less frequently used"
+            },
+            {
+              "root": "plugins",
+              "arguments": "",
+              "comment": "interface to plugin commands"
+            },
+            {
+              "root": "update",
+              "arguments": "",
+              "comment": ""
+            },
+            {
+              "root": "version",
+              "arguments": "",
+              "comment": "show hk version"
             }
           ],
-          "title": "add-on"
+          "title": "hk"
         },
         {
           "commands": [
             {
-              "root": "domain-add",
-              "arguments": "[-a <app>] <domain>",
-              "comment": "add a domain"
+              "root": "release-info",
+              "arguments": "[-a <app>] <version>",
+              "comment": "show release info"
             },
             {
-              "root": "domain-remove",
-              "arguments": "[-a <app>] <domain>",
-              "comment": "remove a domain"
+              "root": "releases",
+              "arguments": "[-a <app>] [<version>...]",
+              "comment": "list releases"
             },
             {
-              "root": "domains",
-              "arguments": "[-a <app>]",
-              "comment": "list domains"
+              "root": "rollback",
+              "arguments": "[-a <app>] <version>",
+              "comment": "rolback to a previous release"
             }
           ],
-          "title": "domain"
-        },
-        {
-          "commands": [
-            {
-              "root": "access",
-              "arguments": "[-a <app>]",
-              "comment": "list access permissions"
-            },
-            {
-              "root": "access-add",
-              "arguments": "[-a <app>] [-s] <email>",
-              "comment": "give a user access to an app"
-            },
-            {
-              "root": "access-remove",
-              "arguments": "[-a <app>] <email>",
-              "comment": "remove a user's access to an app"
-            }
-          ],
-          "title": "access"
+          "title": "release"
         }
       ]
 
