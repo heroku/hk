@@ -14,7 +14,7 @@ var cmdAccess = &Command{
 	Usage:    "access",
 	NeedsApp: true,
 	Category: "access",
-	Short:    "list access permissions",
+	Short:    "list access permissions" + extra,
 	Long: `
 List access permissions for an app. The owner is shown first, and
 collaborators are then listed alphabetically.
@@ -101,7 +101,7 @@ var cmdAccessAdd = &Command{
 	Usage:    "access-add [-s] <email>",
 	NeedsApp: true,
 	Category: "access",
-	Short:    "give a user access to an app",
+	Short:    "give a user access to an app" + extra,
 	Long: `
 Give another Heroku user access to an app.
 
@@ -138,7 +138,7 @@ var cmdAccessRemove = &Command{
 	Usage:    "access-remove <email>",
 	NeedsApp: true,
 	Category: "access",
-	Short:    "remove a user's access to an app",
+	Short:    "remove a user's access to an app" + extra,
 	Long: `
 Remove another Heroku user's access to an app.
 
