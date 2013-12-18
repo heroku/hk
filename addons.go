@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
 )
@@ -23,124 +22,59 @@ Lists addons.
 Examples:
 
     $ hk addons
-    heroku-postgresql:crane
-    pgbackups:plus
+    heroku-postgresql-blue  heroku-postgresql:crane  Nov 19 12:40
+    pgbackups               pgbackups:plus           Sep 30 15:43
 
-    $ hk addons pgbackups:plus
-    pgbackups:plus
+    $ hk addons pgbackups
+    pgbackups  pgbackups:plus  Sep 30 15:43
 `,
 }
 
 func runAddons(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
-	listAddons(w, names)
-}
 
-func listAddons(w io.Writer, names []string) {
-	ms := getMergedAddons(mustApp())
-	abbrevEmailResources(ms)
+	appname := mustApp()
+	addons, err := client.AddonList(appname, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 	for i, s := range names {
 		names[i] = strings.ToLower(s)
 	}
-	for _, m := range ms {
-		if len(names) == 0 || addonMatch(m, names) {
-			listAddon(w, m)
+	for _, a := range addons {
+		if len(names) == 0 || addonMatch(a, names) {
+			listAddon(w, a)
 		}
 	}
 }
 
-func abbrevEmailResources(ms []*mergedAddon) {
-	domains := make(map[string]int)
-	for _, m := range ms {
-		parts := strings.SplitN(m.Owner, "@", 2)
-		if len(parts) == 2 {
-			domains["@"+parts[1]]++
-		}
-	}
-	smax, nmax := "", 0
-	for s, n := range domains {
-		if n > nmax {
-			smax = s
-			nmax = n
-		}
-	}
-	for _, m := range ms {
-		if strings.HasSuffix(m.Owner, smax) {
-			m.Owner = m.Owner[:len(m.Owner)-len(smax)]
-		}
-	}
-}
-
-func addonMatch(m *mergedAddon, a []string) bool {
-	for _, s := range a {
-		if s == strings.ToLower(m.Type) {
+func addonMatch(a heroku.Addon, names []string) bool {
+	for _, name := range names {
+		if name == strings.ToLower(a.Name) {
 			return true
 		}
-		if s == strings.ToLower(m.Id) {
+		if name == strings.ToLower(a.Plan.Name) {
+			return true
+		}
+		if name == strings.ToLower(a.Id) {
 			return true
 		}
 	}
 	return false
 }
 
-func listAddon(w io.Writer, m *mergedAddon) {
-	fmt.Fprintln(w, m.String())
-}
-
-type mergedAddon struct {
-	Type  string
-	Owner string
-	Id    string
-}
-
-func (m *mergedAddon) String() string {
-	return m.Type
-}
-
-func getMergedAddons(appname string) []*mergedAddon {
-	var addons []heroku.Addon
-	app := new(heroku.App)
-	app.Name = appname
-	ch := make(chan error)
-	go func() {
-		var err error
-		addons, err = client.AddonList(app.Name, nil)
-		ch <- err
-	}()
-	go func() {
-		var err error
-		app, err = client.AppInfo(app.Name)
-		ch <- err
-	}()
-	if err := <-ch; err != nil {
-		log.Fatal(err)
+func listAddon(w io.Writer, a heroku.Addon) {
+	name := a.Name
+	if name == "" {
+		name = "[unnamed]"
 	}
-	if err := <-ch; err != nil {
-		log.Fatal(err)
-	}
-	return mergeAddons(app, addons)
+	listRec(w,
+		name,
+		a.Plan.Name,
+		prettyTime{a.CreatedAt},
+	)
 }
-
-func mergeAddons(app *heroku.App, addons []heroku.Addon) (ms []*mergedAddon) {
-	// Type, Owner, Id
-	for _, a := range addons {
-		m := new(mergedAddon)
-		ms = append(ms, m)
-		m.Type = a.Plan.Name
-		m.Owner = app.Owner.Email
-		m.Id = a.Id
-	}
-
-	sort.Sort(mergedAddonsByType(ms))
-	return ms
-}
-
-type mergedAddonsByType []*mergedAddon
-
-func (a mergedAddonsByType) Len() int           { return len(a) }
-func (a mergedAddonsByType) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a mergedAddonsByType) Less(i, j int) bool { return a[i].Type < a[j].Type }
 
 var cmdAddonAdd = &Command{
 	Run:      runAddonAdd,
@@ -153,7 +87,7 @@ Adds an addon to an app.
 
 Examples:
 
-    $ hk addon-add heroku-postgresql:hobby-basic
+    $ hk addon-add heroku-postgresql
 
     $ hk addon-add heroku-postgresql:standard-tengu
 `,
@@ -165,11 +99,6 @@ func runAddonAdd(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	plan := args[0]
-	if strings.IndexRune(plan, ':') == -1 {
-		// has service name, but missing plan name
-		cmd.printUsage()
-		os.Exit(2)
-	}
 	var opts heroku.AddonCreateOpts
 	if len(args) > 1 {
 		config, err := parseAddonAddConfig(args[1:])
@@ -203,7 +132,7 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 
 var cmdAddonRemove = &Command{
 	Run:      runAddonRemove,
-	Usage:    "addon-remove <service>:<plan>",
+	Usage:    "addon-remove <name>",
 	NeedsApp: true,
 	Category: "add-on",
 	Short:    "remove an addon",
@@ -212,9 +141,9 @@ Removes an addon from an app.
 
 Examples:
 
-    $ hk addon-remove heroku-postgresql:basic-dev
+    $ hk addon-remove heroku-postgresql-blue
 
-    $ hk addon-remove heroku-postgresql:standard-tengu
+    $ hk addon-remove redistogo
 `,
 }
 
@@ -224,31 +153,53 @@ func runAddonRemove(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	plan := args[0]
-	if strings.IndexRune(plan, ':') == -1 {
-		// has service name, but missing plan name
+	if strings.IndexRune(plan, ':') != -1 {
+		// specified an addon with plan name, unsupported in v3
+		log.Println("Please specify an addon name, not a plan name.")
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	err := client.AddonDelete(mustApp(), plan)
-	must(err)
+	checkAddonError(client.AddonDelete(mustApp(), plan))
 }
 
 var cmdAddonOpen = &Command{
 	Run:      runAddonOpen,
-	Usage:    "addon-open <service>[:<plan>]",
+	Usage:    "addon-open <name>",
 	NeedsApp: true,
 	Category: "add-on",
 	Short:    "open an addon" + extra,
 	Long: `
 Open the addon's management page in your default web browser.
+
+Examples:
+
+    $ hk addon-open heroku-postgresql-blue
+
+    $ hk addon-open redistogo
 `,
 }
 
+// Couldn't find that add-on. Please choose an addon name from addon-list.
 func runAddonOpen(cmd *Command, args []string) {
-	app := mustApp()
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	must(openURL("https://addons-sso.heroku.com/apps/" + app + "/addons/" + args[0]))
+	name := args[0]
+	// look up addon to make sure it exists and to get plan name
+	a, err := client.AddonInfo(appname, name)
+	checkAddonError(err)
+	must(openURL("https://addons-sso.heroku.com/apps/" + appname + "/addons/" + a.Plan.Name))
+}
+
+func checkAddonError(err error) {
+	if err != nil {
+		if hkerr, ok := err.(heroku.Error); ok && hkerr.Id == "not_found" {
+			log.Println(err, "Choose an addon name from `hk addon-list`.")
+		} else {
+			log.Println(err)
+		}
+		os.Exit(2)
+	}
 }
