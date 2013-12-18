@@ -37,13 +37,16 @@ Options:
 Examples:
 
     $ hk run echo "hello"
+    Running ` + "`" + `echo "hello"` + "`" + ` on myapp as run.1234:
     "hello"
 
     $ hk run -s 2X console
+    Running ` + "`" + `console` + "`" + ` on myapp as run.5678:
     Loading production environment (Rails 3.2.14)
     irb(main):001:0> ...
 
     $ hk run -d bin/my_worker
+    Ran ` + "`" + `bin/my_worker` + "`" + ` on myapp as run.4321, detached.
 `,
 }
 
@@ -80,12 +83,16 @@ func runRun(cmd *Command, args []string) {
 		opts.Size = &dynoSize
 	}
 
-	dyno, err := client.DynoCreate(mustApp(), strings.Join(args, " "), &opts)
+	command := strings.Join(args, " ")
+	appname := mustApp()
+	dyno, err := client.DynoCreate(appname, command, &opts)
 	must(err)
 
 	if detachedRun {
+		log.Printf("Ran `%s` on %s as %s, detached.", dyno.Command, appname, dyno.Name)
 		return
 	}
+	log.Printf("Running `%s` on %s as %s:", dyno.Command, appname, dyno.Name)
 
 	u, err := url.Parse(*dyno.AttachURL)
 	if err != nil {

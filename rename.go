@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/bgentry/heroku-go"
+	"log"
 	"os"
 )
 
@@ -28,8 +28,8 @@ func runRename(cmd *Command, args []string) {
 	oldname, newname := args[0], args[1]
 	app, err := client.AppUpdate(oldname, &heroku.AppUpdateOpts{Name: &newname})
 	must(err)
-	fmt.Println("Renamed app to: " + app.Name)
-	fmt.Println("Ensure you update your git remote URL.")
+	log.Printf("Renamed %s to %s.", oldname, app.Name)
+	log.Println("Ensure you update your git remote URL.")
 	// should we automatically update the remote if they specify an app
 	// or via mustApp + conditional logic - RM
 }

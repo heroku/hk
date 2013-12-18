@@ -175,5 +175,5 @@ func runRollback(cmd *Command, args []string) {
 	ver := strings.TrimPrefix(args[0], "v")
 	rel, err := client.ReleaseRollback(mustApp(), ver)
 	must(err)
-	fmt.Printf("Rolled back to v%s as v%d.\n", ver, rel.Version)
+	log.Printf("Rolled back to v%s as v%d.\n", ver, rel.Version)
 }

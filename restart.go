@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"os"
+	"strings"
 )
 
 var cmdRestart = &Command{
@@ -15,20 +17,36 @@ Restart all app dynos, all dynos of a specific type, or a single dyno.
 
 Examples:
 
-  $ hk restart
-  $ hk restart web
-  $ hk restart web.1
+    $ hk restart
+    Restarted all dynos on myapp.
+
+    $ hk restart web
+    Restarted web dynos on myapp.
+
+    $ hk restart web.1
+    Restarted web.1 dyno on myapp.
 `,
 }
 
 func runRestart(cmd *Command, args []string) {
 	if len(args) > 1 {
-		log.Fatal("Invalid usage. See 'hk help restart'")
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	appname := mustApp()
+
+	target := "all"
+	if len(args) == 1 {
+		target = args[0]
+		must(client.DynoRestart(appname, target))
+	} else {
+		must(client.DynoRestartAll(appname))
 	}
 
-	if len(args) == 1 {
-		must(client.DynoRestart(mustApp(), args[0]))
-	} else {
-		must(client.DynoRestartAll(mustApp()))
+	switch {
+	case strings.Contains(target, "."):
+		log.Printf("Restarted %s dyno for %s.", target, appname)
+	default:
+		log.Printf("Restarted %s dynos for %s.", target, appname)
 	}
 }

@@ -162,6 +162,7 @@ func (u *Updater) update() error {
 	if err != nil {
 		return err
 	}
+	log.Printf("Updated v%s -> v%s.", Version, u.info.Version)
 	return nil
 }
 

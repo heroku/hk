@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/bgentry/heroku-go"
 	"io"
+	"log"
 	"os"
 	"text/tabwriter"
 )
@@ -22,8 +22,9 @@ func runTransfer(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	recipient := args[0]
-	_, err := client.AppTransferCreate(mustApp(), recipient)
+	xfer, err := client.AppTransferCreate(mustApp(), recipient)
 	must(err)
+	log.Printf("Requested transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
 }
 
 var cmdTransfers = &Command{
@@ -64,8 +65,9 @@ var cmdTransferAccept = &Command{
 }
 
 func runTransferAccept(cmd *Command, args []string) {
-	transferId := mustLookupTransfer(mustApp())
-	must(updateTransferState(transferId, "accepted"))
+	xfer := mustLookupTransfer(mustApp())
+	must(updateTransferState(xfer.Id, "accepted"))
+	log.Printf("Accepted transfer of %s from %s.", xfer.App.Name, xfer.Recipient.Email)
 }
 
 var cmdTransferDecline = &Command{
@@ -77,8 +79,8 @@ var cmdTransferDecline = &Command{
 }
 
 func runTransferDecline(cmd *Command, args []string) {
-	transferId := mustLookupTransfer(mustApp())
-	must(updateTransferState(transferId, "declined"))
+	xfer := mustLookupTransfer(mustApp())
+	must(updateTransferState(xfer.Id, "declined"))
 }
 
 var cmdTransferCancel = &Command{
@@ -90,26 +92,27 @@ var cmdTransferCancel = &Command{
 }
 
 func runTransferCancel(cmd *Command, args []string) {
-	must(client.AppTransferDelete(mustLookupTransfer(mustApp())))
+	xfer := mustLookupTransfer(mustApp())
+	must(client.AppTransferDelete(xfer.Id))
+	log.Printf("Canceled transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
 }
 
-func mustLookupTransfer(appname string) string {
+func mustLookupTransfer(appname string) (xfer *heroku.AppTransfer) {
 	// If the API starts allowing app identity instead of requiring
 	// app-transfer UUID, this lookup will be unnecessary.
 	transfers, err := client.AppTransferList(nil)
 	must(err)
-	var transferId string
 	for i := range transfers {
 		if transfers[i].App.Name == appname {
-			transferId = transfers[i].Id
+			xfer = &transfers[i]
 			break
 		}
 	}
-	if transferId == "" {
-		fmt.Printf("no pending transfer for app %s\n", appname)
+	if xfer == nil {
+		log.Println("No pending transfer for " + appname + ".")
 		os.Exit(1)
 	}
-	return transferId
+	return
 }
 
 func updateTransferState(transferId, newstate string) error {
