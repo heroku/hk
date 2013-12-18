@@ -46,8 +46,6 @@ const (
 	plat         = runtime.GOOS + "-" + runtime.GOARCH
 )
 
-const devValidTime = 7 * 24 * time.Hour
-
 var ErrHashMismatch = errors.New("new file hash mismatch after patch")
 
 // Update protocol.
