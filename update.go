@@ -111,7 +111,7 @@ func (u *Updater) wantUpdate() bool {
 	if Version == "dev" || readTime(path).After(time.Now()) {
 		return false
 	}
-	wait := 24*time.Hour + randDuration(24*time.Hour)
+	wait := 12*time.Hour + randDuration(8*time.Hour)
 	return writeTime(path, time.Now().Add(wait))
 }
 
