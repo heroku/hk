@@ -64,10 +64,12 @@ func (c *Client) OAuthAuthorizationCreate(scope []string, options *OAuthAuthoriz
 		Description *string  `json:"description,omitempty"`
 		ExpiresIn   *int     `json:"expires_in,omitempty"`
 	}{
-		Scope:       scope,
-		Client:      options.Client,
-		Description: options.Description,
-		ExpiresIn:   options.ExpiresIn,
+		Scope: scope,
+	}
+	if options != nil {
+		params.Client = options.Client
+		params.Description = options.Description
+		params.ExpiresIn = options.ExpiresIn
 	}
 	var oauthAuthorizationRes OAuthAuthorization
 	return &oauthAuthorizationRes, c.Post(&oauthAuthorizationRes, "/oauth/authorizations", params)

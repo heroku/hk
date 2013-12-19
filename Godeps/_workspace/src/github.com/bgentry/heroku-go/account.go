@@ -55,10 +55,12 @@ func (c *Client) AccountUpdate(password string, options *AccountUpdateOpts) (*Ac
 		Beta          *bool   `json:"beta,omitempty"`
 		Name          *string `json:"name,omitempty"`
 	}{
-		Password:      password,
-		AllowTracking: options.AllowTracking,
-		Beta:          options.Beta,
-		Name:          options.Name,
+		Password: password,
+	}
+	if options != nil {
+		params.AllowTracking = options.AllowTracking
+		params.Beta = options.Beta
+		params.Name = options.Name
 	}
 	var accountRes Account
 	return &accountRes, c.Patch(&accountRes, "/account", params)
