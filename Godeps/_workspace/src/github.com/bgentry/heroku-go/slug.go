@@ -44,8 +44,8 @@ func (c *Client) SlugInfo(appIdentity string, slugIdentity string) (*Slug, error
 //
 // appIdentity is the unique identifier of the slug's app. processTypes is the
 // hash mapping process type names to their respective command. options is the
-// struct of optional parameters for this call.
-func (c *Client) SlugCreate(appIdentity string, processTypes map[string]string, options SlugCreateOpts) (*Slug, error) {
+// struct of optional parameters for this action.
+func (c *Client) SlugCreate(appIdentity string, processTypes map[string]string, options *SlugCreateOpts) (*Slug, error) {
 	params := struct {
 		ProcessTypes map[string]string `json:"process_types"`
 		Commit       *string           `json:"commit,omitempty"`

@@ -129,7 +129,7 @@ func runAccessAdd(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	opts := heroku.CollaboratorCreateOpts{Silent: &flagSilent}
-	_, err := client.CollaboratorCreate(mustApp(), args[0], opts)
+	_, err := client.CollaboratorCreate(mustApp(), args[0], &opts)
 	must(err)
 }
 

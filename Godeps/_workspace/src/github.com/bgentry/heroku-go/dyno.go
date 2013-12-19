@@ -48,8 +48,8 @@ type Dyno struct {
 //
 // appIdentity is the unique identifier of the dyno's app. command is the
 // command used to start this process. options is the struct of optional
-// parameters for this call.
-func (c *Client) DynoCreate(appIdentity string, command string, options DynoCreateOpts) (*Dyno, error) {
+// parameters for this action.
+func (c *Client) DynoCreate(appIdentity string, command string, options *DynoCreateOpts) (*Dyno, error) {
 	params := struct {
 		Command string             `json:"command"`
 		Attach  *bool              `json:"attach,omitempty"`

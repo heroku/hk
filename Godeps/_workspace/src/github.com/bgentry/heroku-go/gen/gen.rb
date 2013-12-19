@@ -370,7 +370,7 @@ module Generator
           args << "#{variablecase(propname)} #{type}"
         end
       end
-      args << "options #{titlecase(modelname)}#{link["rel"].capitalize}Opts" unless optional.empty?
+      args << "options *#{titlecase(modelname)}#{link["rel"].capitalize}Opts" unless optional.empty?
     end
 
     if "instances" == link["rel"]
@@ -438,7 +438,7 @@ module Generator
           raise "Didn't expect 3 rpresults"
         end
       end
-      args << "options is the struct of optional parameters for this call." unless optional_keys.empty?
+      args << "options is the struct of optional parameters for this action." unless optional_keys.empty?
     end
 
     if "instances" == link["rel"]
@@ -447,10 +447,10 @@ module Generator
 
     case link["rel"]
     when "create"
-      ["options is the struct of optional parameters for this call."]
+      ["options is the struct of optional parameters for this action."]
     when "update"
       ["#{variablecase(modelname)}Identity is the unique identifier of the #{titlecase(modelname)}.",
-       "options is the struct of optional parameters for this call."]
+       "options is the struct of optional parameters for this action."]
     when "destroy", "self"
       ["#{variablecase(modelname)}Identity is the unique identifier of the #{titlecase(modelname)}."]
     when "instances"

@@ -56,8 +56,8 @@ type OAuthAuthorization struct {
 // Create a new OAuth authorization.
 //
 // scope is the The scope of access OAuth authorization allows. options is the
-// struct of optional parameters for this call.
-func (c *Client) OAuthAuthorizationCreate(scope []string, options OAuthAuthorizationCreateOpts) (*OAuthAuthorization, error) {
+// struct of optional parameters for this action.
+func (c *Client) OAuthAuthorizationCreate(scope []string, options *OAuthAuthorizationCreateOpts) (*OAuthAuthorization, error) {
 	params := struct {
 		Scope       []string `json:"scope"`
 		Client      *string  `json:"client,omitempty"`

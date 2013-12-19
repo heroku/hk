@@ -108,7 +108,7 @@ func runAddonAdd(cmd *Command, args []string) {
 		}
 		opts = heroku.AddonCreateOpts{Config: config}
 	}
-	_, err := client.AddonCreate(mustApp(), plan, opts)
+	_, err := client.AddonCreate(mustApp(), plan, &opts)
 	must(err)
 }
 

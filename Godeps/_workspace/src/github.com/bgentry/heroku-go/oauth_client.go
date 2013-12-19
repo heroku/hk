@@ -86,8 +86,8 @@ func (c *Client) OAuthClientList(lr *ListRange) ([]OAuthClient, error) {
 // Update OAuth client
 //
 // oauthClientIdentity is the unique identifier of the OAuthClient. options is
-// the struct of optional parameters for this call.
-func (c *Client) OAuthClientUpdate(oauthClientIdentity string, options OAuthClientUpdateOpts) (*OAuthClient, error) {
+// the struct of optional parameters for this action.
+func (c *Client) OAuthClientUpdate(oauthClientIdentity string, options *OAuthClientUpdateOpts) (*OAuthClient, error) {
 	var oauthClientRes OAuthClient
 	return &oauthClientRes, c.Patch(&oauthClientRes, "/oauth/clients/"+oauthClientIdentity, options)
 }

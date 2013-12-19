@@ -69,8 +69,8 @@ func (c *Client) ReleaseList(appIdentity string, lr *ListRange) ([]Release, erro
 //
 // appIdentity is the unique identifier of the release's app. slug is the unique
 // identifier of slug. options is the struct of optional parameters for this
-// call.
-func (c *Client) ReleaseCreate(appIdentity string, slug string, options ReleaseCreateOpts) (*Release, error) {
+// action.
+func (c *Client) ReleaseCreate(appIdentity string, slug string, options *ReleaseCreateOpts) (*Release, error) {
 	params := struct {
 		Slug        string  `json:"slug"`
 		Description *string `json:"description,omitempty"`

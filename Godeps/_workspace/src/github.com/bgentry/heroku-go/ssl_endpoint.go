@@ -89,8 +89,8 @@ func (c *Client) SslEndpointList(appIdentity string, lr *ListRange) ([]SslEndpoi
 //
 // appIdentity is the unique identifier of the ssl-endpoint's app.
 // sslEndpointIdentity is the unique identifier of the SslEndpoint. options is
-// the struct of optional parameters for this call.
-func (c *Client) SslEndpointUpdate(appIdentity string, sslEndpointIdentity string, options SslEndpointUpdateOpts) (*SslEndpoint, error) {
+// the struct of optional parameters for this action.
+func (c *Client) SslEndpointUpdate(appIdentity string, sslEndpointIdentity string, options *SslEndpointUpdateOpts) (*SslEndpoint, error) {
 	var sslEndpointRes SslEndpoint
 	return &sslEndpointRes, c.Patch(&sslEndpointRes, "/apps/"+appIdentity+"/ssl-endpoints/"+sslEndpointIdentity, options)
 }

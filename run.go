@@ -80,7 +80,7 @@ func runRun(cmd *Command, args []string) {
 		opts.Size = &dynoSize
 	}
 
-	dyno, err := client.DynoCreate(mustApp(), strings.Join(args, " "), opts)
+	dyno, err := client.DynoCreate(mustApp(), strings.Join(args, " "), &opts)
 	must(err)
 
 	if detachedRun {

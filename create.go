@@ -28,7 +28,7 @@ func runCreate(cmd *Command, args []string) {
 	if len(args) > 0 {
 		opts.Name = &args[0]
 	}
-	app, err := client.AppCreate(opts)
+	app, err := client.AppCreate(&opts)
 	must(err)
 	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
 	fmt.Println(app.Name)

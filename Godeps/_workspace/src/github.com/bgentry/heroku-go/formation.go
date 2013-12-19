@@ -94,8 +94,8 @@ type FormationBatchUpdateOpts struct {
 //
 // appIdentity is the unique identifier of the formation's app.
 // formationIdentity is the unique identifier of the Formation. options is the
-// struct of optional parameters for this call.
-func (c *Client) FormationUpdate(appIdentity string, formationIdentity string, options FormationUpdateOpts) (*Formation, error) {
+// struct of optional parameters for this action.
+func (c *Client) FormationUpdate(appIdentity string, formationIdentity string, options *FormationUpdateOpts) (*Formation, error) {
 	var formationRes Formation
 	return &formationRes, c.Patch(&formationRes, "/apps/"+appIdentity+"/formation/"+formationIdentity, options)
 }

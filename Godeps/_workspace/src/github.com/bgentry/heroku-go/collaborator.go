@@ -31,8 +31,8 @@ type Collaborator struct {
 //
 // appIdentity is the unique identifier of the collaborator's app. user is the
 // unique email address of account or unique identifier of an account. options
-// is the struct of optional parameters for this call.
-func (c *Client) CollaboratorCreate(appIdentity string, user string, options CollaboratorCreateOpts) (*Collaborator, error) {
+// is the struct of optional parameters for this action.
+func (c *Client) CollaboratorCreate(appIdentity string, user string, options *CollaboratorCreateOpts) (*Collaborator, error) {
 	params := struct {
 		User   string `json:"user"`
 		Silent *bool  `json:"silent,omitempty"`

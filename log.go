@@ -79,7 +79,7 @@ func runLog(cmd *Command, args []string) {
 		opts.Lines = &lineopt
 	}
 
-	session, err := client.LogSessionCreate(mustApp(), opts)
+	session, err := client.LogSessionCreate(mustApp(), &opts)
 	if err != nil {
 		log.Fatal(err)
 	}

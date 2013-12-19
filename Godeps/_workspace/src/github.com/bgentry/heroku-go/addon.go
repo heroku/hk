@@ -33,8 +33,8 @@ type Addon struct {
 //
 // appIdentity is the unique identifier of the addon's app. plan is the unique
 // identifier of this plan or unique name of this plan. options is the struct of
-// optional parameters for this call.
-func (c *Client) AddonCreate(appIdentity string, plan string, options AddonCreateOpts) (*Addon, error) {
+// optional parameters for this action.
+func (c *Client) AddonCreate(appIdentity string, plan string, options *AddonCreateOpts) (*Addon, error) {
 	params := struct {
 		Plan   string             `json:"plan"`
 		Config *map[string]string `json:"config,omitempty"`

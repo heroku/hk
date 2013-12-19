@@ -47,8 +47,8 @@ func (c *Client) AccountInfo() (*Account, error) {
 //
 // accountIdentity is the unique identifier of the Account. password is the
 // current password on the account. options is the struct of optional parameters
-// for this call.
-func (c *Client) AccountUpdate(password string, options AccountUpdateOpts) (*Account, error) {
+// for this action.
+func (c *Client) AccountUpdate(password string, options *AccountUpdateOpts) (*Account, error) {
 	params := struct {
 		Password      string  `json:"password"`
 		AllowTracking *bool   `json:"allow_tracking,omitempty"`

@@ -68,8 +68,8 @@ type App struct {
 
 // Create a new app.
 //
-// options is the struct of optional parameters for this call.
-func (c *Client) AppCreate(options AppCreateOpts) (*App, error) {
+// options is the struct of optional parameters for this action.
+func (c *Client) AppCreate(options *AppCreateOpts) (*App, error) {
 	var appRes App
 	return &appRes, c.Post(&appRes, "/apps", options)
 }
@@ -120,8 +120,8 @@ func (c *Client) AppList(lr *ListRange) ([]App, error) {
 // Update an existing app.
 //
 // appIdentity is the unique identifier of the App. options is the struct of
-// optional parameters for this call.
-func (c *Client) AppUpdate(appIdentity string, options AppUpdateOpts) (*App, error) {
+// optional parameters for this action.
+func (c *Client) AppUpdate(appIdentity string, options *AppUpdateOpts) (*App, error) {
 	var appRes App
 	return &appRes, c.Patch(&appRes, "/apps/"+appIdentity, options)
 }

@@ -26,7 +26,7 @@ func runRename(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	oldname, newname := args[0], args[1]
-	app, err := client.AppUpdate(oldname, heroku.AppUpdateOpts{Name: &newname})
+	app, err := client.AppUpdate(oldname, &heroku.AppUpdateOpts{Name: &newname})
 	must(err)
 	fmt.Println("Renamed app to: " + app.Name)
 	fmt.Println("Ensure you update your git remote URL.")

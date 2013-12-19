@@ -26,8 +26,8 @@ type LogSession struct {
 // Create a new log session.
 //
 // appIdentity is the unique identifier of the log-session's app. options is the
-// struct of optional parameters for this call.
-func (c *Client) LogSessionCreate(appIdentity string, options LogSessionCreateOpts) (*LogSession, error) {
+// struct of optional parameters for this action.
+func (c *Client) LogSessionCreate(appIdentity string, options *LogSessionCreateOpts) (*LogSession, error) {
 	var logSessionRes LogSession
 	return &logSessionRes, c.Post(&logSessionRes, "/apps/"+appIdentity+"/log-sessions", options)
 }

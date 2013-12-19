@@ -420,7 +420,7 @@ func (d *diff) Generate() {
 
 func (d *diff) runGen(deadline time.Time) {
 	command := "hkdist gen " + d.Cmd + " " + d.Platform + " " + d.From + " " + d.To
-	_, err := client.DynoCreate(hkgenAppName, command, heroku.DynoCreateOpts{})
+	_, err := client.DynoCreate(hkgenAppName, command, nil)
 	if err != nil {
 		log.Printf("diff.runGen %s -> %s: %s", d.From, d.To, err)
 		return
@@ -455,7 +455,7 @@ func getCreds(host string) (user, pass string) {
 }
 
 func runreq(appname, command string) error {
-	_, err := client.DynoCreate(appname, command, heroku.DynoCreateOpts{})
+	_, err := client.DynoCreate(appname, command, nil)
 	return err
 }
 
@@ -465,7 +465,7 @@ func identityauthreq(desc string, scopes []string) (string, error) {
 		Description: &desc,
 		ExpiresIn:   &expires,
 	}
-	auth, err := client.OAuthAuthorizationCreate(scopes, opts)
+	auth, err := client.OAuthAuthorizationCreate(scopes, &opts)
 	if err != nil {
 		return "", err
 	}
