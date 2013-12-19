@@ -17,10 +17,35 @@ Check out the [readme](https://github.com/heroku/hk/blob/master/README.md#motiva
 
 ## Code Standards
 
-Please `go fmt` everything before submitting.
-
 We strive to write idiomatic Go code, and welcome any suggestions on how to
-better leverage the expressive nature of Go code.
+better leverage the expressive nature of Go code. Here are a few guidelines:
+
+* Please `go fmt` everything before submitting.
+* Package imports from 3rd parties should be listed separately, in the
+  [goimports][goimports] style:
+
+  ```go
+  import (
+    "fmt"
+    "io"
+    "strings"
+
+    "github.com/bgentry/heroku-go"
+    "github.com/heroku/hk/term"
+  )
+  ```
+
+* Use `fmt` to print to stdout, and `log` to print to stderr. Stdout should be
+  reserved for output that is intended to be piped into other processes, while
+  stderr should be used for informational messaging or errors:
+
+  ```go
+  fmt.Println("dodging-samurai-42")
+  fmt.Println("web.1  up  3h  bin/web")
+  
+  log.Println("Created dodging-samurai-42.")
+  log.Println("This is an error :(")
+  ```
 
 ## Style Guide
 
@@ -31,4 +56,5 @@ style guide can be automatically generated using hk's help output:
 $ ./hk help styleguide > hkdist/public/styleguide.html
 ```
 
+[goimports]: https://github.com/bradfitz/goimports
 [styleguide]: https://hk.heroku.com/styleguide.html
