@@ -51,7 +51,9 @@ func (c *Client) SlugCreate(appIdentity string, processTypes map[string]string, 
 		Commit       *string           `json:"commit,omitempty"`
 	}{
 		ProcessTypes: processTypes,
-		Commit:       options.Commit,
+	}
+	if options != nil {
+		params.Commit = options.Commit
 	}
 	var slugRes Slug
 	return &slugRes, c.Post(&slugRes, "/apps/"+appIdentity+"/slugs", params)

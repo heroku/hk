@@ -39,8 +39,10 @@ func (c *Client) AddonCreate(appIdentity string, plan string, options *AddonCrea
 		Plan   string             `json:"plan"`
 		Config *map[string]string `json:"config,omitempty"`
 	}{
-		Plan:   plan,
-		Config: options.Config,
+		Plan: plan,
+	}
+	if options != nil {
+		params.Config = options.Config
 	}
 	var addonRes Addon
 	return &addonRes, c.Post(&addonRes, "/apps/"+appIdentity+"/addons", params)

@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
-			"Rev": "63be3de71d5cbb63c92c341f41d93f2e78e9230a"
+			"Rev": "0b7a19445d798c30093beeedfc1772f71bb557ae"
 		},
 		{
 			"ImportPath": "github.com/bmizerany/pq",
