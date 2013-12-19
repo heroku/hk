@@ -18,12 +18,13 @@ var cmdTransfer = &Command{
 }
 
 func runTransfer(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
 	recipient := args[0]
-	xfer, err := client.AppTransferCreate(mustApp(), recipient)
+	xfer, err := client.AppTransferCreate(appname, recipient)
 	must(err)
 	log.Printf("Requested transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
 }

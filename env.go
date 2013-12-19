@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"strings"
 )
@@ -17,6 +18,10 @@ var cmdEnv = &Command{
 }
 
 func runEnv(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	config, err := client.ConfigVarInfo(mustApp())
 	must(err)
 	var configKeys []string
@@ -47,7 +52,8 @@ Example:
 
 func runGet(cmd *Command, args []string) {
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help get'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	config, err := client.ConfigVarInfo(mustApp())
 	must(err)
@@ -75,10 +81,11 @@ Example:
 }
 
 func runSet(cmd *Command, args []string) {
-	if len(args) < 1 {
-		log.Fatal("Invalid usage. See 'hk help set'")
-	}
 	appname := mustApp()
+	if len(args) == 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	config := make(map[string]*string)
 	for _, arg := range args {
 		i := strings.Index(arg, "=")
@@ -110,10 +117,11 @@ Example:
 }
 
 func runUnset(cmd *Command, args []string) {
-	if len(args) < 1 {
-		log.Fatal("Invalid usage. See 'hk help unset'")
-	}
 	appname := mustApp()
+	if len(args) == 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	config := make(map[string]*string)
 	for _, key := range args {
 		config[key] = nil

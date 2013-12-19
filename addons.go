@@ -97,11 +97,11 @@ Examples:
 }
 
 func runAddonAdd(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) == 0 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	appname := mustApp()
 	plan := args[0]
 	var opts heroku.AddonCreateOpts
 	if len(args) > 1 {
@@ -155,11 +155,11 @@ Examples:
 }
 
 func runAddonRemove(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	appname := mustApp()
 	name := args[0]
 	if strings.IndexRune(name, ':') != -1 {
 		// specified an addon with plan name, unsupported in v3

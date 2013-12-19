@@ -57,6 +57,12 @@ func init() {
 }
 
 func runRun(cmd *Command, args []string) {
+	appname := mustApp()
+	if len(args) == 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+
 	cols, err := term.Cols()
 	if err != nil {
 		log.Fatal(err)
@@ -85,7 +91,6 @@ func runRun(cmd *Command, args []string) {
 	}
 
 	command := strings.Join(args, " ")
-	appname := mustApp()
 	dyno, err := client.DynoCreate(appname, command, &opts)
 	must(err)
 

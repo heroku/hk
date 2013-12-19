@@ -37,11 +37,11 @@ Example:
 
 // takes args of the form "web=1", "worker=3X", web=4:2X etc
 func runScale(cmd *Command, args []string) {
-	if len(args) < 1 {
+	appname := mustApp()
+	if len(args) == 0 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	appname := mustApp()
 	todo := make([]heroku.FormationBatchUpdateOpts, len(args))
 	types := make(map[string]bool)
 	for i, arg := range args {

@@ -28,10 +28,14 @@ Examples:
 `,
 }
 
-func runAccess(cmd *Command, names []string) {
+func runAccess(cmd *Command, args []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	ma := getMergedAccess(mustApp())
 	for _, m := range ma {
 		listRec(w,
@@ -125,12 +129,13 @@ func init() {
 }
 
 func runAccessAdd(cmd *Command, args []string) {
-	if len(args) < 1 {
+	appname := mustApp()
+	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
 	opts := heroku.CollaboratorCreateOpts{Silent: &flagSilent}
-	_, err := client.CollaboratorCreate(mustApp(), args[0], &opts)
+	_, err := client.CollaboratorCreate(appname, args[0], &opts)
 	must(err)
 }
 
@@ -150,9 +155,10 @@ Examples:
 }
 
 func runAccessRemove(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	must(client.CollaboratorDelete(mustApp(), args[0]))
+	must(client.CollaboratorDelete(appname, args[0]))
 }

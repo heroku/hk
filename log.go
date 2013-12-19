@@ -63,6 +63,11 @@ func init() {
 }
 
 func runLog(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+
 	opts := heroku.LogSessionCreateOpts{}
 	if dyno != "" {
 		opts.Dyno = &dyno

@@ -29,11 +29,11 @@ Examples:
 }
 
 func runRestart(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) > 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	appname := mustApp()
 
 	target := "all"
 	if len(args) == 1 {
