@@ -13,8 +13,8 @@ var cmdWhichApp = &Command{
 	Long: `
 Looks for a git remote named "heroku" with a remote URL in the
 correct form. If successful, it prints the corresponding app name.
-Otherwise, it prints an message to stderr and exits with a nonzero
-status.
+Otherwise, it prints an error message to stderr and exits with a
+nonzero status.
 
 To suppress the error message, run 'hk app 2>/dev/null'.
 `,
