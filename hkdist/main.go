@@ -26,10 +26,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/kr/s3"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/kr/s3"
 )
 
 var (

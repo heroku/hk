@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/term"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/term"
 )
 
 var (

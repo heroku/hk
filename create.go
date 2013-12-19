@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/bgentry/heroku-go"
 	"log"
 	"os/exec"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdCreate = &Command{

@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"log"
 	"os"
 	"text/tabwriter"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdDomains = &Command{

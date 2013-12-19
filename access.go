@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/bgentry/heroku-go"
 	"log"
 	"os"
 	"sort"
 	"text/tabwriter"
 	"time"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdAccess = &Command{

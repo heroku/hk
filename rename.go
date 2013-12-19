@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/bgentry/heroku-go"
 	"log"
 	"os"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdRename = &Command{

@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bitbucket.org/kardianos/osext"
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/inconshreveable/go-update"
-	"github.com/kr/binarydist"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,6 +16,10 @@ import (
 	"os/exec"
 	"runtime"
 	"time"
+
+	"bitbucket.org/kardianos/osext"
+	"github.com/inconshreveable/go-update"
+	"github.com/kr/binarydist"
 )
 
 var cmdUpdate = &Command{

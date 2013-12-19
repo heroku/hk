@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdReleases = &Command{

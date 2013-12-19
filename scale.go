@@ -2,12 +2,13 @@ package main
 
 import (
 	"errors"
-	"github.com/bgentry/heroku-go"
 	"log"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdScale = &Command{

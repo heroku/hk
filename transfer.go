@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"os"
 	"text/tabwriter"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdTransfer = &Command{

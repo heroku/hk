@@ -2,8 +2,9 @@ package main
 
 import (
 	"bytes"
-	"github.com/kr/binarydist"
 	"log"
+
+	"github.com/kr/binarydist"
 )
 
 func gen(args []string) {

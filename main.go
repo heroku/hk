@@ -5,8 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/bgentry/go-netrc/netrc"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"net/http"
@@ -19,6 +17,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/bgentry/go-netrc/netrc"
+	"github.com/bgentry/heroku-go"
 )
 
 var (

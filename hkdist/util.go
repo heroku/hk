@@ -7,11 +7,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/kr/s3"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/kr/s3"
 )
 
 type errReader struct {

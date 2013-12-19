@@ -3,8 +3,6 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
-	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/term"
 	"io"
 	"log"
 	"net/url"
@@ -13,6 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/term"
 )
 
 var (

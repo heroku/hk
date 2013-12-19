@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"os"
 	"sort"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdDynos = &Command{
