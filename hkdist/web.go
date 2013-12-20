@@ -5,15 +5,16 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
-	"github.com/bmizerany/pq"
-	"github.com/gorilla/mux"
-	"github.com/kr/secureheader"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/bmizerany/pq"
+	"github.com/gorilla/mux"
+	"github.com/kr/secureheader"
 )
 
 const (

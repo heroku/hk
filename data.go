@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/bgentry/heroku-go"
 	"time"
+
+	"github.com/bgentry/heroku-go"
 )
 
 type Release struct {

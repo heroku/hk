@@ -192,10 +192,14 @@ params := struct {
 <%- required.each do |propname| %>
   <%= titlecase(propname) %>: <%= variablecase(propname) %>,
 <%- end %>
-<%- optional.each do |propname| %>
-  <%= titlecase(propname) %>: options.<%= titlecase(propname) %>,
-<%- end %>
 }
+<%- if optional.count > 0 %>
+  if options != nil {
+  <%- optional.each do |propname| %>
+    params.<%= titlecase(propname) %> = options.<%= titlecase(propname) %>
+  <%- end %>
+  }
+<%- end %>
 LINK_PARAMS_TEMPLATE
 
 #   definition:               data,

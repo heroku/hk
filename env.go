@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"strings"
 )
@@ -17,6 +18,10 @@ var cmdEnv = &Command{
 }
 
 func runEnv(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	config, err := client.ConfigVarInfo(mustApp())
 	must(err)
 	var configKeys []string
@@ -40,14 +45,15 @@ Get the value of an env var.
 
 Example:
 
-  $ hk get BUILDPACK_URL
-  http://github.com/kr/heroku-buildpack-inline.git
+    $ hk get BUILDPACK_URL
+    http://github.com/kr/heroku-buildpack-inline.git
 `,
 }
 
 func runGet(cmd *Command, args []string) {
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help get'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	config, err := client.ConfigVarInfo(mustApp())
 	must(err)
@@ -65,17 +71,20 @@ var cmdSet = &Command{
 	Category: "config",
 	Short:    "set env var",
 	Long: `
-Set the value of a env var.
+Set the value of an env var.
 
 Example:
 
-  $ hk set BUILDPACK_URL=http://github.com/kr/heroku-buildpack-inline.git
+    $ hk set BUILDPACK_URL=http://github.com/kr/heroku-buildpack-inline.git
+    Set env vars and restarted myapp.
 `,
 }
 
 func runSet(cmd *Command, args []string) {
-	if len(args) < 1 {
-		log.Fatal("Invalid usage. See 'hk help set'")
+	appname := mustApp()
+	if len(args) == 0 {
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	config := make(map[string]*string)
 	for _, arg := range args {
@@ -86,8 +95,9 @@ func runSet(cmd *Command, args []string) {
 		val := arg[i+1:]
 		config[arg[:i]] = &val
 	}
-	_, err := client.ConfigVarUpdate(mustApp(), config)
+	_, err := client.ConfigVarUpdate(appname, config)
 	must(err)
+	log.Printf("Set env vars and restarted " + appname + ".")
 }
 
 var cmdUnset = &Command{
@@ -97,22 +107,26 @@ var cmdUnset = &Command{
 	Category: "config",
 	Short:    "unset env var",
 	Long: `
-Unset a env var.
+Unset an env var.
 
 Example:
 
-  $ hk unset BUILDPACK_URL
+    $ hk unset BUILDPACK_URL
+    Unset env vars and restarted myapp.
 `,
 }
 
 func runUnset(cmd *Command, args []string) {
-	if len(args) < 1 {
-		log.Fatal("Invalid usage. See 'hk help unset'")
+	appname := mustApp()
+	if len(args) == 0 {
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	config := make(map[string]*string)
 	for _, key := range args {
 		config[key] = nil
 	}
-	_, err := client.ConfigVarUpdate(mustApp(), config)
+	_, err := client.ConfigVarUpdate(appname, config)
 	must(err)
+	log.Printf("Unset env vars and restarted %s.", appname)
 }

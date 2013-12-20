@@ -126,11 +126,11 @@ func runHelp(cmd *Command, args []string) {
 
 	if lookupPlugin(args[0]) != "" {
 		_, _, long := pluginInfo(string(args[0]))
-		fmt.Println(long)
+		log.Println(long)
 		return
 	}
 
-	fmt.Fprintf(os.Stderr, "Unknown help topic: %q. Run 'hk help'.\n", args[0])
+	log.Printf("Unknown help topic: %q. Run 'hk help'.\n", args[0])
 	os.Exit(2)
 }
 
@@ -203,7 +203,7 @@ func printUsage() {
 		runListNames = append(runListNames, plugins[i].Name())
 	}
 
-	usageTemplate.Execute(os.Stdout, struct {
+	usageTemplate.Execute(os.Stderr, struct {
 		Commands       []*Command
 		Plugins        []plugin
 		Dev            bool
@@ -224,7 +224,7 @@ func printExtra() {
 		}
 	}
 
-	extraTemplate.Execute(os.Stdout, struct {
+	extraTemplate.Execute(os.Stderr, struct {
 		Commands        []*Command
 		MaxRunExtraName int
 	}{

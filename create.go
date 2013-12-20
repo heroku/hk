@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"github.com/bgentry/heroku-go"
+	"log"
 	"os/exec"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdCreate = &Command{
@@ -11,7 +12,17 @@ var cmdCreate = &Command{
 	Usage:    "create [-r <region>] [<name>]",
 	Category: "app",
 	Short:    "create an app",
-	Long:     `Create creates a new heroku app.`,
+	Long: `
+Create creates a new heroku app.
+
+Examples:
+
+    $ hk create
+    Created dodging-samurai-42.
+
+    $ hk create -r eu myapp
+    Created myapp.
+`,
 }
 
 var flagRegion string
@@ -31,5 +42,5 @@ func runCreate(cmd *Command, args []string) {
 	app, err := client.AppCreate(&opts)
 	must(err)
 	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-	fmt.Println(app.Name)
+	log.Printf("Created %s.", app.Name)
 }

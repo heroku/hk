@@ -5,8 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/bgentry/go-netrc/netrc"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"net/http"
@@ -19,6 +17,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/bgentry/go-netrc/netrc"
+	"github.com/bgentry/heroku-go"
 )
 
 var (
@@ -366,7 +367,7 @@ func openURL(url string) error {
 		args = []string{"/c", "start " + url}
 	default:
 		if _, err := exec.LookPath("xdg-open"); err != nil {
-			fmt.Println("xdg-open is required to open web pages on " + runtime.GOOS)
+			log.Println("xdg-open is required to open web pages on " + runtime.GOOS)
 			os.Exit(2)
 		}
 		command = "xdg-open"
@@ -375,7 +376,7 @@ func openURL(url string) error {
 	if runtime.GOOS != "windows" {
 		p, err := exec.LookPath(command)
 		if err != nil {
-			fmt.Printf("Error finding path to %q: %s\n", command, err)
+			log.Printf("Error finding path to %q: %s\n", command, err)
 			os.Exit(2)
 		}
 		command = p

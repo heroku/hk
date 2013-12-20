@@ -47,8 +47,9 @@ func runSSHKeyAdd(cmd *Command, args []string) {
 		log.Fatal(err)
 	}
 
-	_, err = client.KeyCreate(string(keys))
+	key, err := client.KeyCreate(string(keys))
 	must(err)
+	log.Printf("Key %s for %s added.", abbrev(key.Fingerprint, 15), key.Email)
 }
 
 func findSSHKeys() ([]byte, error) {

@@ -75,8 +75,10 @@ func (c *Client) ReleaseCreate(appIdentity string, slug string, options *Release
 		Slug        string  `json:"slug"`
 		Description *string `json:"description,omitempty"`
 	}{
-		Slug:        slug,
-		Description: options.Description,
+		Slug: slug,
+	}
+	if options != nil {
+		params.Description = options.Description
 	}
 	var releaseRes Release
 	return &releaseRes, c.Post(&releaseRes, "/apps/"+appIdentity+"/releases", params)

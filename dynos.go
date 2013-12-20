@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"os"
 	"sort"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdDynos = &Command{
@@ -38,11 +39,17 @@ Examples:
 func runDynos(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
+
+	if len(names) > 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	listDynos(w, names)
 }
 
 func listDynos(w io.Writer, names []string) {
-	dynos, err := client.DynoList(mustApp(), nil)
+	appname := mustApp()
+	dynos, err := client.DynoList(appname, nil)
 	must(err)
 	sort.Sort(DynosByName(dynos))
 

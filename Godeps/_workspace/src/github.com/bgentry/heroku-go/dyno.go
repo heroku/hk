@@ -57,9 +57,11 @@ func (c *Client) DynoCreate(appIdentity string, command string, options *DynoCre
 		Size    *string            `json:"size,omitempty"`
 	}{
 		Command: command,
-		Attach:  options.Attach,
-		Env:     options.Env,
-		Size:    options.Size,
+	}
+	if options != nil {
+		params.Attach = options.Attach
+		params.Env = options.Env
+		params.Size = options.Size
 	}
 	var dynoRes Dyno
 	return &dynoRes, c.Post(&dynoRes, "/apps/"+appIdentity+"/dynos", params)

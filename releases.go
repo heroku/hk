@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdReleases = &Command{
@@ -145,11 +146,12 @@ var cmdReleaseInfo = &Command{
 }
 
 func runReleaseInfo(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		log.Fatal("Invalid usage. See 'hk help release-info'")
 	}
 	ver := strings.TrimPrefix(args[0], "v")
-	rel, err := client.ReleaseInfo(mustApp(), ver)
+	rel, err := client.ReleaseInfo(appname, ver)
 	must(err)
 
 	fmt.Printf("Version:  v%d\n", rel.Version)
@@ -169,11 +171,12 @@ var cmdRollback = &Command{
 }
 
 func runRollback(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		log.Fatal("Invalid usage. See 'hk help rollback'")
 	}
 	ver := strings.TrimPrefix(args[0], "v")
-	rel, err := client.ReleaseRollback(mustApp(), ver)
+	rel, err := client.ReleaseRollback(appname, ver)
 	must(err)
-	fmt.Printf("Rolled back to v%s as v%d.\n", ver, rel.Version)
+	log.Printf("Rolled back %s to v%s as v%d.\n", appname, ver, rel.Version)
 }

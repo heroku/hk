@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/exec"
 )
@@ -18,6 +19,7 @@ There is no going back, so be sure you mean it.
 Example:
 
     $ hk destroy myapp
+    Destroyed myapp.
 `,
 }
 
@@ -26,9 +28,10 @@ func runDestroy(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	name := args[0]
-	must(client.AppDelete(name))
-	for _, remote := range gitRemotes(gitURL(name)) {
+	appname := args[0]
+	must(client.AppDelete(appname))
+	log.Printf("Destroyed %s.", appname)
+	for _, remote := range gitRemotes(gitURL(appname)) {
 		exec.Command("git", "remote", "rm", remote).Run()
 	}
 }

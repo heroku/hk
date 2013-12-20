@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
+	"log"
 	"os"
 	"text/tabwriter"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdDomains = &Command{
@@ -29,6 +31,10 @@ func runDomains(cmd *Command, args []string) {
 	defer w.Flush()
 
 	appname := mustApp()
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	domains, err := client.DomainList(appname, &heroku.ListRange{
 		Field: "hostname",
 		Max:   1000,
@@ -49,12 +55,15 @@ var cmdDomainAdd = &Command{
 }
 
 func runDomainAdd(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	_, err := client.DomainCreate(mustApp(), args[0])
+	domain := args[0]
+	_, err := client.DomainCreate(appname, domain)
 	must(err)
+	log.Printf("Added %s to %s.", domain, appname)
 }
 
 var cmdDomainRemove = &Command{
@@ -66,9 +75,12 @@ var cmdDomainRemove = &Command{
 }
 
 func runDomainRemove(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	must(client.DomainDelete(mustApp(), args[0]))
+	domain := args[0]
+	must(client.DomainDelete(appname, domain))
+	log.Printf("Removed %s from %s.", domain, appname)
 }

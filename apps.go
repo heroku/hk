@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdApps = &Command{

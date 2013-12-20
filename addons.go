@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"log"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdAddons = &Command{
@@ -88,12 +89,15 @@ Adds an addon to an app.
 Examples:
 
     $ hk addon-add heroku-postgresql
+    Added heroku-postgresql:hobby-dev to myapp.
 
     $ hk addon-add heroku-postgresql:standard-tengu
+    Added heroku-postgresql:standard-tengu to myapp.
 `,
 }
 
 func runAddonAdd(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) == 0 {
 		cmd.printUsage()
 		os.Exit(2)
@@ -103,13 +107,14 @@ func runAddonAdd(cmd *Command, args []string) {
 	if len(args) > 1 {
 		config, err := parseAddonAddConfig(args[1:])
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			os.Exit(2)
 		}
 		opts = heroku.AddonCreateOpts{Config: config}
 	}
-	_, err := client.AddonCreate(mustApp(), plan, &opts)
+	addon, err := client.AddonCreate(appname, plan, &opts)
 	must(err)
+	log.Printf("Added %s to %s.", addon.Plan.Name, appname)
 }
 
 func parseAddonAddConfig(config []string) (*map[string]string, error) {
@@ -142,24 +147,28 @@ Removes an addon from an app.
 Examples:
 
     $ hk addon-remove heroku-postgresql-blue
+    Removed heroku-postgresql-blue from myapp.
 
     $ hk addon-remove redistogo
+    Removed redistogo from myapp.
 `,
 }
 
 func runAddonRemove(cmd *Command, args []string) {
+	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	plan := args[0]
-	if strings.IndexRune(plan, ':') != -1 {
+	name := args[0]
+	if strings.IndexRune(name, ':') != -1 {
 		// specified an addon with plan name, unsupported in v3
 		log.Println("Please specify an addon name, not a plan name.")
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	checkAddonError(client.AddonDelete(mustApp(), plan))
+	checkAddonError(client.AddonDelete(appname, name))
+	log.Printf("Removed %s from %s.", name, appname)
 }
 
 var cmdAddonOpen = &Command{

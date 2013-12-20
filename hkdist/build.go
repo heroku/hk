@@ -6,8 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/bgentry/go-netrc/netrc"
-	"github.com/bgentry/heroku-go"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,6 +17,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/bgentry/go-netrc/netrc"
+	"github.com/bgentry/heroku-go"
 )
 
 const numgen = 20

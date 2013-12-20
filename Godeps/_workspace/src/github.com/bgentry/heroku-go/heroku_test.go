@@ -80,15 +80,41 @@ func TestGet(t *testing.T) {
 	ts, _, c := newTestServerAndClient(t, req)
 	defer ts.Close()
 
-	var v struct {
+	var respBody struct {
 		Omg string
 	}
-	err := c.Get(&v, "/")
+	err := c.Get(&respBody, "/")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if v.Omg != "wtf" {
-		t.Errorf("expected %q, got %q", "wtf", v.Omg)
+	if respBody.Omg != "wtf" {
+		t.Errorf("expected %q, got %q", "wtf", respBody.Omg)
+	}
+}
+
+func TestPost(t *testing.T) {
+	resp := testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   `{"omg": "wtf"}`,
+	}
+	req := newTestRequest("POST", "/", `{"Wtf": "bbq"}`, resp)
+
+	ts, _, c := newTestServerAndClient(t, req)
+	defer ts.Close()
+
+	var reqBody struct {
+		Wtf string
+	}
+	reqBody.Wtf = "bbq"
+	var respBody struct {
+		Omg string
+	}
+	err := c.Post(&respBody, "/", reqBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if respBody.Omg != "wtf" {
+		t.Errorf("expected %q, got %q", "wtf", respBody.Omg)
 	}
 }
 

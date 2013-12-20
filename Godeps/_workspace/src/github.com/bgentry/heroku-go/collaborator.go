@@ -37,8 +37,10 @@ func (c *Client) CollaboratorCreate(appIdentity string, user string, options *Co
 		User   string `json:"user"`
 		Silent *bool  `json:"silent,omitempty"`
 	}{
-		User:   user,
-		Silent: options.Silent,
+		User: user,
+	}
+	if options != nil {
+		params.Silent = options.Silent
 	}
 	var collaboratorRes Collaborator
 	return &collaboratorRes, c.Post(&collaboratorRes, "/apps/"+appIdentity+"/collaborators", params)

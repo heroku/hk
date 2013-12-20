@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/term"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/term"
 )
 
 var (
@@ -62,6 +63,11 @@ func init() {
 }
 
 func runLog(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+
 	opts := heroku.LogSessionCreateOpts{}
 	if dyno != "" {
 		opts.Dyno = &dyno

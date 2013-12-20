@@ -1,5 +1,7 @@
 package main
 
+import "os"
+
 var cmdOpen = &Command{
 	Run:      runOpen,
 	Usage:    "open",
@@ -10,5 +12,9 @@ var cmdOpen = &Command{
 }
 
 func runOpen(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	must(openURL("https://" + mustApp() + ".herokuapp.com/"))
 }
