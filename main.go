@@ -191,6 +191,7 @@ func main() {
 		Debug:     debug,
 	}
 	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+		client.HTTP = &http.Client{Transport: http.DefaultTransport}
 		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
