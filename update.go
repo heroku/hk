@@ -136,9 +136,12 @@ func (u *Updater) update() error {
 	}
 	bin, err := u.fetchAndVerifyPatch(old)
 	if err != nil {
-		if err == ErrHashMismatch {
+		switch err {
+		case ErrNoPatchAvailable:
+			log.Println("update: no patch available, falling back to full binary")
+		case ErrHashMismatch:
 			log.Println("update: hash mismatch from patched binary")
-		} else {
+		default:
 			log.Println("update: patching binary,", err)
 		}
 		bin, err = u.fetchAndVerifyFullBin()
@@ -240,15 +243,22 @@ func randDuration(n time.Duration) time.Duration {
 	return time.Duration(rand.Int63n(int64(n)))
 }
 
+var ErrNoPatchAvailable = errors.New("no patch available")
+
 func fetch(url string) (io.ReadCloser, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode != 200 {
+	switch resp.StatusCode {
+	case 200:
+		return resp.Body, nil
+	case 401, 403, 404:
+		return nil, ErrNoPatchAvailable
+	default:
 		return nil, fmt.Errorf("bad http status from %s: %v", url, resp.Status)
 	}
-	return resp.Body, nil
+	panic("not reached")
 }
 
 func readTime(path string) time.Time {
