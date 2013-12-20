@@ -173,6 +173,7 @@ func main() {
 	// installations being stranded without updates due to errors in other code
 	if args[0] == cmdUpdate.Name() {
 		cmdUpdate.Run(cmdUpdate, args)
+		return
 	} else if updater != nil {
 		defer updater.backgroundRun() // doesn't run if os.Exit is called
 	}
