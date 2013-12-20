@@ -38,7 +38,7 @@ func runApps(cmd *Command, names []string) {
 	var apps []heroku.App
 	if len(names) == 0 {
 		var err error
-		apps, err = client.AppList(nil)
+		apps, err = client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
 		must(err)
 	} else {
 		appch := make(chan *heroku.App, len(names))
