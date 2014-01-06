@@ -86,17 +86,17 @@
             {
               "root": "access",
               "arguments": "[-a <app>]",
-              "comment": "list access permissions"
+              "comment": "list access permissions (extra)"
             },
             {
               "root": "access-add",
               "arguments": "[-a <app>] [-s] <email>",
-              "comment": "give a user access to an app"
+              "comment": "give a user access to an app (extra)"
             },
             {
               "root": "access-remove",
               "arguments": "[-a <app>] <email>",
-              "comment": "remove a user's access to an app"
+              "comment": "remove a user's access to an app (extra)"
             }
           ],
           "title": "access"
@@ -120,12 +120,12 @@
             },
             {
               "root": "addon-open",
-              "arguments": "[-a <app>] <service>[:<plan>]",
+              "arguments": "[-a <app>] <name>",
               "comment": "open an addon (extra)"
             },
             {
               "root": "addon-remove",
-              "arguments": "[-a <app>] <service>:<plan>",
+              "arguments": "[-a <app>] <name>",
               "comment": "remove an addon"
             },
             {
@@ -162,6 +162,21 @@
               "root": "log",
               "arguments": "[-a <app>] [-n <lines>] [-s <source>] [-d <dyno>]",
               "comment": "stream app log lines"
+            },
+            {
+              "root": "maintenance",
+              "arguments": "[-a <app>]",
+              "comment": "show app maintenance mode"
+            },
+            {
+              "root": "maintenance-disable",
+              "arguments": "[-a <app>]",
+              "comment": "disable maintenance mode"
+            },
+            {
+              "root": "maintenance-enable",
+              "arguments": "[-a <app>]",
+              "comment": "enable maintenance mode"
             },
             {
               "root": "open",
