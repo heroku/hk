@@ -188,7 +188,6 @@ Examples:
 `,
 }
 
-// Couldn't find that add-on. Please choose an addon name from addons.
 func runAddonOpen(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
