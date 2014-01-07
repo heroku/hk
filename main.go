@@ -259,10 +259,25 @@ func getCreds(u string) (user, pass string) {
 
 	m, err := netrc.FindMachine(netrcPath(), apiURL.Host)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return "", ""
+		}
 		log.Fatalf("netrc error (%s): %v", apiURL.Host, err)
 	}
 
 	return m.Login, m.Password
+}
+
+// exists returns whether the given file or directory exists or not
+func fileExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 func app() (string, error) {
