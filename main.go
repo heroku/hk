@@ -40,6 +40,10 @@ func homePath() string {
 }
 
 func netrcPath() string {
+	if s := os.Getenv("NETRC_PATH"); s != "" {
+		return s
+	}
+
 	if runtime.GOOS == "windows" {
 		return filepath.Join(homePath(), "_netrc")
 	}
@@ -183,6 +187,9 @@ func main() {
 		apiURL = s
 	}
 	user, pass := getCreds(apiURL)
+	if user == "" && pass == "" {
+		log.Fatalf("No credentials found in HEROKU_API_URL or netrc.")
+	}
 	debug := os.Getenv("HKDEBUG") != ""
 	client = heroku.Client{
 		URL:       apiURL,
