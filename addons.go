@@ -188,7 +188,7 @@ Examples:
 `,
 }
 
-// Couldn't find that add-on. Please choose an addon name from addon-list.
+// Couldn't find that add-on. Please choose an addon name from addons.
 func runAddonOpen(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
@@ -205,7 +205,7 @@ func runAddonOpen(cmd *Command, args []string) {
 func checkAddonError(err error) {
 	if err != nil {
 		if hkerr, ok := err.(heroku.Error); ok && hkerr.Id == "not_found" {
-			log.Println(err, "Choose an addon name from `hk addon-list`.")
+			log.Println(err, "Choose an addon name from `hk addons`.")
 		} else {
 			log.Println(err)
 		}
