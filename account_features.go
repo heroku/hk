@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -49,6 +50,34 @@ func listAccountFeatures(w io.Writer, features []heroku.AccountFeature) {
 			f.Name,
 		)
 	}
+}
+
+var cmdAccountFeatureInfo = &Command{
+	Run:      runAccountFeatureInfo,
+	Usage:    "account-feature-info <feature>",
+	Category: "app",
+	Short:    "show info for an account feature",
+	Long: `
+Shows detailed info for a Heroku Labs feature on an account.
+
+Example:
+
+  $ hk feature-info preboot
+  ...
+`,
+}
+
+func runAccountFeatureInfo(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	feature, err := client.AccountFeatureInfo(args[0])
+	must(err)
+	fmt.Printf("Name:         %s\n", feature.Name)
+	fmt.Printf("Docs:         %s\n", feature.DocURL)
+	fmt.Printf("Enabled:      %t\n", feature.Enabled)
+	fmt.Printf("Description:  %s\n", feature.Description)
 }
 
 var cmdAccountFeatureEnable = &Command{
