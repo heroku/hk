@@ -38,7 +38,7 @@ func runAddons(cmd *Command, names []string) {
 	appname := mustApp()
 	addons, err := client.AddonList(appname, nil)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	for i, s := range names {
 		names[i] = strings.ToLower(s)

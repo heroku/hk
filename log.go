@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -87,17 +86,17 @@ func runLog(cmd *Command, args []string) {
 
 	session, err := client.LogSessionCreate(mustApp(), &opts)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	resp, err := http.Get(session.LogplexURL)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	if resp.StatusCode/100 != 2 {
 		if resp.StatusCode/100 == 4 {
-			log.Fatal("Unauthorized")
+			printError("Unauthorized")
 		} else {
-			log.Fatal("Unexpected error: " + resp.Status)
+			printError("Unexpected error: " + resp.Status)
 		}
 	}
 
@@ -108,9 +107,8 @@ func runLog(cmd *Command, args []string) {
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		if _, err = writer.Writeln(scanner.Text()); err != nil {
-			log.Fatal(err)
-		}
+		_, err = writer.Writeln(scanner.Text())
+		must(err)
 	}
 
 	resp.Body.Close()

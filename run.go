@@ -65,11 +65,11 @@ func runRun(cmd *Command, args []string) {
 
 	cols, err := term.Cols()
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	lines, err := term.Lines()
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 
 	attached := !detachedRun
@@ -102,12 +102,12 @@ func runRun(cmd *Command, args []string) {
 
 	u, err := url.Parse(*dyno.AttachURL)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 
 	cn, err := tls.Dial("tcp", u.Host, nil)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	defer cn.Close()
 
@@ -115,13 +115,13 @@ func runRun(cmd *Command, args []string) {
 
 	_, err = io.WriteString(cn, u.Path[1:]+"\r\n")
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 
 	for {
 		_, pre, err := br.ReadLine()
 		if err != nil {
-			log.Fatal(err)
+			printError(err.Error())
 		}
 		if !pre {
 			break
@@ -131,7 +131,7 @@ func runRun(cmd *Command, args []string) {
 	if term.IsTerminal(os.Stdin) && term.IsTerminal(os.Stdout) {
 		err = term.MakeRaw(os.Stdin)
 		if err != nil {
-			log.Fatal(err)
+			printError(err.Error())
 		}
 		defer term.Restore(os.Stdin)
 
@@ -161,6 +161,6 @@ func runRun(cmd *Command, args []string) {
 	go cp(os.Stdout, br)
 	go cp(cn, os.Stdin)
 	if err = <-errc; err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 }

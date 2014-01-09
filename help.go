@@ -103,7 +103,7 @@ func runHelp(cmd *Command, args []string) {
 		return // not os.Exit(2); success
 	}
 	if len(args) != 1 {
-		log.Fatal("too many arguments")
+		printError("too many arguments")
 	}
 	switch args[0] {
 	case helpMore.Name():
@@ -180,11 +180,11 @@ func printUsage() {
 			if os.IsNotExist(err) {
 				continue
 			}
-			log.Fatal(err)
+			printError(err.Error())
 		}
 		fi, err := d.Readdir(-1)
 		if err != nil {
-			log.Fatal(err)
+			printError(err.Error())
 		}
 		for _, f := range fi {
 			if !f.IsDir() && f.Mode()&0111 != 0 {
@@ -265,7 +265,7 @@ func printStyleGuide() {
 		cmap,
 	})
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 }
 

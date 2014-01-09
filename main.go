@@ -203,7 +203,7 @@ func main() {
 	}
 	user, pass := getCreds(apiURL)
 	if user == "" && pass == "" {
-		log.Fatalf("No credentials found in HEROKU_API_URL or netrc.")
+		printError("No credentials found in HEROKU_API_URL or netrc.")
 	}
 	debug := os.Getenv("HKDEBUG") != ""
 	client = heroku.Client{
@@ -266,13 +266,13 @@ func main() {
 		usage()
 	}
 	err := execPlugin(path, args)
-	log.Fatal("exec error: ", err)
+	printError("exec error: %s", err)
 }
 
 func getCreds(u string) (user, pass string) {
 	apiURL, err := url.Parse(u)
 	if err != nil {
-		log.Fatalf("invalid API URL: %s", err)
+		printError("invalid API URL: %s", err)
 	}
 	if apiURL.Host == "" {
 		printError("missing API host: %s", u)
@@ -287,7 +287,7 @@ func getCreds(u string) (user, pass string) {
 		if os.IsNotExist(err) {
 			return "", ""
 		}
-		log.Fatalf("netrc error (%s): %v", apiURL.Host, err)
+		printError("netrc error (%s): %v", apiURL.Host, err)
 	}
 
 	return m.Login, m.Password
@@ -350,7 +350,7 @@ func isNotFound(err error) bool {
 func mustApp() string {
 	name, err := app()
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	return name
 }

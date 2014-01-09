@@ -35,10 +35,10 @@ This command is unlisted, since users never have to run it directly.
 
 func runUpdate(cmd *Command, args []string) {
 	if updater == nil {
-		log.Fatal("Dev builds don't support auto-updates")
+		printError("Dev builds don't support auto-updates")
 	}
 	if err := updater.update(); err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 }
 

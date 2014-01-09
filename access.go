@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"sort"
 	"text/tabwriter"
@@ -67,10 +66,10 @@ func getMergedAccess(appname string) []*mergedAccess {
 		ch <- err
 	}()
 	if err := <-ch; err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	if err := <-ch; err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	return mergeAccess(app, collaborators)
 }
