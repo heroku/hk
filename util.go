@@ -26,20 +26,20 @@ func fileExists(path string) (bool, error) {
 
 func must(err error) {
 	if err != nil {
-		printError("error:", err.Error())
+		printError(err.Error())
 	}
 }
 
-func printError(prefix, message string) {
-	log.Fatal(colorizeMessage("red", prefix, message))
+func printError(message string, args ...interface{}) {
+	log.Fatal(colorizeMessage("red", "error:", message, args...))
 }
 
-func colorizeMessage(color, prefix, message string) string {
+func colorizeMessage(color, prefix, message string, args ...interface{}) string {
 	prefResult := ""
 	if prefix != "" {
 		prefResult = ansi.Color(prefix, color+"+b") + " " + ansi.ColorCode("reset")
 	}
-	return prefResult + ansi.Color(message, color) + ansi.ColorCode("reset")
+	return prefResult + ansi.Color(fmt.Sprintf(message, args...), color) + ansi.ColorCode("reset")
 }
 
 func listRec(w io.Writer, a ...interface{}) {
