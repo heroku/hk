@@ -10,7 +10,6 @@ import (
 	"regexp"
 
 	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/term"
 	"github.com/mgutz/ansi"
 )
 
@@ -102,11 +101,8 @@ func runLog(cmd *Command, args []string) {
 		}
 	}
 
-	writer := LineWriter(WriterAdapter{os.Stdout})
-
-	if term.IsTerminal(os.Stdout) {
-		writer = newColorizer(writer)
-	}
+	// colors are disabled globally in main() depending on term.IsTerminal()
+	writer := newColorizer(os.Stdout)
 
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Split(bufio.ScanLines)
@@ -120,26 +116,14 @@ func runLog(cmd *Command, args []string) {
 	resp.Body.Close()
 }
 
-type LineWriter interface {
-	Writeln(p string) (int, error)
-}
-
-type WriterAdapter struct {
-	io.Writer
-}
-
-func (w WriterAdapter) Writeln(p string) (n int, err error) {
-	return fmt.Fprintln(w, p)
-}
-
 type colorizer struct {
 	colors      map[string]string
 	colorScheme []string
 	filter      *regexp.Regexp
-	writer      LineWriter
+	writer      io.Writer
 }
 
-func newColorizer(writer LineWriter) *colorizer {
+func newColorizer(writer io.Writer) *colorizer {
 	return &colorizer{
 		colors: make(map[string]string),
 		colorScheme: []string{
@@ -167,8 +151,8 @@ func (c *colorizer) resolve(p string) string {
 func (c *colorizer) Writeln(p string) (n int, err error) {
 	if c.filter.MatchString(p) {
 		submatches := c.filter.FindStringSubmatch(p)
-		return c.writer.Writeln(ansi.Color(submatches[1], c.resolve(submatches[2])) + ansi.ColorCode("reset") + submatches[3])
+		return fmt.Fprintln(c.writer, ansi.Color(submatches[1], c.resolve(submatches[2]))+ansi.ColorCode("reset")+submatches[3])
 	}
 
-	return c.writer.Writeln(p)
+	return fmt.Fprintln(c.writer, p)
 }
