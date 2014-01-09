@@ -270,6 +270,9 @@ func getCreds(u string) (user, pass string) {
 	if err != nil {
 		log.Fatalf("invalid API URL: %s", err)
 	}
+	if apiURL.Host == "" {
+		printError("missing API host: %s", u)
+	}
 	if apiURL.User != nil {
 		pw, _ := apiURL.User.Password()
 		return apiURL.User.Username(), pw
