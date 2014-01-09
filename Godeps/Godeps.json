@@ -21,7 +21,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
-			"Rev": "0b7a19445d798c30093beeedfc1772f71bb557ae"
+			"Rev": "9c384535973e15660e678ce3561a906830ee407d"
 		},
 		{
 			"ImportPath": "github.com/bmizerany/pq",
@@ -50,6 +50,10 @@
 		{
 			"ImportPath": "github.com/kr/secureheader",
 			"Rev": "08f5355a148253e68cbd0a230b3803510e4419b2"
+		},
+		{
+			"ImportPath": "github.com/mgutz/ansi",
+			"Rev": "376eb392d7d7e2ae025da0037c73cf8c20a428d8"
 		}
 	]
 }

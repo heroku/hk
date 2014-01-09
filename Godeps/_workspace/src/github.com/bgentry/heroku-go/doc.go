@@ -85,5 +85,15 @@ wish to set any optional parameters, simply provide a nil in place of the
 options struct, and the options will be omitted from the API request entirely.
 For any individual options that you don't want to set, simply leave them as nil,
 and they will be omitted from the API request.
+
+List Ranges & Sorting
+
+Results from the Heroku API are paginated. You can specify a field for sorting
+and adjust the maximum number of records returned by providing a ListRange to
+API calls that list objects:
+
+  apps, err = client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
+
+Note Field is required when setting any range options.
 */
 package heroku

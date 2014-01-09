@@ -20,6 +20,8 @@ import (
 
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/term"
+	"github.com/mgutz/ansi"
 )
 
 var (
@@ -191,6 +193,10 @@ func main() {
 		return
 	} else if updater != nil {
 		defer updater.backgroundRun() // doesn't run if os.Exit is called
+	}
+
+	if !term.IsTerminal(os.Stdout) {
+		ansi.DisableColors(true)
 	}
 
 	apiURL = heroku.DefaultAPIURL
@@ -365,8 +371,20 @@ func mustApp() string {
 
 func must(err error) {
 	if err != nil {
-		log.Fatal(err)
+		printError("error:", err.Error())
 	}
+}
+
+func printError(prefix, message string) {
+	log.Fatal(colorizeMessage("red", prefix, message))
+}
+
+func colorizeMessage(color, prefix, message string) string {
+	prefResult := ""
+	if prefix != "" {
+		prefResult = ansi.Color(prefix, color+"+b") + " " + ansi.ColorCode("reset")
+	}
+	return prefResult + ansi.Color(message, color) + ansi.ColorCode("reset")
 }
 
 func listRec(w io.Writer, a ...interface{}) {
