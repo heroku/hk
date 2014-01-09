@@ -44,7 +44,7 @@ func runSSHKeyAdd(cmd *Command, args []string) {
 		if _, ok := err.(privKeyError); ok {
 			log.Println("refusing to upload")
 		}
-		log.Fatal(err)
+		printError(err.Error())
 	}
 
 	key, err := client.KeyCreate(string(keys))

@@ -4,13 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
 
 	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/term"
+	"github.com/mgutz/ansi"
 )
 
 var (
@@ -87,66 +86,50 @@ func runLog(cmd *Command, args []string) {
 
 	session, err := client.LogSessionCreate(mustApp(), &opts)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	resp, err := http.Get(session.LogplexURL)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	if resp.StatusCode/100 != 2 {
 		if resp.StatusCode/100 == 4 {
-			log.Fatal("Unauthorized")
+			printError("Unauthorized")
 		} else {
-			log.Fatal("Unexpected error: " + resp.Status)
+			printError("Unexpected error: " + resp.Status)
 		}
 	}
 
-	writer := LineWriter(WriterAdapter{os.Stdout})
-
-	if term.IsTerminal(os.Stdout) {
-		writer = newColorizer(writer)
-	}
+	// colors are disabled globally in main() depending on term.IsTerminal()
+	writer := newColorizer(os.Stdout)
 
 	scanner := bufio.NewScanner(resp.Body)
 	scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
-		if _, err = writer.Writeln(scanner.Text()); err != nil {
-			log.Fatal(err)
-		}
+		_, err = writer.Writeln(scanner.Text())
+		must(err)
 	}
 
 	resp.Body.Close()
-}
-
-type LineWriter interface {
-	Writeln(p string) (int, error)
-}
-
-type WriterAdapter struct {
-	io.Writer
-}
-
-func (w WriterAdapter) Writeln(p string) (n int, err error) {
-	return fmt.Fprintln(w, p)
 }
 
 type colorizer struct {
 	colors      map[string]string
 	colorScheme []string
 	filter      *regexp.Regexp
-	writer      LineWriter
+	writer      io.Writer
 }
 
-func newColorizer(writer LineWriter) *colorizer {
+func newColorizer(writer io.Writer) *colorizer {
 	return &colorizer{
 		colors: make(map[string]string),
 		colorScheme: []string{
-			"36", //cyan
-			"33", //yellow
-			"32", //green
-			"35", //magenta
-			"31", //red
+			"cyan",
+			"yellow",
+			"green",
+			"magenta",
+			"red",
 		},
 		filter: regexp.MustCompile(`(?s)^(.*?\[([\w-]+)(?:[\d\.]+)?\]:)(.*)?$`),
 		writer: writer,
@@ -166,8 +149,8 @@ func (c *colorizer) resolve(p string) string {
 func (c *colorizer) Writeln(p string) (n int, err error) {
 	if c.filter.MatchString(p) {
 		submatches := c.filter.FindStringSubmatch(p)
-		return c.writer.Writeln(fmt.Sprintf("\033[%sm%s\033[0m%s", c.resolve(submatches[2]), submatches[1], submatches[3]))
+		return fmt.Fprintln(c.writer, ansi.Color(submatches[1], c.resolve(submatches[2]))+ansi.ColorCode("reset")+submatches[3])
 	}
 
-	return c.writer.Writeln(p)
+	return fmt.Fprintln(c.writer, p)
 }

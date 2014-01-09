@@ -148,7 +148,8 @@ var cmdReleaseInfo = &Command{
 func runReleaseInfo(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help release-info'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	ver := strings.TrimPrefix(args[0], "v")
 	rel, err := client.ReleaseInfo(appname, ver)
@@ -173,7 +174,8 @@ var cmdRollback = &Command{
 func runRollback(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help rollback'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	ver := strings.TrimPrefix(args[0], "v")
 	rel, err := client.ReleaseRollback(appname, ver)

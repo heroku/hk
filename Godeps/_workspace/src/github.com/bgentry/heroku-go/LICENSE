@@ -1,6 +1,8 @@
 The MIT License (MIT)
 
-Copyright (c) 2013 Blake Gentry
+Copyright (c) 2014 Blake Gentry.
+
+Portions of the base API client (main.go) are Copyright (c) 2013 Keith Rarick.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
