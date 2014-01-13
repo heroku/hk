@@ -142,7 +142,19 @@ var cmdReleaseInfo = &Command{
 	NeedsApp: true,
 	Category: "release",
 	Short:    "show release info",
-	Long:     `release-info shows detailed information about a release.`,
+	Long: `
+release-info shows detailed information about a release.
+
+Examples:
+
+    $ hk release-info v116
+    Version:  v116
+    By:       user@test.com
+    Change:   Deploy 62b3059
+    When:     2014-01-13T21:20:57Z
+    Id:       abcd1234-5678-def0-8190-12347060474d
+    Slug:     98765432-82ba-10ba-fedc-8d206789d062
+`,
 }
 
 func runReleaseInfo(cmd *Command, args []string) {
