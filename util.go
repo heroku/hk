@@ -68,6 +68,37 @@ func (s prettyTime) String() string {
 	return s.Local().Format("Jan _2  2006")
 }
 
+type prettyDuration struct {
+	time.Duration
+}
+
+func (a prettyDuration) String() string {
+	switch d := a.Duration; {
+	case d > 2*24*time.Hour:
+		return a.Unit(24*time.Hour, "d")
+	case d > 2*time.Hour:
+		return a.Unit(time.Hour, "h")
+	case d > 2*time.Minute:
+		return a.Unit(time.Minute, "m")
+	}
+	return a.Unit(time.Second, "s")
+}
+
+func (a prettyDuration) Unit(u time.Duration, s string) string {
+	return fmt.Sprintf("%2d", roundDur(a.Duration, u)) + s
+}
+
+func roundDur(d, k time.Duration) int {
+	return int((d + k/2 - 1) / k)
+}
+
+func abbrev(s string, n int) string {
+	if len(s) > n {
+		return s[:n-1] + "…"
+	}
+	return s
+}
+
 func openURL(url string) error {
 	var command string
 	var args []string

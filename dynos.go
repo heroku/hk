@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"sort"
@@ -110,10 +109,6 @@ func (p DynosByName) Less(i, j int) bool {
 	return p[i].Type < p[j].Type || p[i].Type == p[j].Type && dynoSeq(&p[i]) < dynoSeq(&p[j])
 }
 
-type prettyDuration struct {
-	time.Duration
-}
-
 func dynoAge(d *heroku.Dyno) time.Duration {
 	return time.Now().Sub(d.UpdatedAt)
 }
@@ -121,31 +116,4 @@ func dynoAge(d *heroku.Dyno) time.Duration {
 func dynoSeq(d *heroku.Dyno) int {
 	i, _ := strconv.Atoi(strings.TrimPrefix(d.Name, d.Type+"."))
 	return i
-}
-
-func (a prettyDuration) String() string {
-	switch d := a.Duration; {
-	case d > 2*24*time.Hour:
-		return a.Unit(24*time.Hour, "d")
-	case d > 2*time.Hour:
-		return a.Unit(time.Hour, "h")
-	case d > 2*time.Minute:
-		return a.Unit(time.Minute, "m")
-	}
-	return a.Unit(time.Second, "s")
-}
-
-func (a prettyDuration) Unit(u time.Duration, s string) string {
-	return fmt.Sprintf("%2d", roundDur(a.Duration, u)) + s
-}
-
-func roundDur(d, k time.Duration) int {
-	return int((d + k/2 - 1) / k)
-}
-
-func abbrev(s string, n int) string {
-	if len(s) > n {
-		return s[:n-1] + "…"
-	}
-	return s
 }
