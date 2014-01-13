@@ -180,7 +180,17 @@ var cmdRollback = &Command{
 	Usage:    "rollback <version>",
 	NeedsApp: true,
 	Category: "release",
-	Short:    "rolback to a previous release",
+	Short:    "roll back to a previous release",
+	Long: `
+Rollback re-releases an app at an older version. This action
+creates a new release based on the older release, then restarts
+the app's dynos on the new release.
+
+Examples:
+
+    $ hk rollback v4
+    Rolled back myapp to v4 as v7.
+`,
 }
 
 func runRollback(cmd *Command, args []string) {
