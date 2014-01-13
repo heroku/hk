@@ -39,19 +39,19 @@ Examples:
     2013-10-17T00:17:35.066089+00:00 app[web.1]: Completed 302 Found in 0ms
     2013-10-17T00:17:35.079095+00:00 heroku[router]: at=info method=GET path=/ host=www.heroku.com fwd="1.2.3.4" dyno=web.1 connect=1ms service=6ms status=302 bytes=95
     2013-10-17T00:17:35.505389+00:00 heroku[nginx]: 1.2.3.4 - - [17/Oct/2013:00:17:35 +0000] "GET / HTTP/1.1" 301 5 "-" "Amazon Route 53 Health Check Service" www.heroku.com
-		...
+    ...
 
     $ hk log -n 2 -s app -d web
-		2013-10-17T00:17:34.288521+00:00 app[web.1]: Completed 200 OK in 10ms (Views: 10.0ms)
+    2013-10-17T00:17:34.288521+00:00 app[web.1]: Completed 200 OK in 10ms (Views: 10.0ms)
     2013-10-17T00:17:33.918946+00:00 heroku[web.5]: Started GET "/" for 1.2.3.4 at 2013-10-17 00:17:32 +0000
-		2013-10-17T00:17:34.667654+00:00 heroku[router]: at=info method=GET path=/ host=www.heroku.com fwd="1.2.3.4" dyno=web.5 connect=3ms service=8ms status=301 bytes=0
+    2013-10-17T00:17:34.667654+00:00 heroku[router]: at=info method=GET path=/ host=www.heroku.com fwd="1.2.3.4" dyno=web.5 connect=3ms service=8ms status=301 bytes=0
     2013-10-17T00:17:35.079095+00:00 heroku[router]: at=info method=GET path=/ host=www.heroku.com fwd="1.2.3.4" dyno=web.1 connect=1ms service=6ms status=302 bytes=95
-		...
+    ...
 
     $ hk log -d web.5
     2013-10-17T00:17:33.918946+00:00 app[web.5]: Started GET "/" for 1.2.3.4 at 2013-10-17 00:17:32 +0000
     2013-10-17T00:17:33.918658+00:00 app[web.5]: Processing by PagesController#root as HTML
-		...
+    ...
 `,
 }
 

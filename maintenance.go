@@ -19,8 +19,8 @@ Maintenance shows the current maintenance mode state of an app.
 
 Example:
 
-  $ hk maintenance
-  enabled
+    $ hk maintenance
+    enabled
 `,
 }
 
@@ -49,8 +49,8 @@ Enables maintenance mode on an app.
 
 Example:
 
-  $ hk maintenance-enable
-  Enabled maintenance mode on myapp.
+    $ hk maintenance-enable
+    Enabled maintenance mode on myapp.
 `,
 }
 
@@ -76,8 +76,8 @@ Disables maintenance mode on an app.
 
 Example:
 
-  $ hk maintenance-disable
-  Disabled maintenance mode on myapp.
+    $ hk maintenance-disable
+    Disabled maintenance mode on myapp.
 `,
 }
 

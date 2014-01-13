@@ -21,10 +21,10 @@ Features lists Heroku Labs features for an app.
 
 Example:
 
-  $ hk features
-  +  preboot
-     user-env-compile
-  +  websockets
+    $ hk features
+    +  preboot
+       user-env-compile
+    +  websockets
 `,
 }
 
@@ -66,8 +66,8 @@ Shows detailed info for a Heroku Labs feature on an app.
 
 Example:
 
-  $ hk feature-info preboot
-  ...
+    $ hk feature-info preboot
+    ...
 `,
 }
 
@@ -97,8 +97,8 @@ Enables a Heroku Labs feature on an app.
 
 Example:
 
-  $ hk feature-enable preboot
-  Enabled preboot on myapp.
+    $ hk feature-enable preboot
+    Enabled preboot on myapp.
 `,
 }
 
@@ -125,8 +125,8 @@ Disables a Heroku Labs feature on an app.
 
 Example:
 
-  $ hk feature-disable websockets
-  Disabled websockets on myapp.
+    $ hk feature-disable websockets
+    Disabled websockets on myapp.
 `,
 }
 

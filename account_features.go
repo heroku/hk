@@ -20,8 +20,8 @@ Account-features lists Heroku Labs features for your account.
 
 Example:
 
-  $ hk account-features
-  +  pipelines
+    $ hk account-features
+    +  pipelines
 `,
 }
 
@@ -62,8 +62,8 @@ Shows detailed info for a Heroku Labs feature on an account.
 
 Example:
 
-  $ hk feature-info preboot
-  ...
+    $ hk feature-info preboot
+    ...
 `,
 }
 
@@ -90,8 +90,8 @@ Enables a Heroku Labs feature on your account.
 
 Example:
 
-  $ hk account-feature-enable pipelines
-  Enabled pipelines.
+    $ hk account-feature-enable pipelines
+    Enabled pipelines.
 `,
 }
 
@@ -116,8 +116,8 @@ Disables a Heroku Labs feature on your account.
 
 Example:
 
-  $ hk account-feature-disable pipelines
-  Disabled pipelines.
+    $ hk account-feature-disable pipelines
+    Disabled pipelines.
 `,
 }
 

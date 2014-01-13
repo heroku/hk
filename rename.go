@@ -17,7 +17,7 @@ Rename renames a heroku app.
 
 Example:
 
-  $ hk rename myapp myapp2
+    $ hk rename myapp myapp2
 `,
 }
 
