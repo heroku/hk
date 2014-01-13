@@ -17,18 +17,17 @@ var cmdApps = &Command{
 	Category: "app",
 	Short:    "list apps",
 	Long: `
-Lists apps. Shows the app name, owner, slug size, and last
-release time (or time the app was created, if it's never been
-released).
+Lists apps. Shows the app name, owner, and last release time (or
+time the app was created, if it's never been released).
 
 Examples:
 
     $ hk apps
-    myapp   me  1234k  Jan 2 12:34
-    myapp2  me  4567k  Jan 2 12:34
+    myapp   user@test.com         Jan 2 12:34
+    myapp2  user@longdomainname…  Jan 2 12:34
 
     $ hk apps myapp
-    myapp  me  1234k  Jan 2 12:34
+    myapp  user@test.com  Jan 2 12:34
 `,
 }
 
@@ -103,18 +102,13 @@ func abbrevEmailApps(apps []heroku.App) {
 }
 
 func listApp(w io.Writer, a heroku.App) {
-	size := 0
-	if a.SlugSize != nil {
-		size = *a.SlugSize
-	}
 	t := a.CreatedAt
 	if a.ReleasedAt != nil {
 		t = *a.ReleasedAt
 	}
 	listRec(w,
 		a.Name,
-		abbrev(a.Owner.Email, 10),
-		fmt.Sprintf("%6dk", (size+501)/1000),
+		abbrev(a.Owner.Email, 20),
 		prettyTime{t},
 	)
 }
