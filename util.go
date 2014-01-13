@@ -34,6 +34,10 @@ func printError(message string, args ...interface{}) {
 	log.Fatal(colorizeMessage("red", "error:", message, args...))
 }
 
+func printWarning(message string, args ...interface{}) {
+	log.Fatal(colorizeMessage("yellow", "warning:", message, args...))
+}
+
 func colorizeMessage(color, prefix, message string, args ...interface{}) string {
 	prefResult := ""
 	if prefix != "" {
