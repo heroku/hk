@@ -154,6 +154,11 @@
         {
           "commands": [
             {
+              "root": "account-feature-info",
+              "arguments": "<feature>",
+              "comment": "show info for an account feature"
+            },
+            {
               "root": "apps",
               "arguments": "[<name>...]",
               "comment": "list apps"
@@ -177,6 +182,11 @@
               "root": "feature-enable",
               "arguments": "[-a <app>] <feature>",
               "comment": "enable an app feature"
+            },
+            {
+              "root": "feature-info",
+              "arguments": "[-a <app>] <feature>",
+              "comment": "show info for an app feature"
             },
             {
               "root": "features",
@@ -391,7 +401,7 @@
             {
               "root": "rollback",
               "arguments": "[-a <app>] <version>",
-              "comment": "rolback to a previous release"
+              "comment": "roll back to a previous release"
             }
           ],
           "title": "release"

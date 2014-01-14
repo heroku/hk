@@ -13,6 +13,8 @@ import (
 	"github.com/bgentry/heroku-go"
 )
 
+var releaseCount int
+
 var cmdReleases = &Command{
 	Run:      runReleases,
 	Usage:    "releases [<version>...]",
@@ -27,14 +29,22 @@ description.
 Examples:
 
     $ hk releases
-    v1  bob@me.com   3ae20c2  Jun 12 18:28  Deploy 3ae20c2
-    v2  john@me.com  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
-    v3  john@me.com           Jun 13 18:31  Rollback to v2
+    v1  bob@test.com  3ae20c2  Jun 12 18:28  Deploy 3ae20c2
+    v2  john@me.com   0fda0ae  Jun 13 18:14  Deploy 0fda0ae
+    v3  john@me.com            Jun 13 18:31  Rollback to v2
 
-    $ hk releases 2 3
+    $ hk releases -n 2
     v2  john  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
     v3  john           Jun 13 18:31  Rollback to v2
+
+    $ hk releases 1 3
+    v1  bob@test.com  3ae20c2  Jun 12 18:28  Deploy 3ae20c2
+    v3  john@me.com            Jun 13 18:31  Rollback to v2
 `,
+}
+
+func init() {
+	cmdReleases.Flag.IntVar(&releaseCount, "n", 30, "max number of recent releases to display")
 }
 
 func runReleases(cmd *Command, versions []string) {
@@ -46,7 +56,11 @@ func runReleases(cmd *Command, versions []string) {
 func listReleases(w io.Writer, versions []string) {
 	appname := mustApp()
 	if len(versions) == 0 {
-		hrels, err := client.ReleaseList(appname, nil)
+		hrels, err := client.ReleaseList(appname, &heroku.ListRange{
+			Field:      "version",
+			Max:        releaseCount,
+			Descending: true,
+		})
 		must(err)
 		rels := make([]*Release, len(hrels))
 		for i := range hrels {
