@@ -18,6 +18,7 @@ import (
 
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/postgresql"
 	"github.com/heroku/hk/term"
 	"github.com/mgutz/ansi"
 )
@@ -156,6 +157,7 @@ var commands = []*Command{
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,
 	cmdOpen,
+	cmdPgInfo,
 	cmdTransfer,
 	cmdTransfers,
 	cmdTransferAccept,
@@ -171,6 +173,7 @@ var commands = []*Command{
 var (
 	flagApp   string
 	client    heroku.Client
+	pgclient  postgresql.Client
 	hkAgent   = "hk/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	userAgent = hkAgent + " " + heroku.DefaultUserAgent
 )
@@ -197,40 +200,7 @@ func main() {
 		ansi.DisableColors(true)
 	}
 
-	apiURL = heroku.DefaultAPIURL
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		apiURL = s
-	}
-	user, pass := getCreds(apiURL)
-	if user == "" && pass == "" {
-		printError("No credentials found in HEROKU_API_URL or netrc.")
-	}
-	debug := os.Getenv("HKDEBUG") != ""
-	client = heroku.Client{
-		URL:       apiURL,
-		Username:  user,
-		Password:  pass,
-		UserAgent: userAgent,
-		Debug:     debug,
-	}
-	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
-		client.HTTP = &http.Client{Transport: http.DefaultTransport}
-		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		client.URL = s
-	}
-	client.AdditionalHeaders = http.Header{}
-	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
-		if i := strings.Index(h, ":"); i >= 0 {
-			client.AdditionalHeaders.Set(
-				strings.TrimSpace(h[:i]),
-				strings.TrimSpace(h[i+1:]),
-			)
-		}
-	}
+	initClients()
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] && cmd.Run != nil {
@@ -267,6 +237,47 @@ func main() {
 	}
 	err := execPlugin(path, args)
 	printError("exec error: %s", err)
+}
+
+func initClients() {
+	apiURL = heroku.DefaultAPIURL
+	user, pass := getCreds(apiURL)
+	if user == "" && pass == "" {
+		printError("No credentials found in HEROKU_API_URL or netrc.")
+	}
+	debug := os.Getenv("HKDEBUG") != ""
+	client = heroku.Client{
+		URL:       apiURL,
+		Username:  user,
+		Password:  pass,
+		UserAgent: userAgent,
+		Debug:     debug,
+	}
+	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+		client.HTTP = &http.Client{Transport: http.DefaultTransport}
+		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		client.URL = s
+	}
+	client.AdditionalHeaders = http.Header{}
+	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
+		if i := strings.Index(h, ":"); i >= 0 {
+			client.AdditionalHeaders.Set(
+				strings.TrimSpace(h[:i]),
+				strings.TrimSpace(h[i+1:]),
+			)
+		}
+	}
+
+	pgclient = postgresql.Client{
+		Username:  user,
+		Password:  pass,
+		UserAgent: userAgent,
+		Debug:     debug,
+	}
 }
 
 func getCreds(u string) (user, pass string) {
