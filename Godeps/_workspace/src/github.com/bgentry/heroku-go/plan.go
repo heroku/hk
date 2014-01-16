@@ -41,18 +41,20 @@ type Plan struct {
 
 // Info for existing plan.
 //
+// addonServiceIdentity is the unique identifier of the plan's addon-service.
 // planIdentity is the unique identifier of the Plan.
-func (c *Client) PlanInfo(planIdentity string) (*Plan, error) {
+func (c *Client) PlanInfo(addonServiceIdentity string, planIdentity string) (*Plan, error) {
 	var plan Plan
-	return &plan, c.Get(&plan, "/addon-services/{(%2Fschema%2Faddon-service%23%2Fdefinitions%2Fidentity)}/plans/"+planIdentity)
+	return &plan, c.Get(&plan, "/addon-services/"+addonServiceIdentity+"/plans/"+planIdentity)
 }
 
 // List existing plans.
 //
-// lr is an optional ListRange that sets the Range options for the paginated
-// list of results.
-func (c *Client) PlanList(lr *ListRange) ([]Plan, error) {
-	req, err := c.NewRequest("GET", "/addon-services/{(%2Fschema%2Faddon-service%23%2Fdefinitions%2Fidentity)}/plans", nil)
+// addonServiceIdentity is the unique identifier of the plan's addon-service. lr
+// is an optional ListRange that sets the Range options for the paginated list
+// of results.
+func (c *Client) PlanList(addonServiceIdentity string, lr *ListRange) ([]Plan, error) {
+	req, err := c.NewRequest("GET", "/addon-services/"+addonServiceIdentity+"/plans", nil)
 	if err != nil {
 		return nil, err
 	}

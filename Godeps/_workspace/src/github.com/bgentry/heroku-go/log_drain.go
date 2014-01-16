@@ -24,6 +24,9 @@ type LogDrain struct {
 	// unique identifier of this log drain
 	Id string `json:"id"`
 
+	// token associated with the log drain
+	Token string `json:"token"`
+
 	// when log drain was updated
 	UpdatedAt time.Time `json:"updated_at"`
 
