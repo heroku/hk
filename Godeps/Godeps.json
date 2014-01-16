@@ -24,6 +24,10 @@
 			"Rev": "1a4db8b1e1aaaa5775640df25aa6bec9c3602cc7"
 		},
 		{
+			"ImportPath": "github.com/bgentry/testnet",
+			"Rev": "05450cdcf16c84d5b08dc9bb617250aa7b63c8ff"
+		},
+		{
 			"ImportPath": "github.com/bmizerany/pq",
 			"Rev": "284a1d41dcc27fe8ccc413c339464698ab99f6d1"
 		},
@@ -54,6 +58,10 @@
 		{
 			"ImportPath": "github.com/mgutz/ansi",
 			"Rev": "376eb392d7d7e2ae025da0037c73cf8c20a428d8"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "4c55a02a9da3f9b9daf583332a2a82c38a4521be"
 		}
 	]
 }

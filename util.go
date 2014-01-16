@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/mgutz/ansi"
@@ -97,6 +98,13 @@ func abbrev(s string, n int) string {
 		return s[:n-1] + "…"
 	}
 	return s
+}
+
+func ensurePrefix(val, prefix string) string {
+	if !strings.HasPrefix(val, prefix) {
+		return prefix + val
+	}
+	return val
 }
 
 func openURL(url string) error {
