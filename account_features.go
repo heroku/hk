@@ -55,7 +55,7 @@ func listAccountFeatures(w io.Writer, features []heroku.AccountFeature) {
 var cmdAccountFeatureInfo = &Command{
 	Run:      runAccountFeatureInfo,
 	Usage:    "account-feature-info <feature>",
-	Category: "app",
+	Category: "account",
 	Short:    "show info for an account feature",
 	Long: `
 Shows detailed info for a Heroku Labs feature on an account.
