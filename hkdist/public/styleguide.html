@@ -114,6 +114,11 @@
               "comment": "enable an account feature"
             },
             {
+              "root": "account-feature-info",
+              "arguments": "<feature>",
+              "comment": "show info for an account feature"
+            },
+            {
               "root": "account-features",
               "arguments": "",
               "comment": "list account features"
@@ -153,11 +158,6 @@
         },
         {
           "commands": [
-            {
-              "root": "account-feature-info",
-              "arguments": "<feature>",
-              "comment": "show info for an account feature"
-            },
             {
               "root": "apps",
               "arguments": "[<name>...]",
@@ -222,11 +222,6 @@
               "root": "open",
               "arguments": "[-a <app>]",
               "comment": "open app in a web browser (extra)"
-            },
-            {
-              "root": "pg-info",
-              "arguments": "[-a <app>] <dbname>",
-              "comment": "show heroku postgres database info"
             },
             {
               "root": "rename",
@@ -390,6 +385,16 @@
             }
           ],
           "title": "hk"
+        },
+        {
+          "commands": [
+            {
+              "root": "pg-info",
+              "arguments": "[-a <app>] <dbname>",
+              "comment": "show Heroku Postgres database info"
+            }
+          ],
+          "title": "pg"
         },
         {
           "commands": [
