@@ -94,7 +94,7 @@ func listReleases(w io.Writer, versions []string) {
 	for _ = range versions {
 		select {
 		case err := <-errch:
-			fmt.Fprintln(os.Stderr, err)
+			printError(err.Error())
 		case rel := <-relch:
 			if rel != nil {
 				rels = append(rels, newRelease(rel))
