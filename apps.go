@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"sort"
@@ -58,7 +57,7 @@ func runApps(cmd *Command, names []string) {
 		for _ = range names {
 			select {
 			case err := <-errch:
-				fmt.Fprintln(os.Stderr, err)
+				printError(err.Error())
 			case app := <-appch:
 				if app != nil {
 					apps = append(apps, *app)
