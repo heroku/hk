@@ -159,6 +159,7 @@ var commands = []*Command{
 	cmdOpen,
 	cmdPgInfo,
 	cmdLogDrains,
+	cmdLogDrainInfo,
 	cmdLogDrainAdd,
 	cmdLogDrainRemove,
 	cmdTransfer,

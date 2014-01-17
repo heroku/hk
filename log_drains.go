@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"text/tabwriter"
+
+	"github.com/bgentry/heroku-go"
 )
 
 var cmdLogDrains = &Command{
@@ -103,6 +105,54 @@ func mergeDrainAddonInfo(merged []*mergedLogDrain, addons []heroku.Addon) {
 			}
 		}
 	}
+}
+
+var cmdLogDrainInfo = &Command{
+	Run:      runLogDrainInfo,
+	Usage:    "log-drain-info <id or url>",
+	NeedsApp: true,
+	Category: "app",
+	Short:    "show info for a log drain" + extra,
+	Long: `
+Shows detailed info for a log drain.
+
+Example:
+
+    $ hk log-drain-info syslog://my.other.log.host
+    Id:     7f89b6bb-08af-4343-b0b4-d0415dd81712
+    Token:  d.a9dc787f-e0a8-43f3-a2c8-1fbf937fd47c
+    Addon:  none
+    URL:    syslog://my.log.host
+
+    $ hk log-drain-info 23fcdb8a-3095-46f5-abc2-c5f293c54cf1
+    ...
+`,
+}
+
+func runLogDrainInfo(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	appname := mustApp()
+	drainIdOrURL := args[0]
+	drain, err := client.LogDrainInfo(appname, drainIdOrURL)
+	must(err)
+
+	addonName := "none"
+	if drain.Addon != nil {
+		addon, err := client.AddonInfo(appname, drain.Addon.Id)
+		if err != nil {
+			addonName = "unknown"
+		} else {
+			addonName = addon.Name
+		}
+	}
+
+	fmt.Printf("Id:     %s\n", drain.Id)
+	fmt.Printf("Token:  %s\n", drain.Token)
+	fmt.Printf("Addon:  %s\n", addonName)
+	fmt.Printf("URL:    %s\n", drain.URL)
 }
 
 var cmdLogDrainAdd = &Command{
