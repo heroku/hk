@@ -15,7 +15,7 @@ var cmdFeatures = &Command{
 	Usage:    "features",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "list app features",
+	Short:    "list app features" + extra,
 	Long: `
 Features lists Heroku Labs features for an app.
 
@@ -60,7 +60,7 @@ var cmdFeatureInfo = &Command{
 	Usage:    "feature-info <feature>",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "show info for an app feature",
+	Short:    "show info for an app feature" + extra,
 	Long: `
 Shows detailed info for a Heroku Labs feature on an app.
 
@@ -91,7 +91,7 @@ var cmdFeatureEnable = &Command{
 	Usage:    "feature-enable <feature>",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "enable an app feature",
+	Short:    "enable an app feature" + extra,
 	Long: `
 Enables a Heroku Labs feature on an app.
 
@@ -119,7 +119,7 @@ var cmdFeatureDisable = &Command{
 	Usage:    "feature-disable <feature>",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "disable an app feature",
+	Short:    "disable an app feature" + extra,
 	Long: `
 Disables a Heroku Labs feature on an app.
 

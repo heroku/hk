@@ -14,7 +14,7 @@ var cmdPgInfo = &Command{
 	Usage:    "pg-info <dbname>",
 	NeedsApp: true,
 	Category: "pg",
-	Short:    "show Heroku Postgres database info",
+	Short:    "show Heroku Postgres database info" + extra,
 	Long: `
 Pg-info shows general information about a Heroku PostgreSQL
 database.

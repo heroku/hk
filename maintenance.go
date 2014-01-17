@@ -13,7 +13,7 @@ var cmdMaintenance = &Command{
 	Usage:    "maintenance",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "show app maintenance mode",
+	Short:    "show app maintenance mode" + extra,
 	Long: `
 Maintenance shows the current maintenance mode state of an app.
 
@@ -43,7 +43,7 @@ var cmdMaintenanceEnable = &Command{
 	Usage:    "maintenance-enable",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "enable maintenance mode",
+	Short:    "enable maintenance mode" + extra,
 	Long: `
 Enables maintenance mode on an app.
 
@@ -70,7 +70,7 @@ var cmdMaintenanceDisable = &Command{
 	Usage:    "maintenance-disable",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "disable maintenance mode",
+	Short:    "disable maintenance mode" + extra,
 	Long: `
 Disables maintenance mode on an app.
 

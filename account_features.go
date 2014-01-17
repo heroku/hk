@@ -14,7 +14,7 @@ var cmdAccountFeatures = &Command{
 	Run:      runAccountFeatures,
 	Usage:    "account-features",
 	Category: "account",
-	Short:    "list account features",
+	Short:    "list account features" + extra,
 	Long: `
 Account-features lists Heroku Labs features for your account.
 
@@ -56,7 +56,7 @@ var cmdAccountFeatureInfo = &Command{
 	Run:      runAccountFeatureInfo,
 	Usage:    "account-feature-info <feature>",
 	Category: "account",
-	Short:    "show info for an account feature",
+	Short:    "show info for an account feature" + extra,
 	Long: `
 Shows detailed info for a Heroku Labs feature on an account.
 
@@ -84,7 +84,7 @@ var cmdAccountFeatureEnable = &Command{
 	Run:      runAccountFeatureEnable,
 	Usage:    "account-feature-enable <feature>",
 	Category: "account",
-	Short:    "enable an account feature",
+	Short:    "enable an account feature" + extra,
 	Long: `
 Enables a Heroku Labs feature on your account.
 
@@ -110,7 +110,7 @@ var cmdAccountFeatureDisable = &Command{
 	Run:      runAccountFeatureDisable,
 	Usage:    "account-feature-disable <feature>",
 	Category: "account",
-	Short:    "disable an account feature",
+	Short:    "disable an account feature" + extra,
 	Long: `
 Disables a Heroku Labs feature on your account.
 
