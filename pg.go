@@ -1,8 +1,11 @@
 package main
 
 import (
+	"net/url"
 	"os"
+	"os/exec"
 	"sort"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -16,7 +19,7 @@ var cmdPgInfo = &Command{
 	Category: "pg",
 	Short:    "show Heroku Postgres database info" + extra,
 	Long: `
-Pg-info shows general information about a Heroku PostgreSQL
+Pg-info shows general information about a Heroku Postgres
 database.
 
 Examples:
@@ -106,6 +109,104 @@ func printPgInfo(name string, info postgresql.DBInfo, appConf map[string]string)
 	}
 }
 
+var commandNamePsql string
+
+var cmdPgPsql = &Command{
+	Run:      runPgPsql,
+	Usage:    "pg-psql [-c <command>] [<dbname>]",
+	NeedsApp: true,
+	Category: "pg",
+	Short:    "open a psql shell to a Heroku Postgres database" + extra,
+	Long: `
+Pg-psql opens a PostgreSQL shell to a Heroku Postgres database
+using the locally-installed psql command.
+
+Examples:
+
+    $ hk pg-psql
+    psql (9.3.1, server 9.1.11)
+    SSL connection (cipher: DHE-RSA-AES256-SHA, bits: 256)
+    Type "help" for help.
+    
+    d1234abcdefghi=>
+
+    $ hk pg-psql crimson
+    ...
+
+    $ hk pg-psql heroku-postgresql-crimson
+    ...
+`,
+}
+
+func init() {
+	cmdPgPsql.Flag.StringVar(&commandNamePsql, "c", "", "SQL command to run")
+}
+
+func runPgPsql(cmd *Command, args []string) {
+	if len(args) > 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+
+	configName := "DATABASE_URL"
+	if len(args) == 1 {
+		configName = dbNameToPgEnv(args[0])
+	}
+	appname := mustApp()
+
+	// Make sure psql is installed
+	if _, err := exec.LookPath("psql"); err != nil {
+		printError("Local psql command not found. For help installing psql, see http://devcenter.heroku.com/articles/local-postgresql")
+	}
+
+	// fetch app's config to get the URL
+	config, err := client.ConfigVarInfo(appname)
+	must(err)
+
+	// get URL
+	urlstr, exists := config[configName]
+	if !exists {
+		printError("Env %s not found", configName)
+	}
+	u, err := url.Parse(urlstr)
+	if err != nil {
+		printError("Invalid URL at env " + configName)
+	}
+
+	// handle custom port
+	hostname := u.Host
+	portnum := 5432
+	if colIndex := strings.Index(u.Host, ":"); colIndex != -1 {
+		hostname = u.Host[:colIndex]
+		portnum, err = strconv.Atoi(u.Host[colIndex+1:])
+		if err != nil {
+			printError("Invalid port in %s: %s", configName, u.Host[colIndex+1:])
+		}
+	}
+
+	// construct and run psql command
+	psqlArgs := []string{
+		"psql",
+		"-U", u.User.Username(),
+		"-h", hostname,
+		"-p", strconv.Itoa(portnum),
+	}
+	if commandNamePsql != "" {
+		psqlArgs = append(psqlArgs, "-c")
+		psqlArgs = append(psqlArgs, commandNamePsql)
+	}
+	psqlArgs = append(psqlArgs, u.Path[1:])
+
+	pgenv := os.Environ()
+	pass, _ := u.User.Password()
+	pgenv = append(pgenv, "PGPASSWORD="+pass)
+	pgenv = append(pgenv, "PGSSLMODE=require")
+
+	if err := runCommand("psql", psqlArgs, pgenv); err != nil {
+		printError("Error running psql: %s", err)
+	}
+}
+
 func EnvNamesFromURL(url string, env map[string]string) (names []string) {
 	for k, v := range env {
 		if isEnvKeyFromPostgres(k) && v == url {
@@ -127,6 +228,10 @@ func DatabaseNameFromURL(url string, env map[string]string) string {
 
 func pgEnvToDBName(key string) string {
 	return strings.ToLower(strings.Replace(strings.TrimSuffix(key, "_URL"), "_", "-", -1))
+}
+
+func dbNameToPgEnv(name string) string {
+	return strings.ToUpper(strings.Replace(name, "-", "_", -1)) + "_URL"
 }
 
 func isEnvKeyFromPostgres(key string) bool {

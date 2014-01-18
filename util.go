@@ -125,6 +125,10 @@ func openURL(url string) error {
 		command = "xdg-open"
 		args = []string{command, url}
 	}
+	return runCommand(command, args, os.Environ())
+}
+
+func runCommand(command string, args, env []string) error {
 	if runtime.GOOS != "windows" {
 		p, err := exec.LookPath(command)
 		if err != nil {
@@ -133,5 +137,5 @@ func openURL(url string) error {
 		}
 		command = p
 	}
-	return sysExec(command, args, os.Environ())
+	return sysExec(command, args, env)
 }
