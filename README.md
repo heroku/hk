@@ -151,10 +151,9 @@ hk will set these environment variables for a plugin:
 
 ### Development
 
-hk requires Go 1.1 or later.
+hk requires Go 1.1 or later and uses [Godep](https://github.com/kr/godep) to manage dependencies.
 
 	$ cd hk
-	$ godep go get
 	$ mate main.go
 	$ godep go build
 	$ ./hk apps
