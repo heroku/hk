@@ -258,30 +258,38 @@ func initClients() {
 		UserAgent: userAgent,
 		Debug:     debug,
 	}
+	pgclient = postgresql.Client{
+		Username:  user,
+		Password:  pass,
+		UserAgent: userAgent,
+		Debug:     debug,
+	}
 	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
 		client.HTTP = &http.Client{Transport: http.DefaultTransport}
 		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
+		pgclient.HTTP = client.HTTP
 	}
 	if s := os.Getenv("HEROKU_API_URL"); s != "" {
 		client.URL = s
 	}
+	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
+		pgclient.URL = s
+	}
 	client.AdditionalHeaders = http.Header{}
+	pgclient.AdditionalHeaders = http.Header{}
 	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
 		if i := strings.Index(h, ":"); i >= 0 {
 			client.AdditionalHeaders.Set(
 				strings.TrimSpace(h[:i]),
 				strings.TrimSpace(h[i+1:]),
 			)
+			pgclient.AdditionalHeaders.Set(
+				strings.TrimSpace(h[:i]),
+				strings.TrimSpace(h[i+1:]),
+			)
 		}
-	}
-
-	pgclient = postgresql.Client{
-		Username:  user,
-		Password:  pass,
-		UserAgent: userAgent,
-		Debug:     debug,
 	}
 }
 
