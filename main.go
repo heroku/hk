@@ -158,7 +158,7 @@ var commands = []*Command{
 	cmdMaintenanceDisable,
 	cmdOpen,
 	cmdPgInfo,
-	cmdPgPsql,
+	cmdPsql,
 	cmdLogDrains,
 	cmdLogDrainInfo,
 	cmdLogDrainAdd,
