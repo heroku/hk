@@ -111,38 +111,38 @@ func printPgInfo(name string, info postgresql.DBInfo, appConf map[string]string)
 
 var commandNamePsql string
 
-var cmdPgPsql = &Command{
-	Run:      runPgPsql,
-	Usage:    "pg-psql [-c <command>] [<dbname>]",
+var cmdPsql = &Command{
+	Run:      runPsql,
+	Usage:    "psql [-c <command>] [<dbname>]",
 	NeedsApp: true,
 	Category: "pg",
 	Short:    "open a psql shell to a Heroku Postgres database" + extra,
 	Long: `
-Pg-psql opens a PostgreSQL shell to a Heroku Postgres database
+Psql opens a PostgreSQL shell to a Heroku Postgres database
 using the locally-installed psql command.
 
 Examples:
 
-    $ hk pg-psql
+    $ hk psql
     psql (9.3.1, server 9.1.11)
     SSL connection (cipher: DHE-RSA-AES256-SHA, bits: 256)
     Type "help" for help.
     
     d1234abcdefghi=>
 
-    $ hk pg-psql crimson
+    $ hk psql crimson
     ...
 
-    $ hk pg-psql heroku-postgresql-crimson
+    $ hk psql heroku-postgresql-crimson
     ...
 `,
 }
 
 func init() {
-	cmdPgPsql.Flag.StringVar(&commandNamePsql, "c", "", "SQL command to run")
+	cmdPsql.Flag.StringVar(&commandNamePsql, "c", "", "SQL command to run")
 }
 
-func runPgPsql(cmd *Command, args []string) {
+func runPsql(cmd *Command, args []string) {
 	if len(args) > 1 {
 		cmd.printUsage()
 		os.Exit(2)
