@@ -109,7 +109,7 @@ func ensurePrefix(val, prefix string) string {
 
 func ensureSuffix(val, suffix string) string {
 	if !strings.HasSuffix(val, suffix) {
-		return suffix + val
+		return val + suffix
 	}
 	return val
 }
