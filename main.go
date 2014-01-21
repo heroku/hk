@@ -238,6 +238,9 @@ func main() {
 	path := findPlugin(args[0])
 	if path == "" {
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", args[0])
+		if g := suggest(args[0]); len(g) > 0 {
+			fmt.Fprintf(os.Stderr, "Possible alternatives: %v\n", strings.Join(g, " "))
+		}
 		fmt.Fprintf(os.Stderr, "Run 'hk help' for usage.\n")
 		os.Exit(2)
 	}
