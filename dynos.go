@@ -20,18 +20,18 @@ var cmdDynos = &Command{
 	Category: "dyno",
 	Short:    "list dynos",
 	Long: `
-Lists dynos. Shows the name, state, age, and command.
+Lists dynos. Shows the name, size, state, age, and command.
 
 Examples:
 
     $ hk dynos
-    run.3794  up   1m  bash
-    web.1     up  15h  "blog /app /tmp/dst"
-    web.2     up   8h  "blog /app /tmp/dst"
+    run.3794  2X  up   1m  bash
+    web.1     1X  up  15h  "blog /app /tmp/dst"
+    web.2     1X  up   8h  "blog /app /tmp/dst"
 
     $ hk dynos web
-    web.1     up  15h  "blog /app /tmp/dst"
-    web.2     up   8h  "blog /app /tmp/dst"
+    web.1     1X  up  15h  "blog /app /tmp/dst"
+    web.2     1X  up   8h  "blog /app /tmp/dst"
 `,
 }
 
@@ -77,6 +77,8 @@ func listDynos(w io.Writer, names []string) {
 func listDyno(w io.Writer, d *heroku.Dyno) {
 	listRec(w,
 		d.Name,
+		// ensureSuffix until https://github.com/heroku/api/issues/1546 is fixed
+		ensureSuffix("X", d.Size),
 		d.State,
 		prettyDuration{dynoAge(d)},
 		maybeQuote(d.Command),
