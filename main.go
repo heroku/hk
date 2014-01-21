@@ -238,7 +238,8 @@ func main() {
 	path := findPlugin(args[0])
 	if path == "" {
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", args[0])
-		usage()
+		fmt.Fprintf(os.Stderr, "Run 'hk help' for usage.\n")
+		os.Exit(2)
 	}
 	err := execPlugin(path, args)
 	printError("exec error: %s", err)
