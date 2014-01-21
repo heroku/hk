@@ -30,9 +30,11 @@ func computeAndStorePatch(a, b release) error {
 	wg.Add(2)
 	go func() {
 		ar = newGzReader(fetch(s3DistURL+a.Gzname(), nil))
+		wg.Done()
 	}()
 	go func() {
 		br = newGzReader(fetch(s3DistURL+b.Gzname(), nil))
+		wg.Done()
 	}()
 	wg.Wait()
 	defer ar.Close()
