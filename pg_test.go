@@ -25,6 +25,7 @@ func TestDBNameToPgEnv(t *testing.T) {
 	}{
 		{"heroku-postgresql-blue", "HEROKU_POSTGRESQL_BLUE_URL"},
 		{"heroku-postgresql-crimson", "HEROKU_POSTGRESQL_CRIMSON_URL"},
+		{"rose", "HEROKU_POSTGRESQL_ROSE_URL"},
 	}
 	for _, ex := range tests {
 		result := dbNameToPgEnv(ex.in)

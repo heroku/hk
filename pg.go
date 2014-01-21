@@ -231,7 +231,10 @@ func pgEnvToDBName(key string) string {
 }
 
 func dbNameToPgEnv(name string) string {
-	return strings.ToUpper(strings.Replace(name, "-", "_", -1)) + "_URL"
+	return ensurePrefix(
+		strings.ToUpper(strings.Replace(name, "-", "_", -1)),
+		"HEROKU_POSTGRESQL_",
+	) + "_URL"
 }
 
 func isEnvKeyFromPostgres(key string) bool {
