@@ -78,12 +78,11 @@ HKPLUGINMODE
 }
 
 func init() {
-	const defaultPluginPath = "/usr/local/lib/hk/plugin"
 	hkPath = os.Getenv("HKPATH")
 	if hkPath == "" {
-		hkPath = defaultPluginPath
+		hkPath = defaultPluginPath()
+		os.Setenv("HKPATH", hkPath)
 	}
-
 }
 
 func execPlugin(path string, args []string) error {
