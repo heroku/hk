@@ -46,9 +46,9 @@ import (
   <%- func_args << (variablecase(parent_resource_instance) + 'Identity string') if parent_resource_instance %>
   <%- func_args += func_args_from_model_and_link(definition, key, link) %>
   <%- return_values = return_values_from_link(key, link) %>
-  <%- path = link['href'].gsub("{(%2Fschema%2F\#{key}%23%2Fdefinitions%2Fidentity)}", '"+' + variablecase(resource_instance) + 'Identity') %>
+  <%- path = link['href'].gsub("{(%23%2Fdefinitions%2F\#{key}%2Fdefinitions%2Fidentity)}", '"+' + variablecase(resource_instance) + 'Identity') %>
   <%- if parent_resource_instance %>
-    <%- path = path.gsub("{(%2Fschema%2F" + parent_resource_instance + "%23%2Fdefinitions%2Fidentity)}", '" + ' + variablecase(parent_resource_instance) + 'Identity + "') %>
+    <%- path = path.gsub("{(%23%2Fdefinitions%2F" + parent_resource_instance + "%2Fdefinitions%2Fidentity)}", '" + ' + variablecase(parent_resource_instance) + 'Identity + "') %>
   <%- end %>
   <%- path = ensure_balanced_end_quote(ensure_open_quote(path)) %>
 
@@ -297,7 +297,7 @@ module Generator
       # inline object
       propdef
     elsif ref = propdef["$ref"]
-      matches = ref.match(/\/schema\/([\w-]+)#\/definitions\/([\w-]+)/)
+      matches = ref.match(/\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
       schemaname, fieldname = matches[1..2]
       resolve_typedef(schemas[schemaname]["definitions"][fieldname])
     else
@@ -354,7 +354,7 @@ module Generator
     optional = ((link["schema"] && link["schema"]["properties"]) || {}).keys - required
 
     # check if this link's href requires the model's identity
-    match = link["href"].match(%r{%2Fschema%2F#{modelname}%23%2Fdefinitions%2Fidentity})
+    match = link["href"].match(%r{%23%2Fdefinitions%2F#{modelname}%2Fdefinitions%2Fidentity})
     if %w{update destroy self}.include?(link["rel"]) && match
       args << "#{variablecase(modelname)}Identity string"
     end
@@ -392,13 +392,13 @@ module Generator
     if propdef["description"]
       [propdef]
     elsif ref = propdef["$ref"]
-      matches = ref.match(/\/schema\/([\w-]+)#\/definitions\/([\w-]+)/)
+      matches = ref.match(/#\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
       schemaname, fieldname = matches[1..2]
       resolve_all_propdefs(schemas[schemaname]["definitions"][fieldname])
     elsif anyof = propdef["anyOf"]
       # Identity
       anyof.map do |refhash|
-        matches = refhash["$ref"].match(/\/schema\/([\w-]+)#\/definitions\/([\w-]+)/)
+        matches = refhash["$ref"].match(/#\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
         schemaname, fieldname = matches[1..2]
         resolve_all_propdefs(schemas[schemaname]["definitions"][fieldname])
       end.flatten
@@ -473,9 +473,12 @@ module Generator
     @@schemas ||= {}
   end
 
-  def load_model_schema(modelname)
-    schema_path = File.expand_path("./schema/#{modelname}.json")
-    schemas[modelname] = MultiJson.load(File.read(schema_path))
+  def load_schema
+    schema_path = File.expand_path("./schema.json")
+    schema = MultiJson.load(File.read(schema_path))
+    schema["definitions"].each do |modelname, val|
+      schemas[modelname] = val
+    end
   end
 
   def generate_model(modelname)
@@ -492,8 +495,10 @@ module Generator
     resource_proxy_class = resource_class + 's'
     resource_proxy_instance = resource_instance + 's'
 
-    parent_resource_class, parent_resource_identity, parent_resource_instance = if schemas[modelname]['links'].all? {|link| link['href'].include?('{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}')}
+    parent_resource_class, parent_resource_identity, parent_resource_instance = if schemas[modelname]['links'].all? {|link| link['href'].include?('{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}')}
       ['App', 'app_identity', 'app']
+    elsif schemas[modelname]['links'].all? {|link| link['href'].include?('{(%23%2Fdefinitions%2Faddon-service%2Fdefinitions%2Fidentity)}')}
+      ['AddonService', 'addon_service', 'addon-service']
     end
 
     data = Erubis::Eruby.new(RESOURCE_TEMPLATE).result({
@@ -518,14 +523,10 @@ end
 
 include Generator
 
-models = Dir.glob("schema/*.json").map{|f| f.gsub(".json", "") }.map{|f| f.gsub("schema/", "")}
+puts "Loading schema..."
+Generator.load_schema
 
-models.each do |modelname|
-  puts "Loading #{modelname}..."
-  Generator.load_model_schema(modelname)
-end
-
-models.each do |modelname|
+schemas.keys.each do |modelname|
   puts "Generating #{modelname}..."
   if (Generator.schemas[modelname]["links"] || []).empty? && Generator.schemas[modelname]["properties"].empty?
     puts "-- skipping #{modelname} because it has no links or properties"

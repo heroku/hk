@@ -13,6 +13,8 @@ import (
 	"github.com/bgentry/heroku-go"
 )
 
+var releaseCount int
+
 var cmdReleases = &Command{
 	Run:      runReleases,
 	Usage:    "releases [<version>...]",
@@ -27,14 +29,22 @@ description.
 Examples:
 
     $ hk releases
-    v1  bob@me.com   3ae20c2  Jun 12 18:28  Deploy 3ae20c2
-    v2  john@me.com  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
-    v3  john@me.com           Jun 13 18:31  Rollback to v2
+    v1  bob@test.com  3ae20c2  Jun 12 18:28  Deploy 3ae20c2
+    v2  john@me.com   0fda0ae  Jun 13 18:14  Deploy 0fda0ae
+    v3  john@me.com            Jun 13 18:31  Rollback to v2
 
-    $ hk releases 2 3
+    $ hk releases -n 2
     v2  john  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
     v3  john           Jun 13 18:31  Rollback to v2
+
+    $ hk releases 1 3
+    v1  bob@test.com  3ae20c2  Jun 12 18:28  Deploy 3ae20c2
+    v3  john@me.com            Jun 13 18:31  Rollback to v2
 `,
+}
+
+func init() {
+	cmdReleases.Flag.IntVar(&releaseCount, "n", 30, "max number of recent releases to display")
 }
 
 func runReleases(cmd *Command, versions []string) {
@@ -46,7 +56,11 @@ func runReleases(cmd *Command, versions []string) {
 func listReleases(w io.Writer, versions []string) {
 	appname := mustApp()
 	if len(versions) == 0 {
-		hrels, err := client.ReleaseList(appname, nil)
+		hrels, err := client.ReleaseList(appname, &heroku.ListRange{
+			Field:      "version",
+			Max:        releaseCount,
+			Descending: true,
+		})
 		must(err)
 		rels := make([]*Release, len(hrels))
 		for i := range hrels {
@@ -80,7 +94,7 @@ func listReleases(w io.Writer, versions []string) {
 	for _ = range versions {
 		select {
 		case err := <-errch:
-			fmt.Fprintln(os.Stderr, err)
+			printError(err.Error())
 		case rel := <-relch:
 			if rel != nil {
 				rels = append(rels, newRelease(rel))
@@ -142,13 +156,26 @@ var cmdReleaseInfo = &Command{
 	NeedsApp: true,
 	Category: "release",
 	Short:    "show release info",
-	Long:     `release-info shows detailed information about a release.`,
+	Long: `
+release-info shows detailed information about a release.
+
+Examples:
+
+    $ hk release-info v116
+    Version:  v116
+    By:       user@test.com
+    Change:   Deploy 62b3059
+    When:     2014-01-13T21:20:57Z
+    Id:       abcd1234-5678-def0-8190-12347060474d
+    Slug:     98765432-82ba-10ba-fedc-8d206789d062
+`,
 }
 
 func runReleaseInfo(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help release-info'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	ver := strings.TrimPrefix(args[0], "v")
 	rel, err := client.ReleaseInfo(appname, ver)
@@ -167,13 +194,24 @@ var cmdRollback = &Command{
 	Usage:    "rollback <version>",
 	NeedsApp: true,
 	Category: "release",
-	Short:    "rolback to a previous release",
+	Short:    "roll back to a previous release",
+	Long: `
+Rollback re-releases an app at an older version. This action
+creates a new release based on the older release, then restarts
+the app's dynos on the new release.
+
+Examples:
+
+    $ hk rollback v4
+    Rolled back myapp to v4 as v7.
+`,
 }
 
 func runRollback(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		log.Fatal("Invalid usage. See 'hk help rollback'")
+		cmd.printUsage()
+		os.Exit(2)
 	}
 	ver := strings.TrimPrefix(args[0], "v")
 	rel, err := client.ReleaseRollback(appname, ver)

@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"log"
+	"sync"
 
 	"github.com/kr/binarydist"
 )
@@ -23,10 +25,21 @@ func genPatch(a, b release) {
 }
 
 func computeAndStorePatch(a, b release) error {
-	ar := newGzReader(fetch(s3DistURL+a.Gzname(), nil))
+	var wg sync.WaitGroup
+	var ar, br io.ReadCloser
+	wg.Add(2)
+	go func() {
+		ar = newGzReader(fetch(s3DistURL+a.Gzname(), nil))
+		wg.Done()
+	}()
+	go func() {
+		br = newGzReader(fetch(s3DistURL+b.Gzname(), nil))
+		wg.Done()
+	}()
+	wg.Wait()
 	defer ar.Close()
-	br := newGzReader(fetch(s3DistURL+b.Gzname(), nil))
 	defer br.Close()
+
 	patch := new(bytes.Buffer)
 	if err := binarydist.Diff(ar, br, patch); err != nil {
 		return err

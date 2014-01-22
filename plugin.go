@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/url"
 	"os"
 	"os/exec"
@@ -88,7 +87,7 @@ func init() {
 func execPlugin(path string, args []string) error {
 	u, err := url.Parse(apiURL)
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 
 	hkuser, hkpass := getCreds(apiURL)
@@ -125,7 +124,7 @@ func lookupPlugin(name string) string {
 		if e, ok := err.(*exec.Error); ok && e.Err == exec.ErrNotFound {
 			return ""
 		}
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	return path
 }

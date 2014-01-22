@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -16,10 +15,12 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/postgresql"
+	"github.com/heroku/hk/term"
+	"github.com/mgutz/ansi"
 )
 
 var (
@@ -40,6 +41,10 @@ func homePath() string {
 }
 
 func netrcPath() string {
+	if s := os.Getenv("NETRC_PATH"); s != "" {
+		return s
+	}
+
 	if runtime.GOOS == "windows" {
 		return filepath.Join(homePath(), "_netrc")
 	}
@@ -136,11 +141,28 @@ var commands = []*Command{
 	cmdAccess,
 	cmdAccessAdd,
 	cmdAccessRemove,
+	cmdAccountFeatures,
+	cmdAccountFeatureInfo,
+	cmdAccountFeatureEnable,
+	cmdAccountFeatureDisable,
 	cmdAddonOpen,
 	cmdAPI,
-	cmdGet,
 	cmdCreds,
+	cmdFeatures,
+	cmdFeatureInfo,
+	cmdFeatureEnable,
+	cmdFeatureDisable,
+	cmdGet,
+	cmdMaintenance,
+	cmdMaintenanceEnable,
+	cmdMaintenanceDisable,
 	cmdOpen,
+	cmdPgInfo,
+	cmdPsql,
+	cmdLogDrains,
+	cmdLogDrainInfo,
+	cmdLogDrainAdd,
+	cmdLogDrainRemove,
 	cmdTransfer,
 	cmdTransfers,
 	cmdTransferAccept,
@@ -156,6 +178,7 @@ var commands = []*Command{
 var (
 	flagApp   string
 	client    heroku.Client
+	pgclient  postgresql.Client
 	hkAgent   = "hk/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	userAgent = hkAgent + " " + heroku.DefaultUserAgent
 )
@@ -178,37 +201,11 @@ func main() {
 		defer updater.backgroundRun() // doesn't run if os.Exit is called
 	}
 
-	apiURL = heroku.DefaultAPIURL
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		apiURL = s
+	if !term.IsTerminal(os.Stdout) {
+		ansi.DisableColors(true)
 	}
-	user, pass := getCreds(apiURL)
-	debug := os.Getenv("HKDEBUG") != ""
-	client = heroku.Client{
-		URL:       apiURL,
-		Username:  user,
-		Password:  pass,
-		UserAgent: userAgent,
-		Debug:     debug,
-	}
-	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
-		client.HTTP = &http.Client{Transport: http.DefaultTransport}
-		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-	}
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		client.URL = s
-	}
-	client.AdditionalHeaders = http.Header{}
-	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
-		if i := strings.Index(h, ":"); i >= 0 {
-			client.AdditionalHeaders.Set(
-				strings.TrimSpace(h[:i]),
-				strings.TrimSpace(h[i+1:]),
-			)
-		}
-	}
+
+	initClients()
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] && cmd.Run != nil {
@@ -241,16 +238,72 @@ func main() {
 	path := findPlugin(args[0])
 	if path == "" {
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", args[0])
-		usage()
+		if g := suggest(args[0]); len(g) > 0 {
+			fmt.Fprintf(os.Stderr, "Possible alternatives: %v\n", strings.Join(g, " "))
+		}
+		fmt.Fprintf(os.Stderr, "Run 'hk help' for usage.\n")
+		os.Exit(2)
 	}
 	err := execPlugin(path, args)
-	log.Fatal("exec error: ", err)
+	printError("exec error: %s", err)
+}
+
+func initClients() {
+	apiURL = heroku.DefaultAPIURL
+	user, pass := getCreds(apiURL)
+	if user == "" && pass == "" {
+		printError("No credentials found in HEROKU_API_URL or netrc.")
+	}
+	debug := os.Getenv("HKDEBUG") != ""
+	client = heroku.Client{
+		URL:       apiURL,
+		Username:  user,
+		Password:  pass,
+		UserAgent: userAgent,
+		Debug:     debug,
+	}
+	pgclient = postgresql.Client{
+		Username:  user,
+		Password:  pass,
+		UserAgent: userAgent,
+		Debug:     debug,
+	}
+	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+		client.HTTP = &http.Client{Transport: http.DefaultTransport}
+		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+		pgclient.HTTP = client.HTTP
+	}
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		client.URL = s
+	}
+	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
+		pgclient.URL = s
+	}
+	client.AdditionalHeaders = http.Header{}
+	pgclient.AdditionalHeaders = http.Header{}
+	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
+		if i := strings.Index(h, ":"); i >= 0 {
+			client.AdditionalHeaders.Set(
+				strings.TrimSpace(h[:i]),
+				strings.TrimSpace(h[i+1:]),
+			)
+			pgclient.AdditionalHeaders.Set(
+				strings.TrimSpace(h[:i]),
+				strings.TrimSpace(h[i+1:]),
+			)
+		}
+	}
 }
 
 func getCreds(u string) (user, pass string) {
 	apiURL, err := url.Parse(u)
 	if err != nil {
-		log.Fatalf("invalid API URL: %s", err)
+		printError("invalid API URL: %s", err)
+	}
+	if apiURL.Host == "" {
+		printError("missing API host: %s", u)
 	}
 	if apiURL.User != nil {
 		pw, _ := apiURL.User.Password()
@@ -259,7 +312,10 @@ func getCreds(u string) (user, pass string) {
 
 	m, err := netrc.FindMachine(netrcPath(), apiURL.Host)
 	if err != nil {
-		log.Fatalf("netrc error (%s): %v", apiURL.Host, err)
+		if os.IsNotExist(err) {
+			return "", ""
+		}
+		printError("netrc error (%s): %v", apiURL.Host, err)
 	}
 
 	return m.Login, m.Password
@@ -322,64 +378,7 @@ func isNotFound(err error) bool {
 func mustApp() string {
 	name, err := app()
 	if err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 	return name
-}
-
-func must(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func listRec(w io.Writer, a ...interface{}) {
-	for i, x := range a {
-		fmt.Fprint(w, x)
-		if i+1 < len(a) {
-			w.Write([]byte{'\t'})
-		} else {
-			w.Write([]byte{'\n'})
-		}
-	}
-}
-
-type prettyTime struct {
-	time.Time
-}
-
-func (s prettyTime) String() string {
-	if time.Now().Sub(s.Time) < 12*30*24*time.Hour {
-		return s.Local().Format("Jan _2 15:04")
-	}
-	return s.Local().Format("Jan _2  2006")
-}
-
-func openURL(url string) error {
-	var command string
-	var args []string
-	switch runtime.GOOS {
-	case "darwin":
-		command = "open"
-		args = []string{command, url}
-	case "windows":
-		command = "cmd"
-		args = []string{"/c", "start " + url}
-	default:
-		if _, err := exec.LookPath("xdg-open"); err != nil {
-			log.Println("xdg-open is required to open web pages on " + runtime.GOOS)
-			os.Exit(2)
-		}
-		command = "xdg-open"
-		args = []string{command, url}
-	}
-	if runtime.GOOS != "windows" {
-		p, err := exec.LookPath(command)
-		if err != nil {
-			log.Printf("Error finding path to %q: %s\n", command, err)
-			os.Exit(2)
-		}
-		command = p
-	}
-	return sysExec(command, args, os.Environ())
 }

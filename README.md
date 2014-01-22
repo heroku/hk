@@ -64,6 +64,9 @@ applicable.
 
 ### Installation
 
+> Please note that versions of hk installed from source are unsupported and
+> should only be installed for development purposes.
+
 #### Mac OS X, Linux, BSD
 
 Pre-built binaries are available for Mac OS X, Linux, and BSD. Once installed,
@@ -88,8 +91,7 @@ for Windows, but the installer is not ready yet.
 
 	$ go get github.com/heroku/hk
 
-Please note that versions of hk installed from source are unsupported and
-should only be installed for development purposes.
+Again, note that this installation method is unsupported.
 
 ### netrc
 
@@ -100,31 +102,35 @@ You'll need a line like this in $HOME/.netrc
 ### Usage
 
 ```
-$ hk help
-
-Usage: hk [-a app] [command] [options] [arguments]
+Usage: hk <command> [-a app] [options] [arguments]
 
 
 Commands:
 
-    create    create an app
-    apps      list apps
-    dynos     list dynos
-    releases  list releases
-    addons    list addons
-    scale     change dyno counts
-    restart   restart dynos
-    set       set config var
-    unset     unset config var
-    env       list config vars
-    run       run a process in a dyno
-    log       stream app log lines
-    info      show app info
-    open      open app in a web browser
-    rename    rename an app
-    destroy   destroy an app
-    sshauth   authorize ssh public keys
-    version   show hk version
+    create         create an app
+    apps           list apps
+    dynos          list dynos
+    releases       list releases
+    release-info   show release info
+    rollback       roll back to a previous release
+    addons         list addons
+    addon-add      add an addon
+    addon-remove   remove an addon
+    scale          change dyno quantities and sizes
+    restart        restart dynos
+    set            set env var
+    unset          unset env var
+    env            list env vars
+    run            run a process in a dyno
+    log            stream app log lines
+    info           show app info
+    rename         rename an app
+    destroy        destroy an app
+    domains        list domains
+    domain-add     add a domain
+    domain-remove  remove a domain
+    sshkey-add     add ssh public key
+    version        show hk version
 
 Run 'hk help [command]' for details.
 
@@ -139,6 +145,8 @@ Additional help topics:
 
 ## Plugins
 
+hk currently has a minimal plugin system. It may see substantial changes in the future, and those changes may break existing plugins or change the architecture at any time. Use this functionality at your own risk.
+
 Plugins are executables located in HKPATH or, if HKPATH does not exist, in /usr/local/lib/hk/plugin. They are executed when hk does not know command X and an installed plugin X exists. The special case default plugin will be executed iif hk has no command or installed plugin named X.
 
 hk will set these environment variables for a plugin:
@@ -151,11 +159,10 @@ hk will set these environment variables for a plugin:
 
 ### Development
 
-hk requires Go 1.1 or later.
+hk requires Go 1.2 or later and uses [Godep](https://github.com/kr/godep) to manage dependencies.
 
 	$ cd hk
-	$ godep go get
-	$ mate main.go
+	$ vim main.go
 	$ godep go build
 	$ ./hk apps
 

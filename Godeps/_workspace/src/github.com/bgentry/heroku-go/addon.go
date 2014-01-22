@@ -25,6 +25,9 @@ type Addon struct {
 		Name string `json:"name"`
 	} `json:"plan"`
 
+	// id of this add-on with its provider
+	ProviderId string `json:"provider_id"`
+
 	// when add-on was updated
 	UpdatedAt time.Time `json:"updated_at"`
 }

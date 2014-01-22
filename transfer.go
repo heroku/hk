@@ -38,6 +38,10 @@ var cmdTransfers = &Command{
 }
 
 func runTransfers(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
 	transfers, err := client.AppTransferList(nil)
 	must(err)
 
@@ -67,8 +71,12 @@ var cmdTransferAccept = &Command{
 }
 
 func runTransferAccept(cmd *Command, args []string) {
-	xfer := mustLookupTransfer(mustApp())
-	must(updateTransferState(xfer.Id, "accepted"))
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	xfer, err := client.AppTransferUpdate(mustApp(), "accepted")
+	must(err)
 	log.Printf("Accepted transfer of %s from %s.", xfer.App.Name, xfer.Recipient.Email)
 }
 
@@ -81,8 +89,13 @@ var cmdTransferDecline = &Command{
 }
 
 func runTransferDecline(cmd *Command, args []string) {
-	xfer := mustLookupTransfer(mustApp())
-	must(updateTransferState(xfer.Id, "declined"))
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	xfer, err := client.AppTransferUpdate(mustApp(), "declined")
+	must(err)
+	log.Printf("Declined transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
 }
 
 var cmdTransferCancel = &Command{
@@ -94,30 +107,11 @@ var cmdTransferCancel = &Command{
 }
 
 func runTransferCancel(cmd *Command, args []string) {
-	xfer := mustLookupTransfer(mustApp())
-	must(client.AppTransferDelete(xfer.Id))
-	log.Printf("Canceled transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
-}
-
-func mustLookupTransfer(appname string) (xfer *heroku.AppTransfer) {
-	// If the API starts allowing app identity instead of requiring
-	// app-transfer UUID, this lookup will be unnecessary.
-	transfers, err := client.AppTransferList(nil)
-	must(err)
-	for i := range transfers {
-		if transfers[i].App.Name == appname {
-			xfer = &transfers[i]
-			break
-		}
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
 	}
-	if xfer == nil {
-		log.Println("No pending transfer for " + appname + ".")
-		os.Exit(1)
-	}
-	return
-}
-
-func updateTransferState(transferId, newstate string) error {
-	_, err := client.AppTransferUpdate(transferId, newstate)
-	return err
+	appname := mustApp()
+	must(client.AppTransferDelete(appname))
+	log.Printf("Canceled transfer of %s.", appname)
 }

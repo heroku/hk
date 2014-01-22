@@ -59,7 +59,7 @@ func runGet(cmd *Command, args []string) {
 	must(err)
 	value, found := config[args[0]]
 	if !found {
-		log.Fatalf("No such key as '%s'", args[0])
+		printError("No such key as '%s'", args[0])
 	}
 	fmt.Println(value)
 }
@@ -90,7 +90,7 @@ func runSet(cmd *Command, args []string) {
 	for _, arg := range args {
 		i := strings.Index(arg, "=")
 		if i < 0 {
-			log.Fatalf("bad format: %#q. See 'hk help set'", arg)
+			printError("bad format: %#q. See 'hk help set'", arg)
 		}
 		val := arg[i+1:]
 		config[arg[:i]] = &val

@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"log"
 	"os"
 	"strings"
 )
@@ -56,6 +55,6 @@ func runAPI(cmd *Command, args []string) {
 		body = os.Stdin
 	}
 	if err := client.APIReq(os.Stdout, method, args[1], body); err != nil {
-		log.Fatal(err)
+		printError(err.Error())
 	}
 }

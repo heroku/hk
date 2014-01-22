@@ -86,23 +86,43 @@
             {
               "root": "access",
               "arguments": "[-a <app>]",
-              "comment": "list access permissions"
+              "comment": "list access permissions (extra)"
             },
             {
               "root": "access-add",
               "arguments": "[-a <app>] [-s] <email>",
-              "comment": "give a user access to an app"
+              "comment": "give a user access to an app (extra)"
             },
             {
               "root": "access-remove",
               "arguments": "[-a <app>] <email>",
-              "comment": "remove a user's access to an app"
+              "comment": "remove a user's access to an app (extra)"
             }
           ],
           "title": "access"
         },
         {
           "commands": [
+            {
+              "root": "account-feature-disable",
+              "arguments": "<feature>",
+              "comment": "disable an account feature"
+            },
+            {
+              "root": "account-feature-enable",
+              "arguments": "<feature>",
+              "comment": "enable an account feature"
+            },
+            {
+              "root": "account-feature-info",
+              "arguments": "<feature>",
+              "comment": "show info for an account feature"
+            },
+            {
+              "root": "account-features",
+              "arguments": "",
+              "comment": "list account features"
+            },
             {
               "root": "sshkey-add",
               "arguments": "[<public-key-file>]",
@@ -120,12 +140,12 @@
             },
             {
               "root": "addon-open",
-              "arguments": "[-a <app>] <service>[:<plan>]",
+              "arguments": "[-a <app>] <name>",
               "comment": "open an addon (extra)"
             },
             {
               "root": "addon-remove",
-              "arguments": "[-a <app>] <service>:<plan>",
+              "arguments": "[-a <app>] <name>",
               "comment": "remove an addon"
             },
             {
@@ -154,6 +174,26 @@
               "comment": "destroy an app"
             },
             {
+              "root": "feature-disable",
+              "arguments": "[-a <app>] <feature>",
+              "comment": "disable an app feature"
+            },
+            {
+              "root": "feature-enable",
+              "arguments": "[-a <app>] <feature>",
+              "comment": "enable an app feature"
+            },
+            {
+              "root": "feature-info",
+              "arguments": "[-a <app>] <feature>",
+              "comment": "show info for an app feature"
+            },
+            {
+              "root": "features",
+              "arguments": "[-a <app>]",
+              "comment": "list app features"
+            },
+            {
               "root": "info",
               "arguments": "[-a <app>]",
               "comment": "show app info"
@@ -162,6 +202,41 @@
               "root": "log",
               "arguments": "[-a <app>] [-n <lines>] [-s <source>] [-d <dyno>]",
               "comment": "stream app log lines"
+            },
+            {
+              "root": "log-drain-add",
+              "arguments": "[-a <app>] <url>",
+              "comment": "add a log drain (extra)"
+            },
+            {
+              "root": "log-drain-info",
+              "arguments": "[-a <app>] <id or url>",
+              "comment": "show info for a log drain (extra)"
+            },
+            {
+              "root": "log-drain-remove",
+              "arguments": "[-a <app>] <id or url>",
+              "comment": "remove a log drain (extra)"
+            },
+            {
+              "root": "log-drains",
+              "arguments": "[-a <app>]",
+              "comment": "list log drains (extra)"
+            },
+            {
+              "root": "maintenance",
+              "arguments": "[-a <app>]",
+              "comment": "show app maintenance mode"
+            },
+            {
+              "root": "maintenance-disable",
+              "arguments": "[-a <app>]",
+              "comment": "disable maintenance mode"
+            },
+            {
+              "root": "maintenance-enable",
+              "arguments": "[-a <app>]",
+              "comment": "enable maintenance mode"
             },
             {
               "root": "open",
@@ -334,6 +409,16 @@
         {
           "commands": [
             {
+              "root": "pg-info",
+              "arguments": "[-a <app>] <dbname>",
+              "comment": "show Heroku Postgres database info"
+            }
+          ],
+          "title": "pg"
+        },
+        {
+          "commands": [
+            {
               "root": "release-info",
               "arguments": "[-a <app>] <version>",
               "comment": "show release info"
@@ -346,7 +431,7 @@
             {
               "root": "rollback",
               "arguments": "[-a <app>] <version>",
-              "comment": "rolback to a previous release"
+              "comment": "roll back to a previous release"
             }
           ],
           "title": "release"

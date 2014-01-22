@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"sort"
@@ -21,18 +20,18 @@ var cmdDynos = &Command{
 	Category: "dyno",
 	Short:    "list dynos",
 	Long: `
-Lists dynos. Shows the name, state, age, and command.
+Lists dynos. Shows the name, size, state, age, and command.
 
 Examples:
 
     $ hk dynos
-    run.3794  up   1m  bash
-    web.1     up  15h  "blog /app /tmp/dst"
-    web.2     up   8h  "blog /app /tmp/dst"
+    run.3794  2X  up   1m  bash
+    web.1     1X  up  15h  "blog /app /tmp/dst"
+    web.2     1X  up   8h  "blog /app /tmp/dst"
 
     $ hk dynos web
-    web.1     up  15h  "blog /app /tmp/dst"
-    web.2     up   8h  "blog /app /tmp/dst"
+    web.1     1X  up  15h  "blog /app /tmp/dst"
+    web.2     1X  up   8h  "blog /app /tmp/dst"
 `,
 }
 
@@ -78,6 +77,8 @@ func listDynos(w io.Writer, names []string) {
 func listDyno(w io.Writer, d *heroku.Dyno) {
 	listRec(w,
 		d.Name,
+		// ensureSuffix until https://github.com/heroku/api/issues/1546 is fixed
+		ensureSuffix(d.Size, "X"),
 		d.State,
 		prettyDuration{dynoAge(d)},
 		maybeQuote(d.Command),
@@ -110,10 +111,6 @@ func (p DynosByName) Less(i, j int) bool {
 	return p[i].Type < p[j].Type || p[i].Type == p[j].Type && dynoSeq(&p[i]) < dynoSeq(&p[j])
 }
 
-type prettyDuration struct {
-	time.Duration
-}
-
 func dynoAge(d *heroku.Dyno) time.Duration {
 	return time.Now().Sub(d.UpdatedAt)
 }
@@ -121,31 +118,4 @@ func dynoAge(d *heroku.Dyno) time.Duration {
 func dynoSeq(d *heroku.Dyno) int {
 	i, _ := strconv.Atoi(strings.TrimPrefix(d.Name, d.Type+"."))
 	return i
-}
-
-func (a prettyDuration) String() string {
-	switch d := a.Duration; {
-	case d > 2*24*time.Hour:
-		return a.Unit(24*time.Hour, "d")
-	case d > 2*time.Hour:
-		return a.Unit(time.Hour, "h")
-	case d > 2*time.Minute:
-		return a.Unit(time.Minute, "m")
-	}
-	return a.Unit(time.Second, "s")
-}
-
-func (a prettyDuration) Unit(u time.Duration, s string) string {
-	return fmt.Sprintf("%2d", roundDur(a.Duration, u)) + s
-}
-
-func roundDur(d, k time.Duration) int {
-	return int((d + k/2 - 1) / k)
-}
-
-func abbrev(s string, n int) string {
-	if len(s) > n {
-		return s[:n-1] + "…"
-	}
-	return s
 }

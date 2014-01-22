@@ -30,8 +30,8 @@ Example:
     $ hk scale web=2:1X worker=5:2X
     Scaled myapp to web=2:1X, worker=5:2X.
 
-    $ hk scale web=2X worker=1X
-    Scaled myapp to web=2:2X, worker=5:1X.
+    $ hk scale web=PX worker=1X
+    Scaled myapp to web=2:PX, worker=5:1X.
 `,
 }
 
