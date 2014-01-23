@@ -147,7 +147,7 @@ Additional help topics:
 
 hk currently has a minimal plugin system. It may see substantial changes in the future, and those changes may break existing plugins or change the architecture at any time. Use this functionality at your own risk.
 
-Plugins are executables located in HKPATH or, if HKPATH does not exist, in /usr/local/lib/hk/plugin. They are executed when hk does not know command X and an installed plugin X exists. The special case default plugin will be executed iif hk has no command or installed plugin named X.
+Plugins are executables located in HKPATH or, if HKPATH does not exist, in /usr/local/lib/hk/plugin. They are executed when hk does not know command X and an installed plugin X exists. The special case default plugin will be executed if hk has no command or installed plugin named X.
 
 hk will set these environment variables for a plugin:
 
