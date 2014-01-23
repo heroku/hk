@@ -11,8 +11,7 @@ import (
 
 func defaultPluginPath() string {
 	hkpath := "/usr/local/lib/hk/plugin"
-	fi, err := os.Stat(hkpath)
-	if err == nil && fi.IsDir() {
+	if fi, err := os.Stat(hkpath); err == nil && fi.IsDir() {
 		return hkpath
 	}
 	if u, err := user.Current(); err != nil {
