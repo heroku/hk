@@ -10,14 +10,11 @@ import (
 )
 
 func defaultPluginPath() string {
-	home := ""
-	u, err := user.Current()
-	if err != nil {
-		home = "."
+	if u, err := user.Current(); err != nil {
+		return filepath.Join(".", ".hk", "plugins")
 	} else {
-		home = u.HomeDir
+		return filepath.Join(u.HomeDir, ".hk", "plugins")
 	}
-	return filepath.Join(home, ".hk", "plugins")
 }
 
 func sysExec(path string, args []string, env []string) error {
