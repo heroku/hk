@@ -106,22 +106,22 @@
             {
               "root": "account-feature-disable",
               "arguments": "<feature>",
-              "comment": "disable an account feature"
+              "comment": "disable an account feature (extra)"
             },
             {
               "root": "account-feature-enable",
               "arguments": "<feature>",
-              "comment": "enable an account feature"
+              "comment": "enable an account feature (extra)"
             },
             {
               "root": "account-feature-info",
               "arguments": "<feature>",
-              "comment": "show info for an account feature"
+              "comment": "show info for an account feature (extra)"
             },
             {
               "root": "account-features",
               "arguments": "",
-              "comment": "list account features"
+              "comment": "list account features (extra)"
             },
             {
               "root": "sshkey-add",
@@ -176,22 +176,22 @@
             {
               "root": "feature-disable",
               "arguments": "[-a <app>] <feature>",
-              "comment": "disable an app feature"
+              "comment": "disable an app feature (extra)"
             },
             {
               "root": "feature-enable",
               "arguments": "[-a <app>] <feature>",
-              "comment": "enable an app feature"
+              "comment": "enable an app feature (extra)"
             },
             {
               "root": "feature-info",
               "arguments": "[-a <app>] <feature>",
-              "comment": "show info for an app feature"
+              "comment": "show info for an app feature (extra)"
             },
             {
               "root": "features",
               "arguments": "[-a <app>]",
-              "comment": "list app features"
+              "comment": "list app features (extra)"
             },
             {
               "root": "info",
@@ -226,17 +226,17 @@
             {
               "root": "maintenance",
               "arguments": "[-a <app>]",
-              "comment": "show app maintenance mode"
+              "comment": "show app maintenance mode (extra)"
             },
             {
               "root": "maintenance-disable",
               "arguments": "[-a <app>]",
-              "comment": "disable maintenance mode"
+              "comment": "disable maintenance mode (extra)"
             },
             {
               "root": "maintenance-enable",
               "arguments": "[-a <app>]",
-              "comment": "enable maintenance mode"
+              "comment": "enable maintenance mode (extra)"
             },
             {
               "root": "open",
@@ -411,7 +411,12 @@
             {
               "root": "pg-info",
               "arguments": "[-a <app>] <dbname>",
-              "comment": "show Heroku Postgres database info"
+              "comment": "show Heroku Postgres database info (extra)"
+            },
+            {
+              "root": "psql",
+              "arguments": "[-a <app>] [-c <command>] [<dbname>]",
+              "comment": "open a psql shell to a Heroku Postgres database (extra)"
             }
           ],
           "title": "pg"
