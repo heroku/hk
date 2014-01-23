@@ -6,12 +6,46 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/mgutz/ansi"
 )
+
+func homePath() string {
+	// user.Current() requires cgo and thus doesn't work with cross-compiling.
+	// This following is an alternative that matches how the Heroku Toolbelt
+	// works, though per @fdr it may not be correct for all cases (when users have
+	// modified their home dir).
+	//
+	// http://stackoverflow.com/questions/7922270/obtain-users-home-directory
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
+}
+
+func hkHome() string {
+	return filepath.Join(homePath(), ".hk")
+}
+
+func netrcPath() string {
+	if s := os.Getenv("NETRC_PATH"); s != "" {
+		return s
+	}
+
+	filename := ".netrc"
+	if runtime.GOOS == "windows" {
+		filename = "_netrc"
+	}
+	return filepath.Join(homePath(), filename)
+}
 
 // exists returns whether the given file or directory exists or not
 func fileExists(path string) (bool, error) {
