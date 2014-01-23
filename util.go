@@ -14,23 +14,15 @@ import (
 	"github.com/mgutz/ansi"
 )
 
-func homePath() string {
-	// user.Current() requires cgo and thus doesn't work with cross-compiling.
-	// This following is an alternative that matches how the Heroku Toolbelt
-	// works, though per @fdr it may not be correct for all cases (when users have
-	// modified their home dir).
-	//
-	// http://stackoverflow.com/questions/7922270/obtain-users-home-directory
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
-}
-
+// user.Current() requires cgo and thus doesn't work with cross-compiling.
+// The following is an alternative that matches how the Heroku Toolbelt
+// works, though per @fdr it may not be correct for all cases (when users have
+// modified their home dir).
+//
+// homePath() is defined in the platform-specific source files unix.go and
+// windows.go.
+//
+// http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 func hkHome() string {
 	return filepath.Join(homePath(), ".hk")
 }
@@ -40,11 +32,7 @@ func netrcPath() string {
 		return s
 	}
 
-	filename := ".netrc"
-	if runtime.GOOS == "windows" {
-		filename = "_netrc"
-	}
-	return filepath.Join(homePath(), filename)
+	return filepath.Join(homePath(), netrcFilename)
 }
 
 // exists returns whether the given file or directory exists or not
