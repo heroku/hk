@@ -129,13 +129,6 @@ func ensurePrefix(val, prefix string) string {
 	return val
 }
 
-func ensureSuffix(val, suffix string) string {
-	if !strings.HasSuffix(val, suffix) {
-		return val + suffix
-	}
-	return val
-}
-
 func openURL(url string) error {
 	var command string
 	var args []string

@@ -77,8 +77,7 @@ func listDynos(w io.Writer, names []string) {
 func listDyno(w io.Writer, d *heroku.Dyno) {
 	listRec(w,
 		d.Name,
-		// ensureSuffix until https://github.com/heroku/api/issues/1546 is fixed
-		ensureSuffix(d.Size, "X"),
+		d.Size,
 		d.State,
 		prettyDuration{dynoAge(d)},
 		maybeQuote(d.Command),
