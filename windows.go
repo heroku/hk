@@ -7,6 +7,8 @@ import (
 	"os/exec"
 )
 
+const netrcFilename = "_netrc"
+
 func sysExec(path string, args []string, env []string) error {
 	cmd := exec.Command(path, args...)
 	cmd.Env = env
@@ -19,4 +21,12 @@ func sysExec(path string, args []string, env []string) error {
 	}
 	os.Exit(0)
 	return nil
+}
+
+func homePath() string {
+	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+	if home == "" {
+		home = os.Getenv("USERPROFILE")
+	}
+	return home
 }
