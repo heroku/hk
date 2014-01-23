@@ -76,7 +76,7 @@ available.
 To install a pre-built binary release, run the following one-liner:
 
 ```bash
-$ curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
+$ L=/usr/local/bin/hk && curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >$L && chmod +x $L
 ```
 
 The URL [https://hk.heroku.com/hk.gz](https://hk.heroku.com/hk.gz) will attempt
