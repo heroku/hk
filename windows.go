@@ -5,9 +5,10 @@ package main
 import (
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 )
+
+const netrcFilename = "_netrc"
 
 func sysExec(path string, args []string, env []string) error {
 	cmd := exec.Command(path, args...)
