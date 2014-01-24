@@ -9,19 +9,55 @@ import (
 	"os/exec"
 	"path/filepath"
 	"syscall"
+	"text/tabwriter"
 )
 
 var (
 	sshPubKeyPath string
 )
 
-var cmdSSHKeyAdd = &Command{
-	Run:      runSSHKeyAdd,
-	Usage:    "sshkey-add [<public-key-file>]",
+var cmdKeys = &Command{
+	Run:      runKeys,
+	Usage:    "keys",
 	Category: "account",
-	Short:    "add ssh public key",
+	Short:    "list ssh public keys" + extra,
 	Long: `
-Command sshkey-add adds an ssh public key to your Heroku account.
+Keys lists SSH public keys associated with your Heroku account.
+
+Examples:
+
+    $ hk keys
+    5e:67:40:b6:79:db:56:47:cd:3a:a7:65:ab:ed:12:34  user@test.com
+`,
+}
+
+func runKeys(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+
+	keys, err := client.KeyList(nil)
+	must(err)
+
+	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
+
+	for i := range keys {
+		listRec(w,
+			keys[i].Fingerprint,
+			keys[i].Email,
+		)
+	}
+}
+
+var cmdKeyAdd = &Command{
+	Run:      runKeyAdd,
+	Usage:    "key-add [<public-key-file>]",
+	Category: "account",
+	Short:    "add ssh public key" + extra,
+	Long: `
+Command key-add adds an ssh public key to your Heroku account.
 
 It tries these sources for keys, in order:
 
@@ -31,7 +67,7 @@ It tries these sources for keys, in order:
 `,
 }
 
-func runSSHKeyAdd(cmd *Command, args []string) {
+func runKeyAdd(cmd *Command, args []string) {
 	if len(args) > 1 {
 		cmd.printUsage()
 		os.Exit(2)
@@ -39,7 +75,7 @@ func runSSHKeyAdd(cmd *Command, args []string) {
 	if len(args) == 1 {
 		sshPubKeyPath = args[0]
 	}
-	keys, err := findSSHKeys()
+	keys, err := findKeys()
 	if err != nil {
 		if _, ok := err.(privKeyError); ok {
 			log.Println("refusing to upload")
@@ -52,7 +88,7 @@ func runSSHKeyAdd(cmd *Command, args []string) {
 	log.Printf("Key %s for %s added.", abbrev(key.Fingerprint, 15), key.Email)
 }
 
-func findSSHKeys() ([]byte, error) {
+func findKeys() ([]byte, error) {
 	if sshPubKeyPath != "" {
 		return sshReadPubKey(sshPubKeyPath)
 	}
@@ -98,4 +134,31 @@ type privKeyError string
 
 func (e privKeyError) Error() string {
 	return "appears to be a private key: " + string(e)
+}
+
+var cmdKeyRemove = &Command{
+	Run:      runKeyRemove,
+	Usage:    "key-remove <fingerprint>",
+	Category: "account",
+	Short:    "remove an ssh public key" + extra,
+	Long: `
+Command key-remove removes an ssh public key from your Heroku account.
+
+Examples:
+
+    $ hk key-remove 5e:67:40:b6:79:db:56:47:cd:3a:a7:65:ab:ed:12:34
+    Key 5e:67:40:b6:79:db… removed.
+`,
+}
+
+func runKeyRemove(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	fingerprint := args[0]
+
+	err := client.KeyDelete(fingerprint)
+	must(err)
+	log.Printf("Key %s removed.", abbrev(fingerprint, 18))
 }
