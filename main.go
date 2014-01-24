@@ -103,7 +103,6 @@ var commands = []*Command{
 	cmdDomains,
 	cmdDomainAdd,
 	cmdDomainRemove,
-	cmdKeyAdd,
 	cmdVersion,
 	cmdHelp,
 
@@ -128,6 +127,9 @@ var commands = []*Command{
 	cmdFeatureEnable,
 	cmdFeatureDisable,
 	cmdGet,
+	cmdKeys,
+	cmdKeyAdd,
+	cmdKeyRemove,
 	cmdMaintenance,
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,
