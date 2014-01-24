@@ -152,8 +152,8 @@ var commands = []*Command{
 
 var (
 	flagApp   string
-	client    heroku.Client
-	pgclient  postgresql.Client
+	client    *heroku.Client
+	pgclient  *postgresql.Client
 	hkAgent   = "hk/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	userAgent = hkAgent + " " + heroku.DefaultUserAgent
 )
@@ -235,14 +235,14 @@ func initClients() {
 		printError("No credentials found in HEROKU_API_URL or netrc.")
 	}
 	debug := os.Getenv("HKDEBUG") != ""
-	client = heroku.Client{
+	client = &heroku.Client{
 		URL:       apiURL,
 		Username:  user,
 		Password:  pass,
 		UserAgent: userAgent,
 		Debug:     debug,
 	}
-	pgclient = postgresql.Client{
+	pgclient = &postgresql.Client{
 		Username:  user,
 		Password:  pass,
 		UserAgent: userAgent,
