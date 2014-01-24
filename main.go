@@ -103,7 +103,7 @@ var commands = []*Command{
 	cmdDomains,
 	cmdDomainAdd,
 	cmdDomainRemove,
-	cmdSSHKeyAdd,
+	cmdKeyAdd,
 	cmdVersion,
 	cmdHelp,
 

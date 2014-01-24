@@ -15,13 +15,13 @@ var (
 	sshPubKeyPath string
 )
 
-var cmdSSHKeyAdd = &Command{
-	Run:      runSSHKeyAdd,
-	Usage:    "sshkey-add [<public-key-file>]",
+var cmdKeyAdd = &Command{
+	Run:      runKeyAdd,
+	Usage:    "key-add [<public-key-file>]",
 	Category: "account",
 	Short:    "add ssh public key",
 	Long: `
-Command sshkey-add adds an ssh public key to your Heroku account.
+Command key-add adds an ssh public key to your Heroku account.
 
 It tries these sources for keys, in order:
 
@@ -31,7 +31,7 @@ It tries these sources for keys, in order:
 `,
 }
 
-func runSSHKeyAdd(cmd *Command, args []string) {
+func runKeyAdd(cmd *Command, args []string) {
 	if len(args) > 1 {
 		cmd.printUsage()
 		os.Exit(2)
@@ -39,7 +39,7 @@ func runSSHKeyAdd(cmd *Command, args []string) {
 	if len(args) == 1 {
 		sshPubKeyPath = args[0]
 	}
-	keys, err := findSSHKeys()
+	keys, err := findKeys()
 	if err != nil {
 		if _, ok := err.(privKeyError); ok {
 			log.Println("refusing to upload")
@@ -52,7 +52,7 @@ func runSSHKeyAdd(cmd *Command, args []string) {
 	log.Printf("Key %s for %s added.", abbrev(key.Fingerprint, 15), key.Email)
 }
 
-func findSSHKeys() ([]byte, error) {
+func findKeys() ([]byte, error) {
 	if sshPubKeyPath != "" {
 		return sshReadPubKey(sshPubKeyPath)
 	}
