@@ -41,7 +41,7 @@ code {
 	margin-top: 40px;
 	margin-left: auto;
 	margin-right: auto;
-	width: 850px;
+	width: 815px;
 }
 
 a:link, a:visited, a:active {
@@ -54,7 +54,7 @@ a:link, a:visited, a:active {
 
 <h1>hk</h1>
 
-<code>curl -sL -A `uname -s` https://hk.heroku.com/hk.gz | zcat >/usr/local/bin/hk && chmod +x /usr/local/bin/hk
+<code>L=/usr/local/bin/hk && curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >$L && chmod +x $L
 </code>
 
 </body>

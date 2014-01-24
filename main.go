@@ -10,8 +10,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"os/user"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -27,29 +25,6 @@ var (
 	apiURL = "https://api.heroku.com"
 	stdin  = bufio.NewReader(os.Stdin)
 )
-
-func hkHome() string {
-	return filepath.Join(homePath(), ".hk")
-}
-
-func homePath() string {
-	u, err := user.Current()
-	if err != nil {
-		panic("couldn't determine user: " + err.Error())
-	}
-	return u.HomeDir
-}
-
-func netrcPath() string {
-	if s := os.Getenv("NETRC_PATH"); s != "" {
-		return s
-	}
-
-	if runtime.GOOS == "windows" {
-		return filepath.Join(homePath(), "_netrc")
-	}
-	return filepath.Join(homePath(), ".netrc")
-}
 
 type Command struct {
 	// args does not include the command name

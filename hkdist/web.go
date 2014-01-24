@@ -185,7 +185,7 @@ func isDarwin(ua string) bool {
 }
 
 func guessArch(ua string) string {
-	if strings.Contains(ua, "amd64") || strings.Contains(ua, "x86_64") || isDarwin(ua) {
+	if strings.Contains(ua, "x86_64") || strings.Contains(ua, "amd64") || isDarwin(ua) {
 		return "amd64"
 	}
 	return "386"
