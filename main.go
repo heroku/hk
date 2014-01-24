@@ -224,7 +224,12 @@ func main() {
 }
 
 func initClients() {
+	disableSSLVerify := false
 	apiURL = heroku.DefaultAPIURL
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		apiURL = s
+		disableSSLVerify = true
+	}
 	user, pass := getCreds(apiURL)
 	if user == "" && pass == "" {
 		printError("No credentials found in HEROKU_API_URL or netrc.")
@@ -243,15 +248,12 @@ func initClients() {
 		UserAgent: userAgent,
 		Debug:     debug,
 	}
-	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+	if disableSSLVerify || os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
 		client.HTTP = &http.Client{Transport: http.DefaultTransport}
 		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
 		pgclient.HTTP = client.HTTP
-	}
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		client.URL = s
 	}
 	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
 		pgclient.URL = s
