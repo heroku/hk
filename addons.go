@@ -204,9 +204,9 @@ func runAddonOpen(cmd *Command, args []string) {
 func checkAddonError(err error) {
 	if err != nil {
 		if hkerr, ok := err.(heroku.Error); ok && hkerr.Id == "not_found" {
-			log.Println(err, "Choose an addon name from `hk addons`.")
+			printError(err.Error() + " Choose an addon name from `hk addons`.")
 		} else {
-			log.Println(err)
+			printError(err.Error())
 		}
 		os.Exit(2)
 	}
