@@ -58,9 +58,8 @@ which are all very appealing to Heroku.
 
 #### Unix
 
-Heroku loves Unix. This client should reflect that. Commands are single,
-unhyphenated words that map to their unix ancestors’ names and flags where
-applicable.
+Heroku loves Unix. This client should reflect that. Commands map to their unix
+ancestors’ names and flags where applicable.
 
 ### Installation
 
