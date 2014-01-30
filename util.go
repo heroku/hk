@@ -138,7 +138,7 @@ func openURL(url string) error {
 		args = []string{command, url}
 	case "windows":
 		command = "cmd"
-		args = []string{"/c", "start " + url}
+		args = []string{"/c", "start " + strings.Replace(url, "&", "^&", -1)}
 	default:
 		if _, err := exec.LookPath("xdg-open"); err != nil {
 			log.Println("xdg-open is required to open web pages on " + runtime.GOOS)
