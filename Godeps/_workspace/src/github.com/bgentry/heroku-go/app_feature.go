@@ -29,6 +29,9 @@ type AppFeature struct {
 	// unique name of app feature
 	Name string `json:"name"`
 
+	// state of app feature
+	State string `json:"state"`
+
 	// when app feature was updated
 	UpdatedAt time.Time `json:"updated_at"`
 }

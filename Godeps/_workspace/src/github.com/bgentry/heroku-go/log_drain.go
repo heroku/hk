@@ -11,7 +11,8 @@ import (
 // Log drains provide a way to forward your Heroku logs to an external syslog
 // server for long-term archiving. This external service must be configured to
 // receive syslog packets from Heroku, whereupon its URL can be added to an app
-// using this API.
+// using this API. Some addons will add a log drain when they are provisioned to
+// an app. These drains can only be removed by removing the add-on.
 type LogDrain struct {
 	// addon that created the drain
 	Addon *struct {
@@ -48,7 +49,8 @@ func (c *Client) LogDrainCreate(appIdentity string, url string) (*LogDrain, erro
 	return &logDrainRes, c.Post(&logDrainRes, "/apps/"+appIdentity+"/log-drains", params)
 }
 
-// Delete an existing log drain.
+// Delete an existing log drain. Log drains added by add-ons can only be removed
+// by removing the add-on.
 //
 // appIdentity is the unique identifier of the log-drain's app. logDrainIdentity
 // is the unique identifier of the LogDrain.

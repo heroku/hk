@@ -69,6 +69,14 @@
             "string"
           ]
         },
+        "state": {
+          "description": "state of account feature",
+          "example": "public",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
         "updated_at": {
           "description": "when account feature was updated",
           "example": "2012-01-01T12:00:00Z",
@@ -130,6 +138,9 @@
         },
         "name": {
           "$ref": "#/definitions/account-feature/definitions/name"
+        },
+        "state": {
+          "$ref": "#/definitions/account-feature/definitions/state"
         },
         "updated_at": {
           "$ref": "#/definitions/account-feature/definitions/updated_at"
@@ -448,6 +459,20 @@
         "object"
       ],
       "definitions": {
+        "config_vars": {
+          "description": "config vars associated with this application",
+          "example": [
+            "FOO",
+            "BAZ"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true,
+          "type": [
+            "array"
+          ]
+        },
         "created_at": {
           "description": "when add-on was updated",
           "example": "2012-01-01T12:00:00Z",
@@ -576,6 +601,9 @@
         }
       ],
       "properties": {
+        "config_vars": {
+          "$ref": "#/definitions/addon/definitions/config_vars"
+        },
         "created_at": {
           "$ref": "#/definitions/addon/definitions/created_at"
         },
@@ -675,6 +703,14 @@
             "string"
           ]
         },
+        "state": {
+          "description": "state of app feature",
+          "example": "public",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
         "updated_at": {
           "description": "when app feature was updated",
           "example": "2012-01-01T12:00:00Z",
@@ -736,6 +772,9 @@
         },
         "name": {
           "$ref": "#/definitions/app-feature/definitions/name"
+        },
+        "state": {
+          "$ref": "#/definitions/app-feature/definitions/state"
         },
         "updated_at": {
           "$ref": "#/definitions/app-feature/definitions/updated_at"
@@ -1712,7 +1751,7 @@
       }
     },
     "formation": {
-      "description": "The formation of processes that should be maintained for an app. Update the formation to scale processes or change dyno sizes. Commands and types are defined by the Procfile uploaded with an app.",
+      "description": "The formation of processes that should be maintained for an app. Update the formation to scale processes or change dyno sizes. Available process type names and commands are defined by the `process_types` attribute for the [slug](#slug) currently released on an app.",
       "id": "schema/formation",
       "$schema": "http://json-schema.org/draft-04/hyper-schema",
       "title": "Heroku Platform API - Formation",
@@ -2030,7 +2069,7 @@
       }
     },
     "log-drain": {
-      "description": "[Log drains](https://devcenter.heroku.com/articles/logging#syslog-drains) provide a way to forward your Heroku logs to an external syslog server for long-term archiving. This external service must be configured to receive syslog packets from Heroku, whereupon its URL can be added to an app using this API.",
+      "description": "[Log drains](https://devcenter.heroku.com/articles/logging#syslog-drains) provide a way to forward your Heroku logs to an external syslog server for long-term archiving. This external service must be configured to receive syslog packets from Heroku, whereupon its URL can be added to an app using this API. Some addons will add a log drain when they are provisioned to an app. These drains can only be removed by removing the add-on.",
       "id": "schema/log-drain",
       "$schema": "http://json-schema.org/draft-04/hyper-schema",
       "title": "Heroku Platform API - Log Drain",
@@ -2121,7 +2160,7 @@
           "title": "Create"
         },
         {
-          "description": "Delete an existing log drain.",
+          "description": "Delete an existing log drain. Log drains added by add-ons can only be removed by removing the add-on.",
           "href": "/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}/log-drains/{(%23%2Fdefinitions%2Flog-drain%2Fdefinitions%2Fidentity)}",
           "method": "DELETE",
           "rel": "destroy",
@@ -3356,21 +3395,13 @@
         "object"
       ],
       "definitions": {
-        "blob": {
-          "additionalProperties": false,
-          "description": "HTTP verb and url where clients can fetch or store the release blob file",
-          "example": {
-            "get": "https://api.heroku.com/slugs/1234.tgz"
-          },
-          "patternProperties": {
-            "^\\w+$": {
-              "type": [
-                "string"
-              ]
-            }
-          },
+        "buildpack_provided_description": {
+          "description": "description from buildpack of slug",
+          "example": "Ruby/Rack",
+          "readOnly": false,
           "type": [
-            "object"
+            "null",
+            "string"
           ]
         },
         "commit": {
@@ -3407,6 +3438,14 @@
             }
           ]
         },
+        "method": {
+          "description": "method to be used to interact with the slug blob",
+          "example": "GET",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
         "process_types": {
           "additionalProperties": false,
           "description": "hash mapping process type names to their respective command",
@@ -3432,6 +3471,14 @@
           "type": [
             "string"
           ]
+        },
+        "url": {
+          "description": "URL to interact with the slug blob",
+          "example": "https://api.heroku.com/slugs/1234.tgz",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
         }
       },
       "links": [
@@ -3449,6 +3496,9 @@
           "rel": "create",
           "schema": {
             "properties": {
+              "buildpack_provided_description": {
+                "$ref": "#/definitions/slug/definitions/buildpack_provided_description"
+              },
               "commit": {
                 "$ref": "#/definitions/slug/definitions/commit"
               },
@@ -3465,7 +3515,21 @@
       ],
       "properties": {
         "blob": {
-          "$ref": "#/definitions/slug/definitions/blob"
+          "description": "pointer to the url where clients can fetch or store the actual release binary",
+          "properties": {
+            "method": {
+              "$ref": "#/definitions/slug/definitions/method"
+            },
+            "url": {
+              "$ref": "#/definitions/slug/definitions/url"
+            }
+          },
+          "type": [
+            "object"
+          ]
+        },
+        "buildpack_provided_description": {
+          "$ref": "#/definitions/slug/definitions/buildpack_provided_description"
         },
         "commit": {
           "$ref": "#/definitions/slug/definitions/commit"
