@@ -24,6 +24,10 @@
 			"Rev": "ab3320c0b603292a42f39cd41a0a8f71d1b3716b"
 		},
 		{
+			"ImportPath": "github.com/bgentry/speakeasy",
+			"Rev": "62eddfa017d29832a81604b8118bfc0350144270"
+		},
+		{
 			"ImportPath": "github.com/bgentry/testnet",
 			"Rev": "05450cdcf16c84d5b08dc9bb617250aa7b63c8ff"
 		},

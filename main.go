@@ -7,14 +7,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 	"syscall"
 
-	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
 	"github.com/heroku/hk/postgresql"
 	"github.com/heroku/hk/term"
@@ -134,6 +132,7 @@ var commands = []*Command{
 	cmdKeys,
 	cmdKeyAdd,
 	cmdKeyRemove,
+	cmdLogin,
 	cmdMaintenance,
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,
@@ -271,30 +270,6 @@ func initClients() {
 			)
 		}
 	}
-}
-
-func getCreds(u string) (user, pass string) {
-	apiURL, err := url.Parse(u)
-	if err != nil {
-		printError("invalid API URL: %s", err)
-	}
-	if apiURL.Host == "" {
-		printError("missing API host: %s", u)
-	}
-	if apiURL.User != nil {
-		pw, _ := apiURL.User.Password()
-		return apiURL.User.Username(), pw
-	}
-
-	m, err := netrc.FindMachine(netrcPath(), apiURL.Host)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return "", ""
-		}
-		printError("netrc error (%s): %v", apiURL.Host, err)
-	}
-
-	return m.Login, m.Password
 }
 
 func app() (string, error) {
