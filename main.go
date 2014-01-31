@@ -133,6 +133,7 @@ var commands = []*Command{
 	cmdKeyAdd,
 	cmdKeyRemove,
 	cmdLogin,
+	cmdLogout,
 	cmdMaintenance,
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,

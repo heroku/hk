@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -88,4 +89,36 @@ func readPassword(prompt string) (password string, err error) {
 	}
 	// NOTE: gopass doesn't support multi-byte chars on Windows
 	return speakeasy.Ask("Enter password: ")
+}
+
+var cmdLogout = &Command{
+	Run:      runLogout,
+	Usage:    "logout",
+	Category: "hk",
+	Short:    "log out of your Heroku account" + extra,
+	Long: `
+Log out of your Heroku account and remove credentials from
+this machine.
+
+Example:
+
+    $ hk logout
+    Logged out.
+`,
+}
+
+func runLogout(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	u, err := url.Parse(client.URL)
+	if err != nil {
+		printError("couldn't parse client URL: " + err.Error())
+	}
+	err = removeCreds(strings.Split(u.Host, ":")[0])
+	if err != nil {
+		printError("saving new netrc: " + err.Error())
+	}
+	fmt.Println("Logged out.")
 }

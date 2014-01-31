@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/bgentry/go-netrc/netrc"
 	"io"
 	"io/ioutil"
 	"log"
@@ -14,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bgentry/go-netrc/netrc"
 	"github.com/mgutz/ansi"
 )
 
@@ -82,6 +82,17 @@ func saveCreds(host, user, pass string) error {
 	}
 	m.UpdateLogin(user)
 	m.UpdatePassword(pass)
+
+	body, err := nrc.MarshalText()
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(netrcPath(), body, 0600)
+}
+
+func removeCreds(host string) error {
+	loadNetrc()
+	nrc.RemoveMachine(host)
 
 	body, err := nrc.MarshalText()
 	if err != nil {
