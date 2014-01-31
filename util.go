@@ -71,6 +71,9 @@ func getCreds(u string) (user, pass string) {
 	}
 
 	m := nrc.FindMachine(apiURL.Host)
+	if m == nil {
+		return "", ""
+	}
 	return m.Login, m.Password
 }
 

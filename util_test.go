@@ -33,6 +33,12 @@ func TestGetCreds(t *testing.T) {
 	if p != "faketestpassword" {
 		t.Errorf("expected password=faketestpassword, got %s", p)
 	}
+
+	// test with a nil machine
+	u, p = getCreds("https://someotherapi.heroku.com")
+	if u != "" || p != "" {
+		t.Errorf("expected empty user and pass, got u=%q p=%q", u, p)
+	}
 }
 
 func TestNetrcPath(t *testing.T) {
