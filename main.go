@@ -233,9 +233,6 @@ func initClients() {
 		disableSSLVerify = true
 	}
 	user, pass := getCreds(apiURL)
-	if user == "" && pass == "" {
-		printError("No credentials found in HEROKU_API_URL or netrc.")
-	}
 	debug := os.Getenv("HKDEBUG") != ""
 	client = &heroku.Client{
 		URL:       apiURL,
