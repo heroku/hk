@@ -55,27 +55,24 @@ func runLogin(cmd *Command, args []string) {
 		printError("reading password: " + err.Error())
 	}
 
-	description := "hk login from " + time.Now().UTC().Format(time.RFC3339)
-	expires := 2592000 // 30 days
-	opts := heroku.OAuthAuthorizationCreateOpts{
-		Description: &description,
-		ExpiresIn:   &expires,
-	}
-
-	req, err := client.NewRequest("POST", "/oauth/authorizations", &opts)
+	hostname, token, err := attemptLogin(username, password, "")
 	if err != nil {
-		printError("unknown error when creating login request: %s", err.Error())
+		if herror, ok := err.(heroku.Error); ok && herror.Id == "two_factor" {
+			// 2FA requested, attempt 2FA login
+			var twoFactorCode string
+			fmt.Printf("Enter two-factor auth code: ")
+			_, err := fmt.Scanln(&twoFactorCode)
+			if err != nil {
+				printError("reading two-factor auth code: " + err.Error())
+			}
+			hostname, token, err = attemptLogin(username, password, twoFactorCode)
+			must(err)
+		} else {
+			must(err)
+		}
 	}
-	req.SetBasicAuth(username, password)
 
-	var auth heroku.OAuthAuthorization
-	err = client.DoReq(req, &auth)
-	must(err)
-
-	if auth.AccessToken == nil {
-		printError("access token missing from Heroku API login response")
-	}
-	err = saveCreds(strings.Split(req.Host, ":")[0], username, auth.AccessToken.Token)
+	err = saveCreds(hostname, username, token)
 	if err != nil {
 		printError("saving new token: " + err.Error())
 	}
@@ -87,8 +84,36 @@ func readPassword(prompt string) (password string, err error) {
 		_, err = fmt.Scanln(&password)
 		return
 	}
-	// NOTE: gopass doesn't support multi-byte chars on Windows
+	// NOTE: speakeasy may not support multi-byte chars on Windows
 	return speakeasy.Ask("Enter password: ")
+}
+
+func attemptLogin(username, password, twoFactorCode string) (hostname, token string, err error) {
+	description := "hk login from " + time.Now().UTC().Format(time.RFC3339)
+	expires := 2592000 // 30 days
+	opts := heroku.OAuthAuthorizationCreateOpts{
+		Description: &description,
+		ExpiresIn:   &expires,
+	}
+
+	req, err := client.NewRequest("POST", "/oauth/authorizations", &opts)
+	if err != nil {
+		return "", "", fmt.Errorf("unknown error when creating login request: %s", err.Error())
+	}
+	req.SetBasicAuth(username, password)
+
+	if twoFactorCode != "" {
+		req.Header.Set("Heroku-Two-Factor-Code", twoFactorCode)
+	}
+
+	var auth heroku.OAuthAuthorization
+	if err = client.DoReq(req, &auth); err != nil {
+		return
+	}
+	if auth.AccessToken == nil {
+		return "", "", fmt.Errorf("access token missing from Heroku API login response")
+	}
+	return strings.Split(req.Host, ":")[0], auth.AccessToken.Token, nil
 }
 
 var cmdLogout = &Command{
