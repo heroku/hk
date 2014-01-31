@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/bgentry/go-netrc/netrc"
+	"github.com/bgentry/heroku-go"
 	"github.com/mgutz/ansi"
 )
 
@@ -118,6 +119,11 @@ func fileExists(path string) (bool, error) {
 
 func must(err error) {
 	if err != nil {
+		if herror, ok := err.(heroku.Error); ok {
+			if herror.Id == "unauthorized" {
+				printError(err.Error() + " Log in with `hk login`.")
+			}
+		}
 		printError(err.Error())
 	}
 }
