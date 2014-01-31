@@ -283,6 +283,7 @@ module Generator
                 arraytype = if propdef["items"]["$ref"]
                   resolve_typedef(propdef["items"])
                 else
+                  puts "propdef[items][type]: #{propdef["items"]["type"].inspect}"
                   propdef["items"]["type"]
                 end
                 "[]#{arraytype}"

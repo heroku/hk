@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,8 +13,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bgentry/go-netrc/netrc"
+	"github.com/bgentry/heroku-go"
 	"github.com/mgutz/ansi"
 )
+
+var nrc *netrc.Netrc
 
 // user.Current() requires cgo and thus doesn't work with cross-compiling.
 // The following is an alternative that matches how the Heroku Toolbelt
@@ -35,6 +41,70 @@ func netrcPath() string {
 	return filepath.Join(homePath(), netrcFilename)
 }
 
+func loadNetrc() {
+	if nrc == nil {
+		var err error
+		if nrc, err = netrc.ParseFile(netrcPath()); err != nil {
+			if os.IsNotExist(err) {
+				return
+			}
+			printError("loading netrc: " + err.Error())
+		}
+	}
+}
+
+func getCreds(u string) (user, pass string) {
+	loadNetrc()
+	if nrc == nil {
+		return "", ""
+	}
+
+	apiURL, err := url.Parse(u)
+	if err != nil {
+		printError("invalid API URL: %s", err)
+	}
+	if apiURL.Host == "" {
+		printError("missing API host: %s", u)
+	}
+	if apiURL.User != nil {
+		pw, _ := apiURL.User.Password()
+		return apiURL.User.Username(), pw
+	}
+
+	m := nrc.FindMachine(apiURL.Host)
+	if m == nil {
+		return "", ""
+	}
+	return m.Login, m.Password
+}
+
+func saveCreds(host, user, pass string) error {
+	loadNetrc()
+	m := nrc.FindMachine(host)
+	if m == nil || m.IsDefault() {
+		m = nrc.NewMachine(host, user, pass, "")
+	}
+	m.UpdateLogin(user)
+	m.UpdatePassword(pass)
+
+	body, err := nrc.MarshalText()
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(netrcPath(), body, 0600)
+}
+
+func removeCreds(host string) error {
+	loadNetrc()
+	nrc.RemoveMachine(host)
+
+	body, err := nrc.MarshalText()
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(netrcPath(), body, 0600)
+}
+
 // exists returns whether the given file or directory exists or not
 func fileExists(path string) (bool, error) {
 	_, err := os.Stat(path)
@@ -49,6 +119,11 @@ func fileExists(path string) (bool, error) {
 
 func must(err error) {
 	if err != nil {
+		if herror, ok := err.(heroku.Error); ok {
+			if herror.Id == "unauthorized" {
+				printError(err.Error() + " Log in with `hk login`.")
+			}
+		}
 		printError(err.Error())
 	}
 }
@@ -138,7 +213,7 @@ func openURL(url string) error {
 		args = []string{command, url}
 	case "windows":
 		command = "cmd"
-		args = []string{"/c", "start " + url}
+		args = []string{"/c", "start " + strings.Replace(url, "&", "^&", -1)}
 	default:
 		if _, err := exec.LookPath("xdg-open"); err != nil {
 			log.Println("xdg-open is required to open web pages on " + runtime.GOOS)

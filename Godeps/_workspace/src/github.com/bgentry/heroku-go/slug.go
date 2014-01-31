@@ -11,8 +11,14 @@ import (
 // A slug is a snapshot of your application code that is ready to run on the
 // platform.
 type Slug struct {
-	// HTTP verb and url where clients can fetch or store the release blob file
-	Blob map[string]string `json:"blob"`
+	// pointer to the url where clients can fetch or store the actual release binary
+	Blob struct {
+		Method string `json:"method"`
+		URL    string `json:"url"`
+	} `json:"blob"`
+
+	// description from buildpack of slug
+	BuildpackProvidedDescription *string `json:"buildpack_provided_description"`
 
 	// identification of the code with your version control system (eg: SHA of the git HEAD)
 	Commit *string `json:"commit"`
@@ -47,12 +53,14 @@ func (c *Client) SlugInfo(appIdentity string, slugIdentity string) (*Slug, error
 // struct of optional parameters for this action.
 func (c *Client) SlugCreate(appIdentity string, processTypes map[string]string, options *SlugCreateOpts) (*Slug, error) {
 	params := struct {
-		ProcessTypes map[string]string `json:"process_types"`
-		Commit       *string           `json:"commit,omitempty"`
+		ProcessTypes                 map[string]string `json:"process_types"`
+		BuildpackProvidedDescription *string           `json:"buildpack_provided_description,omitempty"`
+		Commit                       *string           `json:"commit,omitempty"`
 	}{
 		ProcessTypes: processTypes,
 	}
 	if options != nil {
+		params.BuildpackProvidedDescription = options.BuildpackProvidedDescription
 		params.Commit = options.Commit
 	}
 	var slugRes Slug
@@ -61,6 +69,8 @@ func (c *Client) SlugCreate(appIdentity string, processTypes map[string]string, 
 
 // SlugCreateOpts holds the optional parameters for SlugCreate
 type SlugCreateOpts struct {
+	// description from buildpack of slug
+	BuildpackProvidedDescription *string `json:"buildpack_provided_description,omitempty"`
 	// identification of the code with your version control system (eg: SHA of the git HEAD)
 	Commit *string `json:"commit,omitempty"`
 }
