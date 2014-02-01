@@ -35,9 +35,13 @@ type Client struct {
 	// Heroku Postgres API.
 	HTTP *http.Client
 
-	// The URL of the Heroku API to communicate with. Defaults to
-	// "https://api.heroku.com".
+	// The URL of the Heroku Postgres API to communicate with. Defaults to
+	// DefaultAPIURL.
 	URL string
+
+	// The URL of the Heroku Postgres Starter API to communicate with. Defaults
+	// to DefaultStarterAPIURL.
+	StarterURL string
 
 	// Username is the HTTP basic auth username for API calls made by this Client.
 	Username string
@@ -91,6 +95,9 @@ func (c *Client) NewRequest(isStarterPlan bool, method, path string) (*http.Requ
 	var rbody io.Reader
 
 	apiURL := strings.TrimRight(c.URL, "/")
+	if isStarterPlan {
+		apiURL = strings.TrimRight(c.StarterURL, "/")
+	}
 	if apiURL == "" {
 		if isStarterPlan {
 			apiURL = DefaultStarterAPIURL

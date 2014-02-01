@@ -4,11 +4,11 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 
+	"github.com/bgentry/heroku-go"
 	"github.com/heroku/hk/postgresql"
 )
 
@@ -51,9 +51,22 @@ func runPgInfo(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	appname := mustApp()
-	addonName := ensurePrefix(args[0], "heroku-postgresql-")
-	addon, err := client.AddonInfo(appname, addonName)
+	// list all addons
+	addons, err := client.AddonList(appname, nil)
 	must(err)
+
+	// locate specific addon
+	addonName := ensurePrefix(args[0], hpgAddonName()+"-")
+	var addon *heroku.Addon
+	for i := range addons {
+		if addons[i].Name == addonName {
+			addon = &addons[i]
+			break
+		}
+	}
+	if addon == nil {
+		printError("addon %s not found", addonName)
+	}
 
 	// fetch app's config concurrently in case we need to resolve DB names
 	var appConf map[string]string
@@ -77,15 +90,16 @@ func runPgInfo(cmd *Command, args []string) {
 	case appConf = <-confch:
 	}
 
-	printPgInfo(addonName, info, appConf)
+	addonMap := newPgAddonMap(addons, appConf)
+	printPgInfo(addonName, info, &addonMap)
 }
 
-func printPgInfo(name string, info postgresql.DBInfo, appConf map[string]string) {
+func printPgInfo(name string, info postgresql.DBInfo, addonMap *pgAddonMap) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
 	listRec(w, "Name:", name)
-	envNames := strings.Join(EnvNamesFromURL(info.ResourceURL, appConf), ", ")
+	envNames := strings.Join(addonMap.FindEnvsFromValue(info.ResourceURL), ", ")
 	listRec(w, "Env Vars:", envNames)
 
 	// List info items returned by PG API
@@ -100,10 +114,12 @@ func printPgInfo(name string, info postgresql.DBInfo, appConf map[string]string)
 				}
 				if ie.ResolveDBName {
 					valstr := val.(string)
-					listRec(w, label, DatabaseNameFromURL(valstr, appConf))
-				} else {
-					listRec(w, label, val)
+					if addonName, ok := addonMap.FindAddonFromValue(valstr); ok {
+						listRec(w, label, addonName)
+						continue
+					}
 				}
+				listRec(w, label, val)
 			}
 		}
 	}
@@ -205,39 +221,4 @@ func runPsql(cmd *Command, args []string) {
 	if err := runCommand("psql", psqlArgs, pgenv); err != nil {
 		printError("Error running psql: %s", err)
 	}
-}
-
-func EnvNamesFromURL(url string, env map[string]string) (names []string) {
-	for k, v := range env {
-		if isEnvKeyFromPostgres(k) && v == url {
-			names = append(names, k)
-		}
-	}
-	sort.Strings(names)
-	return
-}
-
-func DatabaseNameFromURL(url string, env map[string]string) string {
-	for k, v := range env {
-		if isEnvKeyFromPostgres(k) && v == url {
-			return pgEnvToDBName(k)
-		}
-	}
-	return url
-}
-
-func pgEnvToDBName(key string) string {
-	return strings.ToLower(strings.Replace(strings.TrimSuffix(key, "_URL"), "_", "-", -1))
-}
-
-func dbNameToPgEnv(name string) string {
-	return ensurePrefix(
-		strings.ToUpper(strings.Replace(name, "-", "_", -1)),
-		"HEROKU_POSTGRESQL_",
-	) + "_URL"
-}
-
-func isEnvKeyFromPostgres(key string) bool {
-	return key == "DATABASE_URL" ||
-		strings.HasPrefix(key, "HEROKU_POSTGRESQL_") && strings.HasSuffix(key, "_URL")
 }

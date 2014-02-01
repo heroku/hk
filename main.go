@@ -255,7 +255,11 @@ func initClients() {
 		pgclient.HTTP = client.HTTP
 	}
 	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
-		pgclient.URL = s
+		pgclient.StarterURL = "https://" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
+		pgclient.URL = "https://" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
+	}
+	if s := os.Getenv("SHOGUN"); s != "" {
+		pgclient.URL = "https://shogun-" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
 	}
 	client.AdditionalHeaders = http.Header{}
 	pgclient.AdditionalHeaders = http.Header{}
