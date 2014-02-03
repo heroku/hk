@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"os"
 	"text/tabwriter"
 )
@@ -22,25 +21,21 @@ Examples:
 `,
 }
 
-func runRegions(cmd *Command, names []string) {
-	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
-	defer w.Flush()
-
-	if len(names) > 1 {
+func runRegions(cmd *Command, args []string) {
+	if len(args) != 0 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	listRegions(w, names)
-}
-
-func listRegions(w io.Writer, names []string) {
 	regions, err := client.RegionList(nil)
 	must(err)
 
-	for _, d := range regions {
+	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
+
+	for _, r := range regions {
 		listRec(w,
-			d.Name,
-			d.Description,
+			r.Name,
+			r.Description,
 		)
 	}
 }
