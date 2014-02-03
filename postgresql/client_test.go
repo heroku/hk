@@ -41,17 +41,34 @@ func TestNewRequestURL(t *testing.T) {
 
 	// Test with an overridden Client.URL
 	c.URL = "https://myfakeurl.com/omg"
-	req, err = c.NewRequest(true, "GET", "/")
+	c.StarterURL = ""
+	req, err = c.NewRequest(false, "GET", "/")
 	if err != nil {
 		t.Error(err)
 	} else if req.URL.String() != c.URL+"/" {
 		t.Errorf("expected overridden non-starter req.URL=%s, got %s", c.URL+"/", req.URL.String())
 	}
+	req, err = c.NewRequest(true, "GET", "/")
+	if err != nil {
+		t.Error(err)
+	} else if req.URL.String() != DefaultStarterAPIURL+"/" {
+		t.Errorf("expected default starter req.URL=%s, got %s", DefaultStarterAPIURL+"/", req.URL.String())
+	}
+
+	// Test with an overridden Client.StarterURL
+	c.URL = ""
+	c.StarterURL = "https://myfakeurl.com/omg"
 	req, err = c.NewRequest(false, "GET", "/")
 	if err != nil {
 		t.Error(err)
-	} else if req.URL.String() != c.URL+"/" {
-		t.Errorf("expected overridden starter req.URL=%s, got %s", c.URL+"/", req.URL.String())
+	} else if req.URL.String() != DefaultAPIURL+"/" {
+		t.Errorf("expected default non-starter req.URL=%s, got %s", DefaultAPIURL+"/", req.URL.String())
+	}
+	req, err = c.NewRequest(true, "GET", "/")
+	if err != nil {
+		t.Error(err)
+	} else if req.URL.String() != c.StarterURL+"/" {
+		t.Errorf("expected overridden starter req.URL=%s, got %s", c.StarterURL+"/", req.URL.String())
 	}
 }
 
