@@ -140,6 +140,7 @@ var commands = []*Command{
 	cmdOpen,
 	cmdPgInfo,
 	cmdPsql,
+	cmdRegions,
 	cmdTransfer,
 	cmdTransfers,
 	cmdTransferAccept,
