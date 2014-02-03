@@ -141,6 +141,7 @@ var commands = []*Command{
 	cmdPgInfo,
 	cmdPsql,
 	cmdRegions,
+	cmdStatus,
 	cmdTransfer,
 	cmdTransfers,
 	cmdTransferAccept,
