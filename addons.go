@@ -89,10 +89,10 @@ Adds an addon to an app.
 Examples:
 
     $ hk addon-add heroku-postgresql
-    Added heroku-postgresql:hobby-dev to myapp.
+    Added heroku-postgresql:hobby-dev to myapp as heroku-postgresql-yellow.
 
     $ hk addon-add heroku-postgresql:standard-tengu
-    Added heroku-postgresql:standard-tengu to myapp.
+    Added heroku-postgresql:standard-tengu to myapp as heroku-postgresql-orange.
 `,
 }
 
@@ -114,7 +114,7 @@ func runAddonAdd(cmd *Command, args []string) {
 	}
 	addon, err := client.AddonCreate(appname, plan, &opts)
 	must(err)
-	log.Printf("Added %s to %s.", addon.Plan.Name, appname)
+	log.Printf("Added %s to %s as %s.", addon.Plan.Name, appname, addon.Name)
 }
 
 func parseAddonAddConfig(config []string) (*map[string]string, error) {
