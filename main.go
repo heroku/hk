@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -37,10 +38,14 @@ type Command struct {
 }
 
 func (c *Command) printUsage() {
+	c.printUsageTo(os.Stderr)
+}
+
+func (c *Command) printUsageTo(w io.Writer) {
 	if c.Runnable() {
-		fmt.Printf("Usage: hk %s\n\n", c.FullUsage())
+		fmt.Fprintf(w, "Usage: hk %s\n\n", c.FullUsage())
 	}
-	fmt.Println(strings.Trim(c.Long, "\n"))
+	fmt.Fprintln(w, strings.Trim(c.Long, "\n"))
 }
 
 func (c *Command) FullUsage() string {
@@ -168,7 +173,8 @@ func main() {
 	// make sure command is specified, disallow global args
 	args := os.Args[1:]
 	if len(args) < 1 || strings.IndexRune(args[0], '-') == 0 {
-		usage()
+		printUsageTo(os.Stderr)
+		os.Exit(2)
 	}
 
 	// Run the update command as early as possible to avoid the possibility of
