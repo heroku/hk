@@ -133,7 +133,7 @@ func printError(message string, args ...interface{}) {
 }
 
 func printWarning(message string, args ...interface{}) {
-	log.Fatal(colorizeMessage("yellow", "warning:", message, args...))
+	log.Println(colorizeMessage("yellow", "warning:", message, args...))
 }
 
 func colorizeMessage(color, prefix, message string, args ...interface{}) string {
