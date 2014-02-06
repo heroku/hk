@@ -110,11 +110,35 @@ func runAddonAdd(cmd *Command, args []string) {
 			log.Println(err)
 			os.Exit(2)
 		}
+		// if this is a postgres addon, resolve fork/follow/rollback args
+		provider, _ := splitProviderAndPlan(plan)
+		if provider == hpgAddonName() && config != nil {
+			for k, _ := range *config {
+				if i := stringsIndex(hpgOptNames, k); i != -1 {
+					// contains an hpgOptNames key, we need to resolve these against envs
+					appEnv, err := client.ConfigVarInfo(appname)
+					must(err)
+					must(hpgAddonOptResolve(config, appEnv))
+					break
+				}
+			}
+		}
 		opts = heroku.AddonCreateOpts{Config: config}
 	}
 	addon, err := client.AddonCreate(appname, plan, &opts)
 	must(err)
 	log.Printf("Added %s to %s as %s.", addon.Plan.Name, appname, addon.Name)
+}
+
+func splitProviderAndPlan(providerAndPlan string) (provider string, plan string) {
+	parts := strings.Split(providerAndPlan, ":")
+	if len(parts) > 0 {
+		provider = parts[0]
+	}
+	if len(parts) > 1 {
+		plan = parts[1]
+	}
+	return
 }
 
 func parseAddonAddConfig(config []string) (*map[string]string, error) {

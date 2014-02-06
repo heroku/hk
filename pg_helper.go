@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -18,15 +19,37 @@ func hpgAddonName() string {
 	return "heroku-postgresql"
 }
 
+// addon options that Heroku Postgres needs resolved from database names to
+// full postgres URLs
+var hpgOptNames = []string{"fork", "follow", "rollback"}
+
+// resolve addon options whose names are in hpgOptNames into their full URLs
+func hpgAddonOptResolve(opts *map[string]string, appEnv map[string]string) error {
+	if opts != nil {
+		for _, k := range hpgOptNames {
+			val, ok := (*opts)[k]
+			if ok && !strings.HasPrefix(val, "postgres://") {
+				envName := dbNameToPgEnv(val)
+				url, exists := appEnv[envName]
+				if !exists {
+					return fmt.Errorf("could not resolve %s option %q to a %s addon", k, val, hpgAddonName())
+				}
+				(*opts)[k] = url
+			}
+		}
+	}
+	return nil
+}
+
 func pgEnvToDBName(key string) string {
 	return strings.ToLower(strings.Replace(strings.TrimSuffix(key, "_URL"), "_", "-", -1))
 }
 
 func dbNameToPgEnv(name string) string {
-	return ensurePrefix(
+	return ensureSuffix(ensurePrefix(
 		strings.ToUpper(strings.Replace(name, "-", "_", -1)),
 		strings.ToUpper(strings.Replace(hpgAddonName()+"_", "-", "_", -1)),
-	) + "_URL"
+	), "_URL")
 }
 
 type pgAddonMap struct {
