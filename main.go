@@ -9,10 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/bgentry/heroku-go"
 	"github.com/heroku/hk/postgresql"
@@ -209,10 +207,18 @@ func main() {
 				}
 			}
 			if cmd.NeedsApp {
-				if a, _ := app(); a == "" {
-					log.Println("no app specified")
+				a, err := app()
+				switch {
+				case err == errMultipleHerokuRemotes, err == nil && a == "":
+					msg := "no app specified"
+					if err != nil {
+						msg = err.Error()
+					}
+					printError(msg)
 					cmd.printUsage()
 					os.Exit(2)
+				case err != nil:
+					printFatal(err.Error())
 				}
 			}
 			cmd.Run(cmd, cmd.Flag.Args())
@@ -294,49 +300,7 @@ func app() (string, error) {
 		return app, nil
 	}
 
-	gitRemote := remoteFromGit()
-	gitRemoteApp, err := appFromGitRemote(gitRemote)
-	if err != nil {
-		return "", err
-	}
-
-	return gitRemoteApp, nil
-}
-
-func remoteFromGit() string {
-	b, err := exec.Command("git", "config", "heroku.remote").Output()
-	if err != nil {
-		return "heroku"
-	}
-	return strings.TrimSpace(string(b))
-}
-
-func appFromGitRemote(remote string) (string, error) {
-	b, err := exec.Command("git", "config", "remote."+remote+".url").Output()
-	if err != nil {
-		if isNotFound(err) {
-			wdir, _ := os.Getwd()
-			return "", fmt.Errorf("could not find git remote "+remote+" in %s", wdir)
-		}
-		return "", err
-	}
-
-	out := strings.TrimSpace(string(b))
-
-	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
-		return "", fmt.Errorf("could not find app name in " + remote + " git remote")
-	}
-
-	return out[len(gitURLPre) : len(out)-len(gitURLSuf)], nil
-}
-
-func isNotFound(err error) bool {
-	if ee, ok := err.(*exec.ExitError); ok {
-		if ws, ok := ee.ProcessState.Sys().(syscall.WaitStatus); ok {
-			return ws.ExitStatus() == 1
-		}
-	}
-	return false
+	return appFromGitRemote(remoteFromGitConfig())
 }
 
 func mustApp() string {
