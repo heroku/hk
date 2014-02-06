@@ -48,7 +48,7 @@ func loadNetrc() {
 			if os.IsNotExist(err) {
 				return
 			}
-			printError("loading netrc: " + err.Error())
+			printFatal("loading netrc: " + err.Error())
 		}
 	}
 }
@@ -61,10 +61,10 @@ func getCreds(u string) (user, pass string) {
 
 	apiURL, err := url.Parse(u)
 	if err != nil {
-		printError("invalid API URL: %s", err)
+		printFatal("invalid API URL: %s", err)
 	}
 	if apiURL.Host == "" {
-		printError("missing API host: %s", u)
+		printFatal("missing API host: %s", u)
 	}
 	if apiURL.User != nil {
 		pw, _ := apiURL.User.Password()
@@ -121,19 +121,23 @@ func must(err error) {
 	if err != nil {
 		if herror, ok := err.(heroku.Error); ok {
 			if herror.Id == "unauthorized" {
-				printError(err.Error() + " Log in with `hk login`.")
+				printFatal(err.Error() + " Log in with `hk login`.")
 			}
 		}
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 }
 
 func printError(message string, args ...interface{}) {
+	log.Println(colorizeMessage("red", "error:", message, args...))
+}
+
+func printFatal(message string, args ...interface{}) {
 	log.Fatal(colorizeMessage("red", "error:", message, args...))
 }
 
 func printWarning(message string, args ...interface{}) {
-	log.Fatal(colorizeMessage("yellow", "warning:", message, args...))
+	log.Println(colorizeMessage("yellow", "warning:", message, args...))
 }
 
 func colorizeMessage(color, prefix, message string, args ...interface{}) string {

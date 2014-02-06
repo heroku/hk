@@ -65,7 +65,7 @@ func runPgInfo(cmd *Command, args []string) {
 		}
 	}
 	if addon == nil {
-		printError("addon %s not found", addonName)
+		printFatal("addon %s not found", addonName)
 	}
 
 	// fetch app's config concurrently in case we need to resolve DB names
@@ -86,7 +86,7 @@ func runPgInfo(cmd *Command, args []string) {
 
 	select {
 	case err := <-errch:
-		printError(err.Error())
+		printFatal(err.Error())
 	case appConf = <-confch:
 	}
 
@@ -172,7 +172,7 @@ func runPsql(cmd *Command, args []string) {
 
 	// Make sure psql is installed
 	if _, err := exec.LookPath("psql"); err != nil {
-		printError("Local psql command not found. For help installing psql, see http://devcenter.heroku.com/articles/local-postgresql")
+		printFatal("Local psql command not found. For help installing psql, see http://devcenter.heroku.com/articles/local-postgresql")
 	}
 
 	// fetch app's config to get the URL
@@ -182,11 +182,11 @@ func runPsql(cmd *Command, args []string) {
 	// get URL
 	urlstr, exists := config[configName]
 	if !exists {
-		printError("Env %s not found", configName)
+		printFatal("Env %s not found", configName)
 	}
 	u, err := url.Parse(urlstr)
 	if err != nil {
-		printError("Invalid URL at env " + configName)
+		printFatal("Invalid URL at env " + configName)
 	}
 
 	// handle custom port
@@ -196,7 +196,7 @@ func runPsql(cmd *Command, args []string) {
 		hostname = u.Host[:colIndex]
 		portnum, err = strconv.Atoi(u.Host[colIndex+1:])
 		if err != nil {
-			printError("Invalid port in %s: %s", configName, u.Host[colIndex+1:])
+			printFatal("Invalid port in %s: %s", configName, u.Host[colIndex+1:])
 		}
 	}
 
@@ -219,6 +219,6 @@ func runPsql(cmd *Command, args []string) {
 	pgenv = append(pgenv, "PGSSLMODE=require")
 
 	if err := runCommand("psql", psqlArgs, pgenv); err != nil {
-		printError("Error running psql: %s", err)
+		printFatal("Error running psql: %s", err)
 	}
 }

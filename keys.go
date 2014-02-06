@@ -80,7 +80,7 @@ func runKeyAdd(cmd *Command, args []string) {
 		if _, ok := err.(privKeyError); ok {
 			log.Println("refusing to upload")
 		}
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 
 	key, err := client.KeyCreate(string(keys))

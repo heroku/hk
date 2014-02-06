@@ -55,6 +55,6 @@ func runAPI(cmd *Command, args []string) {
 		body = os.Stdin
 	}
 	if err := client.APIReq(os.Stdout, method, args[1], body); err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 }

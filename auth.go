@@ -52,7 +52,7 @@ func runLogin(cmd *Command, args []string) {
 	// NOTE: gopass doesn't support multi-byte chars on Windows
 	password, err := readPassword("Enter password: ")
 	if err != nil {
-		printError("reading password: " + err.Error())
+		printFatal("reading password: " + err.Error())
 	}
 
 	hostname, token, err := attemptLogin(username, password, "")
@@ -63,7 +63,7 @@ func runLogin(cmd *Command, args []string) {
 			fmt.Printf("Enter two-factor auth code: ")
 			_, err := fmt.Scanln(&twoFactorCode)
 			if err != nil {
-				printError("reading two-factor auth code: " + err.Error())
+				printFatal("reading two-factor auth code: " + err.Error())
 			}
 			hostname, token, err = attemptLogin(username, password, twoFactorCode)
 			must(err)
@@ -74,7 +74,7 @@ func runLogin(cmd *Command, args []string) {
 
 	err = saveCreds(hostname, username, token)
 	if err != nil {
-		printError("saving new token: " + err.Error())
+		printFatal("saving new token: " + err.Error())
 	}
 	fmt.Println("Logged in.")
 }
@@ -139,11 +139,11 @@ func runLogout(cmd *Command, args []string) {
 	}
 	u, err := url.Parse(client.URL)
 	if err != nil {
-		printError("couldn't parse client URL: " + err.Error())
+		printFatal("couldn't parse client URL: " + err.Error())
 	}
 	err = removeCreds(strings.Split(u.Host, ":")[0])
 	if err != nil {
-		printError("saving new netrc: " + err.Error())
+		printFatal("saving new netrc: " + err.Error())
 	}
 	fmt.Println("Logged out.")
 }

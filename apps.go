@@ -57,7 +57,7 @@ func runApps(cmd *Command, names []string) {
 		for _ = range names {
 			select {
 			case err := <-errch:
-				printError(err.Error())
+				printFatal(err.Error())
 			case app := <-appch:
 				if app != nil {
 					apps = append(apps, *app)

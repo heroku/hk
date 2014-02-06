@@ -38,7 +38,7 @@ func runAddons(cmd *Command, names []string) {
 	appname := mustApp()
 	addons, err := client.AddonList(appname, nil)
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	for i, s := range names {
 		names[i] = strings.ToLower(s)
@@ -204,9 +204,9 @@ func runAddonOpen(cmd *Command, args []string) {
 func checkAddonError(err error) {
 	if err != nil {
 		if hkerr, ok := err.(heroku.Error); ok && hkerr.Id == "not_found" {
-			printError(err.Error() + " Choose an addon name from `hk addons`.")
+			printFatal(err.Error() + " Choose an addon name from `hk addons`.")
 		} else {
-			printError(err.Error())
+			printFatal(err.Error())
 		}
 		os.Exit(2)
 	}
