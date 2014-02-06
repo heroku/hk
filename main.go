@@ -230,7 +230,7 @@ func main() {
 		os.Exit(2)
 	}
 	err := execPlugin(path, args)
-	printError("exec error: %s", err)
+	printFatal("exec error: %s", err)
 }
 
 func initClients() {
@@ -342,7 +342,7 @@ func isNotFound(err error) bool {
 func mustApp() string {
 	name, err := app()
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	return name
 }

@@ -56,7 +56,7 @@ func runStatus(cmd *Command, args []string) {
 	res, err := http.Get("https://" + herokuStatusHost + "/api/v3/current-status.json")
 	must(err)
 	if res.StatusCode/100 != 2 { // 200, 201, 202, etc
-		printError("unexpected HTTP status: %d", res.StatusCode)
+		printFatal("unexpected HTTP status: %d", res.StatusCode)
 	}
 
 	var sr statusResponse

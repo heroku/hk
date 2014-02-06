@@ -66,10 +66,10 @@ func getMergedAccess(appname string) []*mergedAccess {
 		ch <- err
 	}()
 	if err := <-ch; err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	if err := <-ch; err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	return mergeAccess(app, collaborators)
 }

@@ -86,17 +86,17 @@ func runLog(cmd *Command, args []string) {
 
 	session, err := client.LogSessionCreate(mustApp(), &opts)
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	resp, err := http.Get(session.LogplexURL)
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	if resp.StatusCode/100 != 2 {
 		if resp.StatusCode/100 == 4 {
-			printError("Unauthorized")
+			printFatal("Unauthorized")
 		} else {
-			printError("Unexpected error: " + resp.Status)
+			printFatal("Unexpected error: " + resp.Status)
 		}
 	}
 
