@@ -13,13 +13,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/hkclient"
 	"github.com/heroku/hk/term"
 	"github.com/mgutz/ansi"
 )
 
-var nrc *netrc.Netrc
+var nrc *hkclient.NetRc
 
 // user.Current() requires cgo and thus doesn't work with cross-compiling.
 // The following is an alternative that matches how the Heroku Toolbelt
@@ -43,11 +43,12 @@ func netrcPath() string {
 }
 
 func loadNetrc() {
+	var err error
+
 	if nrc == nil {
-		var err error
-		if nrc, err = netrc.ParseFile(netrcPath()); err != nil {
+		if nrc, err = hkclient.LoadNetRc(); err != nil {
 			if os.IsNotExist(err) {
-				nrc = &netrc.Netrc{}
+				nrc = &hkclient.NetRc{}
 				return
 			}
 			printFatal("loading netrc: " + err.Error())
@@ -65,19 +66,13 @@ func getCreds(u string) (user, pass string) {
 	if err != nil {
 		printFatal("invalid API URL: %s", err)
 	}
-	if apiURL.Host == "" {
-		printFatal("missing API host: %s", u)
-	}
-	if apiURL.User != nil {
-		pw, _ := apiURL.User.Password()
-		return apiURL.User.Username(), pw
+
+	user, pass, err = nrc.GetCreds(apiURL)
+	if err != nil {
+		printError(err.Error())
 	}
 
-	m := nrc.FindMachine(apiURL.Host)
-	if m == nil {
-		return "", ""
-	}
-	return m.Login, m.Password
+	return user, pass
 }
 
 func saveCreds(host, user, pass string) error {

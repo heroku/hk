@@ -2,17 +2,16 @@ package main
 
 import (
 	"bufio"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"runtime"
 	"strings"
 
 	"github.com/bgentry/heroku-go"
 	flag "github.com/bgentry/pflag"
+	"github.com/heroku/hk/hkclient"
 	"github.com/heroku/hk/postgresql"
 	"github.com/heroku/hk/rollbar"
 	"github.com/heroku/hk/term"
@@ -171,6 +170,18 @@ var (
 	userAgent = hkAgent + " " + heroku.DefaultUserAgent
 )
 
+func initClients() {
+	loadNetrc()
+	suite, err := hkclient.New(nrc, hkAgent)
+	if err != nil {
+		printError(err.Error())
+	}
+
+	client = suite.Client
+	pgclient = suite.PgClient
+
+}
+
 func main() {
 	log.SetFlags(0)
 
@@ -248,58 +259,6 @@ func main() {
 	}
 	err := execPlugin(path, args)
 	printFatal("exec error: %s", err)
-}
-
-func initClients() {
-	disableSSLVerify := false
-	apiURL = heroku.DefaultAPIURL
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		apiURL = s
-		disableSSLVerify = true
-	}
-	user, pass := getCreds(apiURL)
-	debug := os.Getenv("HKDEBUG") != ""
-	client = &heroku.Client{
-		URL:       apiURL,
-		Username:  user,
-		Password:  pass,
-		UserAgent: userAgent,
-		Debug:     debug,
-	}
-	pgclient = &postgresql.Client{
-		Username:  user,
-		Password:  pass,
-		UserAgent: userAgent,
-		Debug:     debug,
-	}
-	if disableSSLVerify || os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
-		client.HTTP = &http.Client{Transport: http.DefaultTransport}
-		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-		pgclient.HTTP = client.HTTP
-	}
-	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
-		pgclient.StarterURL = "https://" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
-		pgclient.URL = "https://" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
-	}
-	if s := os.Getenv("SHOGUN"); s != "" {
-		pgclient.URL = "https://shogun-" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
-	}
-	client.AdditionalHeaders = http.Header{}
-	pgclient.AdditionalHeaders = http.Header{}
-	for _, h := range strings.Split(os.Getenv("HKHEADER"), "\n") {
-		if i := strings.Index(h, ":"); i >= 0 {
-			client.AdditionalHeaders.Set(
-				strings.TrimSpace(h[:i]),
-				strings.TrimSpace(h[i+1:]),
-			)
-			pgclient.AdditionalHeaders.Set(
-				strings.TrimSpace(h[:i]),
-				strings.TrimSpace(h[i+1:]),
-			)
-		}
-	}
 }
 
 var rollbarClient = &rollbar.Client{
