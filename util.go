@@ -208,6 +208,13 @@ func ensurePrefix(val, prefix string) string {
 	return val
 }
 
+func ensureSuffix(val, suffix string) string {
+	if !strings.HasSuffix(val, suffix) {
+		return val + suffix
+	}
+	return val
+}
+
 func openURL(url string) error {
 	var command string
 	var args []string
@@ -239,4 +246,13 @@ func runCommand(command string, args, env []string) error {
 		command = p
 	}
 	return sysExec(command, args, env)
+}
+
+func stringsIndex(s []string, item string) int {
+	for i := range s {
+		if s[i] == item {
+			return i
+		}
+	}
+	return -1
 }
