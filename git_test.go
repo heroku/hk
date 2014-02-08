@@ -11,10 +11,17 @@ func TestGitHost(t *testing.T) {
 	}
 
 	os.Setenv("HEROKU_GIT_HOST", "notheroku.com")
-	defer os.Setenv("HEROKU_GIT_HOST", "")
 
 	if res := gitHost(); res != "notheroku.com" {
 		t.Errorf("expected notheroku.com, got %s", res)
+	}
+
+	os.Setenv("HEROKU_GIT_HOST", "")
+	os.Setenv("HEROKU_HOST", "stillnotheroku.com")
+	defer os.Setenv("HEROKU_HOST", "")
+
+	if res := gitHost(); res != "stillnotheroku.com" {
+		t.Errorf("expected stillnotheroku.com, got %s", res)
 	}
 }
 

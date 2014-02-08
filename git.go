@@ -20,8 +20,11 @@ const (
 )
 
 func gitHost() string {
-	if gh := os.Getenv("HEROKU_GIT_HOST"); gh != "" {
-		return gh
+	if herokuGitHost := os.Getenv("HEROKU_GIT_HOST"); herokuGitHost != "" {
+		return herokuGitHost
+	}
+	if herokuHost := os.Getenv("HEROKU_HOST"); herokuHost != "" {
+		return herokuHost
 	}
 	return "heroku.com"
 }
