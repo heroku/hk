@@ -166,14 +166,17 @@ var cmdAddonRemove = &Command{
 	Category: "add-on",
 	Short:    "remove an addon",
 	Long: `
-Removes an addon from an app.
+Removes an addon from an app. The command will prompt for
+confirmation, or accept confirmation via stdin.
 
 Examples:
 
     $ hk addon-remove heroku-postgresql-blue
+    warning: This will destroy heroku-postgresql-blue on myapp. Please type "myapp" to continue:
+    > myapp
     Removed heroku-postgresql-blue from myapp.
 
-    $ hk addon-remove redistogo
+    $ echo myapp | hk addon-remove redistogo
     Removed redistogo from myapp.
 `,
 }
@@ -191,6 +194,10 @@ func runAddonRemove(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
+
+	warning := fmt.Sprintf("This will destroy %s on %s. Please type %q to continue:", name, appname, appname)
+	mustConfirm(warning, appname)
+
 	checkAddonError(client.AddonDelete(appname, name))
 	log.Printf("Removed %s from %s.", name, appname)
 }

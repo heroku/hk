@@ -5,9 +5,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-
-	"github.com/heroku/hk/term"
-	"github.com/mgutz/ansi"
 )
 
 var cmdDestroy = &Command{
@@ -38,18 +35,8 @@ func runDestroy(cmd *Command, args []string) {
 	}
 	appname := args[0]
 
-	if term.IsTerminal(os.Stdin) {
-		printWarning("This will destroy %s and its add-ons. Please type %q to continue:", appname, appname)
-		fmt.Printf(ansi.Color("> ", "+b") + ansi.ColorCode("reset"))
-	}
-	var confirm string
-	if _, err := fmt.Scanln(&confirm); err != nil {
-		printFatal(err.Error())
-	}
-
-	if confirm != appname {
-		printFatal("Confirmation did not match %q.", appname)
-	}
+	warning := fmt.Sprintf("This will destroy %s and its add-ons. Please type %q to continue:", appname, appname)
+	mustConfirm(warning, appname)
 
 	must(client.AppDelete(appname))
 	log.Printf("Destroyed %s.", appname)

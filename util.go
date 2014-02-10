@@ -15,6 +15,7 @@ import (
 
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/term"
 	"github.com/mgutz/ansi"
 )
 
@@ -138,6 +139,21 @@ func printFatal(message string, args ...interface{}) {
 
 func printWarning(message string, args ...interface{}) {
 	log.Println(colorizeMessage("yellow", "warning:", message, args...))
+}
+
+func mustConfirm(warning, desired string) {
+	if term.IsTerminal(os.Stdin) {
+		printWarning(warning)
+		fmt.Printf(ansi.Color("> ", "+b") + ansi.ColorCode("reset"))
+	}
+	var confirm string
+	if _, err := fmt.Scanln(&confirm); err != nil {
+		printFatal(err.Error())
+	}
+
+	if confirm != desired {
+		printFatal("Confirmation did not match %q.", desired)
+	}
 }
 
 func colorizeMessage(color, prefix, message string, args ...interface{}) string {
