@@ -4,6 +4,7 @@ package term
 
 import (
 	"os"
+	"syscall"
 )
 
 func IsANSI(f *os.File) bool {
@@ -12,7 +13,8 @@ func IsANSI(f *os.File) bool {
 
 // IsTerminal returns false on Windows.
 func IsTerminal(f *os.File) bool {
-	return false
+	ft, _ := syscall.GetFileType(syscall.Handle(f.Fd()))
+	return ft == syscall.FILE_TYPE_CHAR
 }
 
 // MakeRaw is a no-op on windows. It returns nil.
