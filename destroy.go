@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -12,13 +13,17 @@ var cmdDestroy = &Command{
 	Category: "app",
 	Short:    "destroy an app",
 	Long: `
-Destroy destroys a heroku app.
-
-There is no going back, so be sure you mean it.
+Destroy destroys a heroku app. There is no going back, so be
+sure you mean it. The command will prompt for confirmation, or
+accept confirmation via stdin.
 
 Example:
 
     $ hk destroy myapp
+    warning: This will destroy myapp and its add-ons. Please type "myapp" to continue:
+    Destroyed myapp.
+
+    $ echo myapp | hk destroy myapp
     Destroyed myapp.
 `,
 }
@@ -29,6 +34,10 @@ func runDestroy(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	appname := args[0]
+
+	warning := fmt.Sprintf("This will destroy %s and its add-ons. Please type %q to continue:", appname, appname)
+	mustConfirm(warning, appname)
+
 	must(client.AppDelete(appname))
 	log.Printf("Destroyed %s.", appname)
 	remotes, _ := gitRemotes()

@@ -184,7 +184,7 @@ func main() {
 		defer updater.backgroundRun() // doesn't run if os.Exit is called
 	}
 
-	if !term.IsTerminal(os.Stdout) {
+	if !term.IsANSI(os.Stdout) {
 		ansi.DisableColors(true)
 	}
 

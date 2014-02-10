@@ -61,8 +61,7 @@ func runLogin(cmd *Command, args []string) {
 			// 2FA requested, attempt 2FA login
 			var twoFactorCode string
 			fmt.Printf("Enter two-factor auth code: ")
-			_, err := fmt.Scanln(&twoFactorCode)
-			if err != nil {
+			if _, err := fmt.Scanln(&twoFactorCode); err != nil {
 				printFatal("reading two-factor auth code: " + err.Error())
 			}
 			hostname, token, err = attemptLogin(username, password, twoFactorCode)
