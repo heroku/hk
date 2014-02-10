@@ -25,6 +25,6 @@ func defaultPluginPath() string {
 	hkpath := "/usr/local/lib/hk/plugin"
 	if fi, err := os.Stat(hkpath); err == nil && fi.IsDir() {
 		return hkpath
-    }
+	}
 	return filepath.Join(homePath(), ".hk", "plugins")
 }
