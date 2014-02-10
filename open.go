@@ -16,5 +16,7 @@ func runOpen(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	must(openURL("https://" + mustApp() + ".herokuapp.com/"))
+	app, err := client.AppInfo(mustApp())
+	must(err)
+	must(openURL(app.WebURL))
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 )
 
 var cmdURL = &Command{
@@ -14,5 +15,11 @@ var cmdURL = &Command{
 }
 
 func runURL(cmd *Command, args []string) {
-	fmt.Println("https://" + mustApp() + ".herokuapp.com/")
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	app, err := client.AppInfo(mustApp())
+	must(err)
+	fmt.Println(app.WebURL)
 }
