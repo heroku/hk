@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+func IsANSI(f *os.File) bool {
+	return IsTerminal(f)
+}
+
 // IsTerminal returns true if f is a terminal.
 func IsTerminal(f *os.File) bool {
 	cmd := exec.Command("test", "-t", "0")

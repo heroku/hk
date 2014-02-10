@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+func IsANSI(f *os.File) bool {
+	return false
+}
+
 // IsTerminal returns false on Windows.
 func IsTerminal(f *os.File) bool {
 	return false
