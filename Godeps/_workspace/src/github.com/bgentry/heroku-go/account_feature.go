@@ -29,6 +29,9 @@ type AccountFeature struct {
 	// unique name of account feature
 	Name string `json:"name"`
 
+	// state of account feature
+	State string `json:"state"`
+
 	// when account feature was updated
 	UpdatedAt time.Time `json:"updated_at"`
 }

@@ -124,9 +124,19 @@
               "comment": "list account features (extra)"
             },
             {
-              "root": "sshkey-add",
+              "root": "key-add",
               "arguments": "[<public-key-file>]",
-              "comment": "add ssh public key"
+              "comment": "add ssh public key (extra)"
+            },
+            {
+              "root": "key-remove",
+              "arguments": "<fingerprint>",
+              "comment": "remove an ssh public key (extra)"
+            },
+            {
+              "root": "keys",
+              "arguments": "",
+              "comment": "list ssh public keys (extra)"
             }
           ],
           "title": "account"
@@ -174,6 +184,26 @@
               "comment": "destroy an app"
             },
             {
+              "root": "drain-add",
+              "arguments": "[-a <app>] <url>",
+              "comment": "add a log drain (extra)"
+            },
+            {
+              "root": "drain-info",
+              "arguments": "[-a <app>] <id or url>",
+              "comment": "show info for a log drain (extra)"
+            },
+            {
+              "root": "drain-remove",
+              "arguments": "[-a <app>] <id or url>",
+              "comment": "remove a log drain (extra)"
+            },
+            {
+              "root": "drains",
+              "arguments": "[-a <app>]",
+              "comment": "list log drains (extra)"
+            },
+            {
               "root": "feature-disable",
               "arguments": "[-a <app>] <feature>",
               "comment": "disable an app feature (extra)"
@@ -202,26 +232,6 @@
               "root": "log",
               "arguments": "[-a <app>] [-n <lines>] [-s <source>] [-d <dyno>]",
               "comment": "stream app log lines"
-            },
-            {
-              "root": "log-drain-add",
-              "arguments": "[-a <app>] <url>",
-              "comment": "add a log drain (extra)"
-            },
-            {
-              "root": "log-drain-info",
-              "arguments": "[-a <app>] <id or url>",
-              "comment": "show info for a log drain (extra)"
-            },
-            {
-              "root": "log-drain-remove",
-              "arguments": "[-a <app>] <id or url>",
-              "comment": "remove a log drain (extra)"
-            },
-            {
-              "root": "log-drains",
-              "arguments": "[-a <app>]",
-              "comment": "list log drains (extra)"
             },
             {
               "root": "maintenance",
@@ -384,6 +394,16 @@
               "comment": ""
             },
             {
+              "root": "login",
+              "arguments": "<email>",
+              "comment": "log in to your Heroku account (extra)"
+            },
+            {
+              "root": "logout",
+              "arguments": "",
+              "comment": "log out of your Heroku account (extra)"
+            },
+            {
               "root": "more",
               "arguments": "",
               "comment": "additional commands, less frequently used"
@@ -405,6 +425,16 @@
             }
           ],
           "title": "hk"
+        },
+        {
+          "commands": [
+            {
+              "root": "regions",
+              "arguments": "",
+              "comment": "list regions (extra)"
+            }
+          ],
+          "title": "misc"
         },
         {
           "commands": [

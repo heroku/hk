@@ -76,7 +76,7 @@ func runScale(cmd *Command, args []string) {
 	rindex := 0
 	for _, f := range sortedFormations {
 		if _, exists := types[f.Type]; exists {
-			results[rindex] = f.Type + "=" + strconv.Itoa(f.Quantity) + ":" + f.Size + "X"
+			results[rindex] = f.Type + "=" + strconv.Itoa(f.Quantity) + ":" + f.Size
 			rindex += 1
 		}
 	}

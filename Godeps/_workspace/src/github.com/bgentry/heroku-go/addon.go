@@ -10,6 +10,9 @@ import (
 
 // Add-ons represent add-ons that have been provisioned for an app.
 type Addon struct {
+	// config vars associated with this application
+	ConfigVars []string `json:"config_vars"`
+
 	// when add-on was updated
 	CreatedAt time.Time `json:"created_at"`
 

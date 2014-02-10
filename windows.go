@@ -8,7 +8,10 @@ import (
 	"path/filepath"
 )
 
-const netrcFilename = "_netrc"
+const (
+	netrcFilename           = "_netrc"
+	acceptPasswordFromStdin = false
+)
 
 func sysExec(path string, args []string, env []string) error {
 	cmd := exec.Command(path, args...)

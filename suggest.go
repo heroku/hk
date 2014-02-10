@@ -2,6 +2,7 @@ package main
 
 import (
 	"sort"
+	"strconv"
 )
 
 type Suggestion struct {
@@ -20,7 +21,11 @@ func suggest(s string) (a []string) {
 	var g Suggestions
 	for _, c := range commands {
 		if d := editDistance(s, c.Name()); d < 4 {
-			g = append(g, Suggestion{c.Name(), d})
+			if c.Runnable() {
+				g = append(g, Suggestion{c.Name(), d})
+			} else {
+				g = append(g, Suggestion{strconv.Quote("help " + c.Name()), d})
+			}
 		}
 	}
 	sort.Sort(g)

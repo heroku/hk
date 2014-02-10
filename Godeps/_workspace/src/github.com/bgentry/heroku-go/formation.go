@@ -9,8 +9,9 @@ import (
 )
 
 // The formation of processes that should be maintained for an app. Update the
-// formation to scale processes or change dyno sizes. Commands and types are
-// defined by the Procfile uploaded with an app.
+// formation to scale processes or change dyno sizes. Available process type
+// names and commands are defined by the process_types attribute for the slug
+// currently released on an app.
 type Formation struct {
 	// command to use to launch this process
 	Command string `json:"command"`

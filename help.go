@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"os"
 	"sort"
@@ -99,11 +100,11 @@ func init() {
 
 func runHelp(cmd *Command, args []string) {
 	if len(args) == 0 {
-		printUsage()
+		printUsageTo(os.Stdout)
 		return // not os.Exit(2); success
 	}
 	if len(args) != 1 {
-		printError("too many arguments")
+		printFatal("too many arguments")
 	}
 	switch args[0] {
 	case helpMore.Name():
@@ -119,7 +120,7 @@ func runHelp(cmd *Command, args []string) {
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] {
-			cmd.printUsage()
+			cmd.printUsageTo(os.Stdout)
 			return
 		}
 	}
@@ -172,7 +173,7 @@ Run 'hk help [command]' for details.
 
 `[1:]))
 
-func printUsage() {
+func printUsageTo(w io.Writer) {
 	var plugins []plugin
 	for _, path := range strings.Split(hkPath, ":") {
 		d, err := os.Open(path)
@@ -180,11 +181,11 @@ func printUsage() {
 			if os.IsNotExist(err) {
 				continue
 			}
-			printError(err.Error())
+			printFatal(err.Error())
 		}
 		fi, err := d.Readdir(-1)
 		if err != nil {
-			printError(err.Error())
+			printFatal(err.Error())
 		}
 		for _, f := range fi {
 			if !f.IsDir() && f.Mode()&0111 != 0 {
@@ -203,7 +204,7 @@ func printUsage() {
 		runListNames = append(runListNames, plugins[i].Name())
 	}
 
-	usageTemplate.Execute(os.Stderr, struct {
+	usageTemplate.Execute(w, struct {
 		Commands       []*Command
 		Plugins        []plugin
 		Dev            bool
@@ -224,7 +225,7 @@ func printExtra() {
 		}
 	}
 
-	extraTemplate.Execute(os.Stderr, struct {
+	extraTemplate.Execute(os.Stdout, struct {
 		Commands        []*Command
 		MaxRunExtraName int
 	}{
@@ -265,7 +266,7 @@ func printStyleGuide() {
 		cmap,
 	})
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 }
 
@@ -315,11 +316,6 @@ func (cm commandMap) UsageJSON(prefix string) template.JS {
 	resp := strings.Replace(string(buf), "\\u003c", "<", -1)
 	resp = strings.Replace(resp, "\\u003e", ">", -1)
 	return template.JS(resp)
-}
-
-func usage() {
-	printUsage()
-	os.Exit(2)
 }
 
 var styleGuideTemplate = template.Must(template.New("styleguide").Delims("{{{", "}}}").Parse(`

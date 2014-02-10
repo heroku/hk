@@ -31,7 +31,10 @@ func runDestroy(cmd *Command, args []string) {
 	appname := args[0]
 	must(client.AppDelete(appname))
 	log.Printf("Destroyed %s.", appname)
-	for _, remote := range gitRemotes(gitURL(appname)) {
-		exec.Command("git", "remote", "rm", remote).Run()
+	remotes, _ := gitRemotes()
+	for remote, remoteApp := range remotes {
+		if appname == remoteApp {
+			exec.Command("git", "remote", "rm", remote).Run()
+		}
 	}
 }

@@ -5,16 +5,13 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"os/exec"
 	"runtime"
 	"strings"
-	"syscall"
 
-	"github.com/bgentry/go-netrc/netrc"
 	"github.com/bgentry/heroku-go"
 	"github.com/heroku/hk/postgresql"
 	"github.com/heroku/hk/term"
@@ -39,10 +36,14 @@ type Command struct {
 }
 
 func (c *Command) printUsage() {
+	c.printUsageTo(os.Stderr)
+}
+
+func (c *Command) printUsageTo(w io.Writer) {
 	if c.Runnable() {
-		fmt.Printf("Usage: hk %s\n\n", c.FullUsage())
+		fmt.Fprintf(w, "Usage: hk %s\n\n", c.FullUsage())
 	}
-	fmt.Println(strings.Trim(c.Long, "\n"))
+	fmt.Fprintln(w, strings.Trim(c.Long, "\n"))
 }
 
 func (c *Command) FullUsage() string {
@@ -103,7 +104,6 @@ var commands = []*Command{
 	cmdDomains,
 	cmdDomainAdd,
 	cmdDomainRemove,
-	cmdSSHKeyAdd,
 	cmdVersion,
 	cmdHelp,
 
@@ -123,21 +123,28 @@ var commands = []*Command{
 	cmdAddonOpen,
 	cmdAPI,
 	cmdCreds,
+	cmdDrains,
+	cmdDrainInfo,
+	cmdDrainAdd,
+	cmdDrainRemove,
 	cmdFeatures,
 	cmdFeatureInfo,
 	cmdFeatureEnable,
 	cmdFeatureDisable,
 	cmdGet,
+	cmdKeys,
+	cmdKeyAdd,
+	cmdKeyRemove,
+	cmdLogin,
+	cmdLogout,
 	cmdMaintenance,
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,
 	cmdOpen,
 	cmdPgInfo,
 	cmdPsql,
-	cmdLogDrains,
-	cmdLogDrainInfo,
-	cmdLogDrainAdd,
-	cmdLogDrainRemove,
+	cmdRegions,
+	cmdStatus,
 	cmdTransfer,
 	cmdTransfers,
 	cmdTransferAccept,
@@ -152,8 +159,8 @@ var commands = []*Command{
 
 var (
 	flagApp   string
-	client    heroku.Client
-	pgclient  postgresql.Client
+	client    *heroku.Client
+	pgclient  *postgresql.Client
 	hkAgent   = "hk/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 	userAgent = hkAgent + " " + heroku.DefaultUserAgent
 )
@@ -164,7 +171,8 @@ func main() {
 	// make sure command is specified, disallow global args
 	args := os.Args[1:]
 	if len(args) < 1 || strings.IndexRune(args[0], '-') == 0 {
-		usage()
+		printUsageTo(os.Stderr)
+		os.Exit(2)
 	}
 
 	// Run the update command as early as possible to avoid the possibility of
@@ -199,10 +207,18 @@ func main() {
 				}
 			}
 			if cmd.NeedsApp {
-				if a, _ := app(); a == "" {
-					log.Println("no app specified")
+				a, err := app()
+				switch {
+				case err == errMultipleHerokuRemotes, err == nil && a == "":
+					msg := "no app specified"
+					if err != nil {
+						msg = err.Error()
+					}
+					printError(msg)
 					cmd.printUsage()
 					os.Exit(2)
+				case err != nil:
+					printFatal(err.Error())
 				}
 			}
 			cmd.Run(cmd, cmd.Flag.Args())
@@ -220,41 +236,44 @@ func main() {
 		os.Exit(2)
 	}
 	err := execPlugin(path, args)
-	printError("exec error: %s", err)
+	printFatal("exec error: %s", err)
 }
 
 func initClients() {
+	disableSSLVerify := false
 	apiURL = heroku.DefaultAPIURL
-	user, pass := getCreds(apiURL)
-	if user == "" && pass == "" {
-		printError("No credentials found in HEROKU_API_URL or netrc.")
+	if s := os.Getenv("HEROKU_API_URL"); s != "" {
+		apiURL = s
+		disableSSLVerify = true
 	}
+	user, pass := getCreds(apiURL)
 	debug := os.Getenv("HKDEBUG") != ""
-	client = heroku.Client{
+	client = &heroku.Client{
 		URL:       apiURL,
 		Username:  user,
 		Password:  pass,
 		UserAgent: userAgent,
 		Debug:     debug,
 	}
-	pgclient = postgresql.Client{
+	pgclient = &postgresql.Client{
 		Username:  user,
 		Password:  pass,
 		UserAgent: userAgent,
 		Debug:     debug,
 	}
-	if os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
+	if disableSSLVerify || os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
 		client.HTTP = &http.Client{Transport: http.DefaultTransport}
 		client.HTTP.Transport.(*http.Transport).TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
 		pgclient.HTTP = client.HTTP
 	}
-	if s := os.Getenv("HEROKU_API_URL"); s != "" {
-		client.URL = s
-	}
 	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
-		pgclient.URL = s
+		pgclient.StarterURL = "https://" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
+		pgclient.URL = "https://" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
+	}
+	if s := os.Getenv("SHOGUN"); s != "" {
+		pgclient.URL = "https://shogun-" + s + ".herokuapp.com" + postgresql.DefaultAPIPath
 	}
 	client.AdditionalHeaders = http.Header{}
 	pgclient.AdditionalHeaders = http.Header{}
@@ -272,30 +291,6 @@ func initClients() {
 	}
 }
 
-func getCreds(u string) (user, pass string) {
-	apiURL, err := url.Parse(u)
-	if err != nil {
-		printError("invalid API URL: %s", err)
-	}
-	if apiURL.Host == "" {
-		printError("missing API host: %s", u)
-	}
-	if apiURL.User != nil {
-		pw, _ := apiURL.User.Password()
-		return apiURL.User.Username(), pw
-	}
-
-	m, err := netrc.FindMachine(netrcPath(), apiURL.Host)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return "", ""
-		}
-		printError("netrc error (%s): %v", apiURL.Host, err)
-	}
-
-	return m.Login, m.Password
-}
-
 func app() (string, error) {
 	if flagApp != "" {
 		return flagApp, nil
@@ -305,55 +300,13 @@ func app() (string, error) {
 		return app, nil
 	}
 
-	gitRemote := remoteFromGit()
-	gitRemoteApp, err := appFromGitRemote(gitRemote)
-	if err != nil {
-		return "", err
-	}
-
-	return gitRemoteApp, nil
-}
-
-func remoteFromGit() string {
-	b, err := exec.Command("git", "config", "heroku.remote").Output()
-	if err != nil {
-		return "heroku"
-	}
-	return strings.TrimSpace(string(b))
-}
-
-func appFromGitRemote(remote string) (string, error) {
-	b, err := exec.Command("git", "config", "remote."+remote+".url").Output()
-	if err != nil {
-		if isNotFound(err) {
-			wdir, _ := os.Getwd()
-			return "", fmt.Errorf("could not find git remote "+remote+" in %s", wdir)
-		}
-		return "", err
-	}
-
-	out := strings.TrimSpace(string(b))
-
-	if !strings.HasPrefix(out, gitURLPre) || !strings.HasSuffix(out, gitURLSuf) {
-		return "", fmt.Errorf("could not find app name in " + remote + " git remote")
-	}
-
-	return out[len(gitURLPre) : len(out)-len(gitURLSuf)], nil
-}
-
-func isNotFound(err error) bool {
-	if ee, ok := err.(*exec.ExitError); ok {
-		if ws, ok := ee.ProcessState.Sys().(syscall.WaitStatus); ok {
-			return ws.ExitStatus() == 1
-		}
-	}
-	return false
+	return appFromGitRemote(remoteFromGitConfig())
 }
 
 func mustApp() string {
 	name, err := app()
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 	return name
 }
