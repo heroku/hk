@@ -196,7 +196,7 @@ func main() {
 				cmd.printUsage()
 			}
 			if cmd.NeedsApp {
-				cmd.Flag.StringVar(&flagApp, "a", "", "app name")
+				args = parseAppFromArgs(args)
 			}
 			if err := cmd.Flag.Parse(args[1:]); err != nil {
 				os.Exit(2)
@@ -289,6 +289,25 @@ func initClients() {
 			)
 		}
 	}
+}
+
+func parseAppFromArgs(args []string) []string {
+	if len(args) > 1 {
+		if i := stringsIndex(args[1:], "-a"); i != -1 {
+			if len(args[1:]) < i+2 {
+				printFatal("missing value for app flag")
+			}
+			if strings.IndexRune(args[1:][i+1], '-') == 0 {
+				printFatal("invalid value for app param: %s", args[1:][i+1])
+			}
+			flagApp = args[i+2]
+			args = append(args[:1], append(args[1:i+1], args[i+3:]...)...)
+			if j := stringsIndex(args[1:], "-a"); j != -1 {
+				printFatal("duplicate -a flag provided")
+			}
+		}
+	}
+	return args
 }
 
 func app() (string, error) {
