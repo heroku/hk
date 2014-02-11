@@ -23,8 +23,7 @@ var (
 
 var cmdRun = &Command{
 	Run:      runRun,
-	Usage:    "run [-s <size>] [-d] <command> [<argument>...]",
-	NeedsApp: true,
+	Usage:    "run [-a <app>] [-s <size>] [-d] <command> [<argument>...]",
 	Category: "dyno",
 	Short:    "run a process in a dyno",
 	Long: `
@@ -52,11 +51,19 @@ Examples:
 }
 
 func init() {
+	cmdRun.Flag.StringVar(&flagApp, "a", "", "app name")
 	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
 	cmdRun.Flag.StringVar(&dynoSize, "s", "", "dyno size")
 }
 
 func runRun(cmd *Command, args []string) {
+	if stringsIndex(args, "-a") > -1 && stringsIndex(os.Args, "--") < 2 {
+		printError("ambiguous -a flag provided")
+		printFatal(
+			"If you really wanted to run %q, please re-run with a -- before the command.",
+			strings.Join(args, " "),
+		)
+	}
 	appname := mustApp()
 	if len(args) == 0 {
 		cmd.printUsage()
