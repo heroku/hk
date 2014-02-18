@@ -159,29 +159,30 @@ func parseAddonAddConfig(config []string) (*map[string]string, error) {
 	return &conf, nil
 }
 
-var cmdAddonRemove = &Command{
-	Run:      runAddonRemove,
-	Usage:    "addon-remove <name>",
+var cmdAddonDestroy = &Command{
+	Run:      runAddonDestroy,
+	Usage:    "addon-destroy <name>",
 	NeedsApp: true,
 	Category: "add-on",
-	Short:    "remove an addon",
+	Short:    "destroy an addon",
 	Long: `
-Removes an addon from an app. The command will prompt for
-confirmation, or accept confirmation via stdin.
+Removes an addon from an app, permanently destroying any data
+stored by that addon. The command will prompt for confirmation,
+or accept confirmation via stdin.
 
 Examples:
 
-    $ hk addon-remove heroku-postgresql-blue
+    $ hk addon-destroy heroku-postgresql-blue
     warning: This will destroy heroku-postgresql-blue on myapp. Please type "myapp" to continue:
     > myapp
-    Removed heroku-postgresql-blue from myapp.
+    Destroyed heroku-postgresql-blue on myapp.
 
-    $ echo myapp | hk addon-remove redistogo
-    Removed redistogo from myapp.
+    $ echo myapp | hk addon-destroy redistogo
+    Destroyed redistogo on myapp.
 `,
 }
 
-func runAddonRemove(cmd *Command, args []string) {
+func runAddonDestroy(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
 		cmd.printUsage()
@@ -199,7 +200,7 @@ func runAddonRemove(cmd *Command, args []string) {
 	mustConfirm(warning, appname)
 
 	checkAddonError(client.AddonDelete(appname, name))
-	log.Printf("Removed %s from %s.", name, appname)
+	log.Printf("Destroyed %s on %s.", name, appname)
 }
 
 var cmdAddonOpen = &Command{
