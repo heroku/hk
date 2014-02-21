@@ -12,6 +12,103 @@ import (
 	"github.com/heroku/hk/postgresql"
 )
 
+var cmdPgList = &Command{
+	Run:      runPgList,
+	Usage:    "pg-list",
+	NeedsApp: true,
+	Category: "pg",
+	Short:    "list Heroku Postgres databases" + extra,
+	Long: `
+Pg-list shows the name, plan, state, and connection count for
+all Heroku Postgres databases on an app. Forks and followers are
+shown in a tree under the database they follow.
+
+The database configured as your DATABASE_URL is indicated with
+an asterisk (*). Exclamation marks (!!) indicate databases which
+are due for maintenance.
+
+Examples:
+
+    $ hk pg-list
+    * heroku-postgresql-crimson       crane  Available  5
+      └───> heroku-postgresql-copper  ronin  Available  3
+
+    $ hk pg-list
+      heroku-postgresql-green              standard-tengu  Available     3
+    * heroku-postgresql-olive              standard-tengu  Available     3
+      ├───> heroku-postgresql-gray         standard-tengu  Available !!  3
+      ├─ ─┤ heroku-postgresql-rose         standard-tengu  Available     3
+      │     └───> heroku-postgresql-white  standard-tengu  Available     3
+      └─ ─┤ heroku-postgresql-teal         standard-tengu  Available     3
+`,
+}
+
+func runPgList(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	appname := mustApp()
+	// list all addons
+	addons, err := client.AddonList(appname, nil)
+	must(err)
+
+	// locate Heroku Postgres addons
+	hpgprefix := hpgAddonName() + "-"
+	hpgs := make(map[string]*heroku.Addon)
+	for i := range addons {
+		if strings.HasPrefix(addons[i].Name, hpgprefix) {
+			hpgs[addons[i].Name] = &addons[i]
+		}
+	}
+	if len(hpgs) == 0 {
+		return // no Heroku Postgres databases to list
+	}
+
+	// fetch app's config concurrently in case we need to resolve DB names
+	var appConf map[string]string
+	confch := make(chan map[string]string, 1)
+	errch := make(chan error, len(hpgs)+1)
+	go func(appname string) {
+		if config, err := client.ConfigVarInfo(appname); err != nil {
+			errch <- err
+		} else {
+			confch <- config
+		}
+	}(appname)
+
+	// fetch info for each database concurrently
+	var dbinfos []*fullDBInfo
+	dbinfoch := make(chan fullDBInfo, len(hpgs))
+	for name, addon := range hpgs {
+		go func(name string, addon *heroku.Addon) {
+			db := pgclient.NewDB(addon.ProviderId, addon.Plan.Name)
+			if dbinfo, err := db.Info(); err != nil {
+				errch <- err
+			} else {
+				dbinfoch <- fullDBInfo{Name: name, DBInfo: dbinfo}
+			}
+		}(name, addon)
+	}
+	// wait for db info repsonses and app config response
+	for i := 0; i < len(hpgs)+1; i++ {
+		select {
+		case err := <-errch:
+			printFatal(err.Error())
+		case dbinfo := <-dbinfoch:
+			dbinfos = append(dbinfos, &dbinfo)
+		case appConf = <-confch:
+		}
+	}
+
+	addonMap := newPgAddonMap(addons, appConf)
+	dbinfos = sortedDBInfoTree(dbinfos, addonMap)
+
+	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
+	printDBTree(w, dbinfos, addonMap)
+}
+
 var cmdPgInfo = &Command{
 	Run:      runPgInfo,
 	Usage:    "pg-info <dbname>",
@@ -81,7 +178,7 @@ func runPgInfo(cmd *Command, args []string) {
 	}(appname)
 
 	db := pgclient.NewDB(addon.ProviderId, addon.Plan.Name)
-	info, err := db.Info()
+	dbi, err := db.Info()
 	must(err)
 
 	select {
@@ -91,19 +188,19 @@ func runPgInfo(cmd *Command, args []string) {
 	}
 
 	addonMap := newPgAddonMap(addons, appConf)
-	printPgInfo(addonName, info, &addonMap)
+	printPgInfo(addonName, dbi, &addonMap)
 }
 
-func printPgInfo(name string, info postgresql.DBInfo, addonMap *pgAddonMap) {
+func printPgInfo(name string, dbi postgresql.DBInfo, addonMap *pgAddonMap) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
 	listRec(w, "Name:", name)
-	envNames := strings.Join(addonMap.FindEnvsFromValue(info.ResourceURL), ", ")
+	envNames := strings.Join(addonMap.FindEnvsFromValue(dbi.ResourceURL), ", ")
 	listRec(w, "Env Vars:", envNames)
 
 	// List info items returned by PG API
-	for _, ie := range info.Info {
+	for _, ie := range dbi.Info {
 		if len(ie.Values) == 0 {
 			listRec(w, ie.Name+":", "none")
 		} else {

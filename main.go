@@ -141,6 +141,7 @@ var commands = []*Command{
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,
 	cmdOpen,
+	cmdPgList,
 	cmdPgInfo,
 	cmdPsql,
 	cmdRegions,
