@@ -87,7 +87,7 @@ var pgInfoResponse = `
     {
       "name": "Forks",
       "resolve_db_name": true,
-      "values": []
+			"values": ["postgres://myfakedb.com/dbname"]
     },
     {
       "name": "Maintenance",
@@ -136,7 +136,7 @@ func TestDBInfo(t *testing.T) {
 		t.Errorf("expected DatabaseUser=%s, got %s", "username", dbi.DatabaseUser)
 	}
 
-	// InfoFields
+	// InfoEntries
 	if len(dbi.Info) != 12 {
 		t.Errorf("expected 12 info entries, got %d", len(dbi.Info))
 	} else if !reflect.DeepEqual(dbi.Info[0], InfoEntry{
@@ -191,5 +191,56 @@ func TestDBInfo(t *testing.T) {
 	}
 	if dbi.TargetTransaction != "5" {
 		t.Errorf("expected TargetTransaction=%s, got %s", "5", dbi.TargetTransaction)
+	}
+}
+
+func TestInfoEntryListNamed(t *testing.T) {
+	var dbi DBInfo
+	err := json.Unmarshal([]byte(pgInfoResponse), &dbi)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ie := dbi.Info.Named("Plan")
+	if ie == nil {
+		t.Fatal("expected to find Plan info")
+	}
+	expected := InfoEntry{
+		Name:   "Plan",
+		Values: []interface{}{"Standard Tengu"},
+	}
+	if !reflect.DeepEqual(*ie, expected) {
+		t.Errorf("expected %+v, got %+v", expected, *ie)
+	}
+}
+
+var getStringTests = []struct {
+	Name            string
+	ExpectedValue   string
+	ExpectedResolve bool
+}{
+	{Name: "Plan", ExpectedValue: "Standard Tengu"},
+	{Name: "Status", ExpectedValue: "Available"},
+	{Name: "Tables", ExpectedValue: "0"},
+	{Name: "Status", ExpectedValue: "Available"},
+	{Name: "PG Version", ExpectedValue: "9.3.2"},
+	{Name: "Forks", ExpectedValue: "postgres://myfakedb.com/dbname", ExpectedResolve: true},
+	{Name: "Followers", ExpectedValue: "", ExpectedResolve: true},
+	{Name: "Maintenance", ExpectedValue: "not required"},
+}
+
+func TestGetString(t *testing.T) {
+	var dbi DBInfo
+	err := json.Unmarshal([]byte(pgInfoResponse), &dbi)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, st := range getStringTests {
+		value, resolve := dbi.Info.GetString(st.Name)
+		if value != st.ExpectedValue {
+			t.Errorf("expected %s value of %q, got %q", st.Name, st.ExpectedValue, value)
+		}
+		if resolve != st.ExpectedResolve {
+			t.Errorf("expected %s resolve of %t, got %t", st.Name, st.ExpectedResolve, resolve)
+		}
 	}
 }

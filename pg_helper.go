@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/postgresql"
+	"github.com/mgutz/ansi"
 )
 
 // the names of heroku postgres addons vary in dev environments
@@ -96,4 +100,125 @@ func newPgAddonMap(addons []heroku.Addon, appConf map[string]string) pgAddonMap 
 		}
 	}
 	return pgAddonMap{m, appConf}
+}
+
+type fullDBInfo struct {
+	Name     string
+	DBInfo   postgresql.DBInfo
+	Parent   *fullDBInfo
+	Children []*fullDBInfo
+}
+
+func (f *fullDBInfo) MaintenanceString() string {
+	valstr, _ := f.DBInfo.Info.GetString("Maintenance")
+	if valstr != "" && valstr != "not required" {
+		return " " + ansi.Color("!!", "red+b") + ansi.ColorCode("reset")
+	}
+	return ""
+}
+
+// fullDBInfosByName implements sort.Interface for []*fullDBInfo based on the
+// Name field.
+type fullDBInfosByName []*fullDBInfo
+
+func (f fullDBInfosByName) Len() int           { return len(f) }
+func (f fullDBInfosByName) Swap(i, j int)      { f[i], f[j] = f[j], f[i] }
+func (f fullDBInfosByName) Less(i, j int) bool { return f[i].Name < f[j].Name }
+
+func sortedDBInfoTree(dbinfos []*fullDBInfo, addonMap pgAddonMap) (result []*fullDBInfo) {
+	sort.Sort(fullDBInfosByName(dbinfos))
+	// get all children organized under their parents
+	for _, info := range dbinfos {
+		parentName := getResolvedInfoValue(info.DBInfo, "Forked From", &addonMap)
+		if parentName == "" {
+			parentName = getResolvedInfoValue(info.DBInfo, "Following", &addonMap)
+		}
+		if parentName != "" {
+			for _, parent := range dbinfos {
+				if parent.Name == parentName {
+					parent.Children = append(parent.Children, info)
+					info.Parent = parent
+					break
+				}
+			}
+		}
+	}
+	// keep items that have no parent
+	for i := 0; i < len(dbinfos); i++ {
+		if dbinfos[i].Parent == nil {
+			result = append(result, dbinfos[i])
+		}
+	}
+	return
+}
+
+func printDBTree(w io.Writer, dbinfos []*fullDBInfo, addonMap pgAddonMap) {
+	for _, info := range dbinfos {
+		name := info.Name
+		if info.Parent != nil {
+			name = printTreeElements(info) + name
+		}
+		dburlMarker := "  "
+		if stringsIndex(addonMap.addonToEnv[info.Name], "DATABASE_URL") != -1 {
+			dburlMarker = "* "
+		}
+		status, _ := info.DBInfo.Info.GetString("Status")
+		listRec(w,
+			dburlMarker+name,
+			info.DBInfo.Plan,
+			status+info.MaintenanceString(),
+			info.DBInfo.NumConnections,
+		)
+		if len(info.Children) > 0 {
+			printDBTree(w, info.Children, addonMap)
+		}
+	}
+}
+
+const (
+	treeMiddleBranch = "├─"
+	treeLastBranch   = "└─"
+	treeForkSymbol   = " ─┤"
+	treeFollowSymbol = "──>"
+	treeIndentMiddle = "│     "
+	treeIndentLast   = "      "
+)
+
+func printTreeElements(info *fullDBInfo) string {
+	if info == nil || info.Parent == nil {
+		return ""
+	}
+	prefix := ""
+	for curInfo, p := info, info.Parent; p != nil; curInfo, p = p, p.Parent {
+		prefix = treePrefix(p, curInfo, prefix == "") + prefix
+	}
+	symbol := treeForkSymbol
+	if info.DBInfo.IsFollower() {
+		symbol = treeFollowSymbol
+	}
+	return prefix + symbol + " "
+}
+
+func treePrefix(parent, info *fullDBInfo, firstLevel bool) string {
+	if parent.Children[len(parent.Children)-1] == info {
+		// this is the parent's last child
+		if firstLevel {
+			return treeLastBranch
+		}
+		return treeIndentLast
+	}
+	if firstLevel {
+		return treeMiddleBranch
+	}
+	return treeIndentMiddle
+}
+
+func getResolvedInfoValue(dbi postgresql.DBInfo, key string, addonMap *pgAddonMap) string {
+	val, resolve := dbi.Info.GetString(key)
+	if val != "" && resolve {
+		if addonName, ok := addonMap.FindAddonFromValue(val); ok {
+			return addonName
+		}
+	}
+	return val
 }
