@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"os/exec"
@@ -148,46 +149,10 @@ func runPgInfo(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	appname := mustApp()
-	// list all addons
-	addons, err := client.AddonList(appname, nil)
-	must(err)
-
-	// locate specific addon
 	addonName := ensurePrefix(args[0], hpgAddonName()+"-")
-	var addon *heroku.Addon
-	for i := range addons {
-		if addons[i].Name == addonName {
-			addon = &addons[i]
-			break
-		}
-	}
-	if addon == nil {
-		printFatal("addon %s not found", addonName)
-	}
 
-	// fetch app's config concurrently in case we need to resolve DB names
-	var appConf map[string]string
-	confch := make(chan map[string]string, 1)
-	errch := make(chan error, 1)
-	go func(appname string) {
-		if config, err := client.ConfigVarInfo(appname); err != nil {
-			errch <- err
-		} else {
-			confch <- config
-		}
-	}(appname)
+	_, dbi, addonMap := mustGetDBInfoAndAddonMap(addonName, appname)
 
-	db := pgclient.NewDB(addon.ProviderId, addon.Plan.Name)
-	dbi, err := db.Info()
-	must(err)
-
-	select {
-	case err := <-errch:
-		printFatal(err.Error())
-	case appConf = <-confch:
-	}
-
-	addonMap := newPgAddonMap(addons, appConf)
 	printPgInfo(addonName, dbi, &addonMap)
 }
 
@@ -220,6 +185,58 @@ func printPgInfo(name string, dbi postgresql.DBInfo, addonMap *pgAddonMap) {
 			}
 		}
 	}
+}
+
+var cmdPgUnfollow = &Command{
+	Run:      runPgUnfollow,
+	Usage:    "pg-unfollow <dbname>",
+	NeedsApp: true,
+	Category: "pg",
+	Short:    "stop a replica postgres database from following" + extra,
+	Long: `
+Pg-unfollow stops a Heroku Postgres database follower from
+following, turning it into a read/write database. The command
+will prompt for confirmation, or accept confirmation via stdin.
+
+Examples:
+
+    $ hk pg-unfollow heroku-postgresql-blue
+    warning: heroku-postgresql-blue on myapp will permanently stop following heroku-postgresql-red.
+    warning: This cannot be undone. Please type "heroku-postgresql-blue" to continue:
+    > heroku-postgresql-blue
+    Unfollowed heroku-postgresql-blue on myapp.
+
+    $ hk pg-unfollow blue
+    warning: heroku-postgresql-blue on myapp will permanently stop following heroku-postgresql-red.
+    warning: This cannot be undone. Please type "blue" to continue:
+    > blue
+    Unfollowed heroku-postgresql-blue on myapp.
+
+    $ echo blue | hk pg-unfollow blue
+    Unfollowed heroku-postgresql-blue on myapp.
+`,
+}
+
+func runPgUnfollow(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	appname := mustApp()
+	addonName := ensurePrefix(args[0], hpgAddonName()+"-")
+
+	db, dbi, addonMap := mustGetDBInfoAndAddonMap(addonName, appname)
+	if !dbi.IsFollower() {
+		printFatal("%s is not following another database.", addonName)
+	}
+	parentName := getResolvedInfoValue(dbi, "Following", &addonMap)
+
+	printWarning("%s on %s will permanently stop following %s.", addonName, appname, parentName)
+	warning := fmt.Sprintf("This cannot be undone. Please type %q to continue:", args[0])
+	mustConfirm(warning, args[0])
+
+	must(db.Unfollow())
+	fmt.Printf("Unfollowed %s on %s.", addonName, appname)
 }
 
 var commandNamePsql string

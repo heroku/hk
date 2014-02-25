@@ -102,6 +102,49 @@ func newPgAddonMap(addons []heroku.Addon, appConf map[string]string) pgAddonMap 
 	return pgAddonMap{m, appConf}
 }
 
+func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, postgresql.DBInfo, pgAddonMap) {
+	// list all addons
+	addons, err := client.AddonList(appname, nil)
+	must(err)
+
+	// locate specific addon
+	var addon *heroku.Addon
+	for i := range addons {
+		if addons[i].Name == addonName {
+			addon = &addons[i]
+			break
+		}
+	}
+	if addon == nil {
+		printFatal("addon %s not found", addonName)
+	}
+
+	// fetch app's config concurrently in case we need to resolve DB names
+	var appConf map[string]string
+	confch := make(chan map[string]string, 1)
+	errch := make(chan error, 1)
+	go func(appname string) {
+		if config, err := client.ConfigVarInfo(appname); err != nil {
+			errch <- err
+		} else {
+			confch <- config
+		}
+	}(appname)
+
+	db := pgclient.NewDB(addon.ProviderId, addon.Plan.Name)
+	dbi, err := db.Info()
+	must(err)
+
+	select {
+	case err := <-errch:
+		printFatal(err.Error())
+	case appConf = <-confch:
+	}
+
+	addonMap := newPgAddonMap(addons, appConf)
+	return db, dbi, addonMap
+}
+
 type fullDBInfo struct {
 	Name     string
 	DBInfo   postgresql.DBInfo
