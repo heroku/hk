@@ -143,6 +143,7 @@ var commands = []*Command{
 	cmdOpen,
 	cmdPgList,
 	cmdPgInfo,
+	cmdPgUnfollow,
 	cmdPsql,
 	cmdRegions,
 	cmdStatus,
