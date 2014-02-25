@@ -47,6 +47,7 @@ func loadNetrc() {
 		var err error
 		if nrc, err = netrc.ParseFile(netrcPath()); err != nil {
 			if os.IsNotExist(err) {
+				nrc = &netrc.Netrc{}
 				return
 			}
 			printFatal("loading netrc: " + err.Error())
