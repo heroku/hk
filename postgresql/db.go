@@ -70,7 +70,7 @@ type DBInfo struct {
 	ResourceURL           string        `json:"resource_url"`
 	ServicePort           string        `json:"service_port"`
 	StatusUpdatedAt       time.Time     `json:"status_updated_at"`
-	Standalone            string        `json:"standalone?"`
+	Standalone            bool          `json:"standalone?"`
 	TargetTransaction     string        `json:"target_transaction"`
 }
 
