@@ -145,7 +145,7 @@ func printWarning(message string, args ...interface{}) {
 func mustConfirm(warning, desired string) {
 	if term.IsTerminal(os.Stdin) {
 		printWarning(warning)
-		fmt.Printf(ansi.Color("> ", "+b") + ansi.ColorCode("reset"))
+		fmt.Printf("> ")
 	}
 	var confirm string
 	if _, err := fmt.Scanln(&confirm); err != nil {
