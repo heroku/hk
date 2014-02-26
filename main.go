@@ -107,6 +107,7 @@ var commands = []*Command{
 	cmdVersion,
 	cmdHelp,
 
+	helpCommands,
 	helpEnviron,
 	helpPlugins,
 	helpMore,
