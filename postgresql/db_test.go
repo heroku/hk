@@ -17,6 +17,7 @@ var starterTests = []starterTest{
 	{"basic", true},
 	{"hobby-dev", true},
 	{"hobby-basic", true},
+	{"devcloud", true},
 	{"crane", false},
 	{"kappa", false},
 	{"ronin", false},
@@ -29,7 +30,7 @@ func TestIsStarterPlan(t *testing.T) {
 	for _, st := range starterTests {
 		db := DB{Plan: st.plan}
 		if db.IsStarterPlan() != st.isStarter {
-			t.Errorf("expected isStarter=%b for %s", st.isStarter, st.plan)
+			t.Errorf("expected isStarter=%t for %s", st.isStarter, st.plan)
 		}
 	}
 }

@@ -25,7 +25,10 @@ func (d *DB) Ingress() error {
 // Plan names ending in "dev" or "basic" are currently handled by the starter
 // API while all others are handled by the production API.
 func (d *DB) IsStarterPlan() bool {
-	return strings.HasSuffix(d.Plan, "dev") || strings.HasSuffix(d.Plan, "basic")
+	return strings.HasSuffix(d.Plan, "dev") ||
+		strings.HasSuffix(d.Plan, "basic") ||
+		// special exception for devcloud plans:
+		strings.HasSuffix(d.Plan, "devcloud")
 }
 
 func (d *DB) Reset() error {
