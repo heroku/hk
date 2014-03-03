@@ -26,7 +26,7 @@ func runCreds(cmd *Command, args []string) {
 
 var cmdLogin = &Command{
 	Run:      runLogin,
-	Usage:    "login <email>",
+	Usage:    "login",
 	Category: "hk",
 	Short:    "log in to your Heroku account" + extra,
 	Long: `
@@ -36,26 +36,45 @@ on standard input.
 
 Example:
 
-    $ hk login user@test.com
+    $ hk login
+    Enter email: user@test.com
     Enter password: 
     Login successful.
 `,
 }
 
 func runLogin(cmd *Command, args []string) {
-	if len(args) != 1 {
+	if len(args) != 0 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
-	username := args[0]
+	oldEmail := client.Username
+	var email string
+	if oldEmail == "" {
+		fmt.Printf("Enter email: ")
+	} else {
+		fmt.Printf("Enter email [%s]: ", oldEmail)
+	}
+	_, err := fmt.Scanln(&email)
+	switch {
+	case err != nil && err.Error() != "unexpected newline":
+		printFatal(err.Error())
+	case email == "" && oldEmail == "":
+		printFatal("email is required.")
+	case email == "":
+		email = oldEmail
+	}
 
 	// NOTE: gopass doesn't support multi-byte chars on Windows
 	password, err := readPassword("Enter password: ")
-	if err != nil {
-		printFatal("reading password: " + err.Error())
+	switch {
+	case err.Error() == "unexpected newline":
+		printFatal("password is required.")
+	case err != nil:
+		printFatal(err.Error())
 	}
 
-	hostname, token, err := attemptLogin(username, password, "")
+	hostname, token, err := attemptLogin(email, password, "")
 	if err != nil {
 		if herror, ok := err.(heroku.Error); ok && herror.Id == "two_factor" {
 			// 2FA requested, attempt 2FA login
@@ -64,14 +83,14 @@ func runLogin(cmd *Command, args []string) {
 			if _, err := fmt.Scanln(&twoFactorCode); err != nil {
 				printFatal("reading two-factor auth code: " + err.Error())
 			}
-			hostname, token, err = attemptLogin(username, password, twoFactorCode)
+			hostname, token, err = attemptLogin(email, password, twoFactorCode)
 			must(err)
 		} else {
 			must(err)
 		}
 	}
 
-	err = saveCreds(hostname, username, token)
+	err = saveCreds(hostname, email, token)
 	if err != nil {
 		printFatal("saving new token: " + err.Error())
 	}
