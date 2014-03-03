@@ -103,7 +103,7 @@ var pgInfoResponse = `
   "plan": "standard-tengu",
   "postgresql_version": "9.3.2",
   "resource_url": "postgres://username:password@ec2-107-12-34-82.compute-1.amazonaws.com:5552/dbname",
-  "service_port": "5552",
+  "service_port": 5552,
   "standalone?": false,
   "status_updated_at": "2014-01-16T00:43:52+00:00",
   "target_transaction": "5"
@@ -177,8 +177,8 @@ func TestDBInfo(t *testing.T) {
 	if dbi.ResourceURL != "postgres://username:password@ec2-107-12-34-82.compute-1.amazonaws.com:5552/dbname" {
 		t.Errorf("expected ResourceURL=%s, got %s", "postgres://username:password@ec2-107-12-34-82.compute-1.amazonaws.com:5552/dbname", dbi.ResourceURL)
 	}
-	if dbi.ServicePort != "5552" {
-		t.Errorf("expected ServicePort=%s, got %s", "5552", dbi.ServicePort)
+	if dbi.ServicePort != 5552 {
+		t.Errorf("expected ServicePort=%d, got %s", 5552, dbi.ServicePort)
 	}
 	if dbi.Standalone != false {
 		t.Errorf("expected Standalone=%t, got %t", false, dbi.Standalone)

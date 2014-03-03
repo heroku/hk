@@ -68,7 +68,7 @@ type DBInfo struct {
 	Plan                  string        `json:"plan"`
 	PostgresqlVersion     string        `json:"postgresql_version"`
 	ResourceURL           string        `json:"resource_url"`
-	ServicePort           string        `json:"service_port"`
+	ServicePort           int           `json:"service_port"`
 	StatusUpdatedAt       time.Time     `json:"status_updated_at"`
 	Standalone            bool          `json:"standalone?"`
 	TargetTransaction     string        `json:"target_transaction"`
