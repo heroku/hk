@@ -14,6 +14,7 @@ import (
 
 	"github.com/bgentry/heroku-go"
 	"github.com/heroku/hk/postgresql"
+	"github.com/heroku/hk/rollbar"
 	"github.com/heroku/hk/term"
 	"github.com/mgutz/ansi"
 )
@@ -195,6 +196,8 @@ func main() {
 
 	for _, cmd := range commands {
 		if cmd.Name() == args[0] && cmd.Run != nil {
+			defer recoverPanic()
+
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()
 			}
@@ -290,6 +293,32 @@ func initClients() {
 				strings.TrimSpace(h[:i]),
 				strings.TrimSpace(h[i+1:]),
 			)
+		}
+	}
+}
+
+var rollbarClient = &rollbar.Client{
+	AppName:    "hk",
+	AppVersion: Version,
+	Endpoint:   "https://api.rollbar.com/api/1/item/",
+	Token:      "d344db7a09fa481e983694bfa326e6d9",
+}
+
+func recoverPanic() {
+	if Version != "dev" {
+		if rec := recover(); rec != nil {
+			message := ""
+			switch rec := rec.(type) {
+			case error:
+				message = rec.Error()
+			default:
+				message = fmt.Sprintf("%v", rec)
+			}
+			if err := rollbarClient.Report(message); err != nil {
+				printError("reporting crash failed: %s", err.Error())
+				panic(rec)
+			}
+			printFatal("hk internal error")
 		}
 	}
 }
