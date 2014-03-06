@@ -13,7 +13,13 @@ var cmdCreate = &Command{
 	Category: "app",
 	Short:    "create an app",
 	Long: `
-Create creates a new heroku app.
+Create creates a new Heroku app. If <name> is not specified, the
+app is created with a random haiku name.
+
+Options:
+
+    -r <region>  Heroku region to create app in
+    <name>       optional name for the app
 
 Examples:
 
