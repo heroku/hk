@@ -1,6 +1,8 @@
 #compdef hk
 
-# hk Autocomplete plugin for Oh-My-Zsh
+# hk Autocomplete plugin for Oh-My-Zsh. Drop this plugin at
+# ~/.oh-my-zsh/custom/plugins/hk/_hk to install it.
+#
 # Requires: The hk Heroku client (https://hk.heroku.com)
 # Author: Blake Gentry (https://bgentry.io)
 
@@ -32,12 +34,6 @@ __hk_app_names() {
   compadd $* - $_app_names
 }
 
-__region_names() {
-  declare -a region_names
-  region_names=(${(f)"$(hk regions | cut -f 1 -d ' ')"})
-  compadd $* - $region_names
-}
-
 _hk_app_names_caching_policy() {
   # Rebuild if cache is older than 1 hour.
   local -a oldp
@@ -46,6 +42,40 @@ _hk_app_names_caching_policy() {
   # m matches files with a given modification time, and h modifies the units to hours.
   # Finally, the +1 makes this match files modified at least 1 hour ago.
   oldp=( "$1"(Nmh+1) )
+  # return the length of oldp (given by #)
+  (( $#oldp ))
+}
+
+__hk_region_names() {
+  # set a local curcontext to use for caching
+  local curcontext=${curcontext%:*:*}:hk-__hk_region_names: state line cache_policy ret=1
+  local cache_name=":completion:${curcontext}:"
+
+  # See if a cache-policy is already set up, and set one if not
+  zstyle -s $cache_name cache-policy cache_policy
+  [[ -z "$cache_policy" ]] && zstyle $cache_name cache-policy _hk_region_names_caching_policy
+
+  # If _region_names isn't populated or the cache is invalid, and we fail to
+  # retrieve the cache:
+  if ( ((${#_region_names} == 0)) || _cache_invalid $cache_name ) \
+    && ! _retrieve_cache $cache_name; then
+    # If we've gotten to this point, the region names aren't cached. Fetch them.
+    _region_names=(${(f)"$(hk regions | cut -f 1 -d ' ')"})
+    # Store _region_names in the cache
+    _store_cache $cache_name _region_names
+  fi
+
+  compadd $* - $_region_names
+}
+
+_hk_region_names_caching_policy() {
+  # Rebuild if cache is older than 2 weeks.
+  local -a oldp
+  # This is a glob expansion for file modification time.
+  # N sets NULL_GLOB, deleting the pattern from the arg list if it doesn't match.
+  # m matches files with a given modification time, and w modifies the units to weeks.
+  # Finally, the +1 makes this match files modified at least 2 weeks ago.
+  oldp=( "$1"(Nmw+2) )
   # return the length of oldp (given by #)
   (( $#oldp ))
 }
@@ -82,7 +112,7 @@ _hk-create() {
   declare -A opt_args
 
   _arguments -C -s -S -A "-*" \
-    '-r=[region]::heroku region name:__region_names' \
+    '-r=[region]::heroku region name:__hk_region_names' \
     '*::app name:' \
    && ret=0
 
