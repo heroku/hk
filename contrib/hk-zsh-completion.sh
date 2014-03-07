@@ -156,6 +156,18 @@ _hk-create() {
   return ret
 }
 
+_hk-domain-add() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-domain-remove() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-domains() {
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
@@ -166,12 +178,54 @@ _hk-drains() {
   _hk_complete_only_app_flag
 }
 
+_hk-drain-add() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-drain-info() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-drain-remove() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-env() {
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
 }
 
+_hk-feature-disable() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-feature-enable() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-feature-info() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-features() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-get() {
+  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
 }
@@ -185,7 +239,23 @@ _hk-help() {
   return ret
 }
 
+_hk-info() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-maintenance() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-maintenance-disable() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-maintenance-enable() {
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
 }
@@ -195,7 +265,19 @@ _hk-open() {
   _hk_complete_only_app_flag
 }
 
+_hk-pg-info() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-pg-list() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-pg-unfollow() {
+  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
 }
@@ -218,6 +300,30 @@ _hk-restart() {
   _hk_complete_only_app_flag
 }
 
+_hk-rollback() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-scale() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-set() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-transfer() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-transfer-accept() {
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
@@ -234,6 +340,12 @@ _hk-transfer-decline() {
 }
 
 _hk-transfers() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-unset() {
+  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
 }
