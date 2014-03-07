@@ -8,6 +8,10 @@
 
 typeset -A opt_args
 
+_hk_is_default_cloud() {
+  ( [[ -z $HEROKU_API_URL ]] || [[ "https://api.heroku.com" == $HEROKU_API_URL ]] )
+}
+
 _hkrawcmds() {
   print -l ${(f)"$(hk help commands)"}
 }
@@ -27,16 +31,22 @@ __hk_app_names() {
     && ! _retrieve_cache $cache_name; then
     # If we've gotten to this point, the app names aren't cached. Fetch them.
     _app_names=(${(f)"$(hk apps | cut -f 1 -d ' ')"})
-    # Store _app_names in the cache
-    _store_cache $cache_name _app_names
+    # Store _app_names in the cache if this is a default cloud
+    ( _hk_is_default_cloud ) && _store_cache $cache_name _app_names
   fi
 
   compadd $* - $_app_names
+  # don't let this var persist in non-default clouds
+  ( ! _hk_is_default_cloud ) && unset _app_names
 }
 
 _hk_app_names_caching_policy() {
   # Rebuild if cache is older than 1 hour.
   local -a oldp
+  if ( ! _hk_is_default_cloud ); then
+    return 0 # don't cache data in non-default clouds
+  fi
+
   # This is a glob expansion for file modification time.
   # N sets NULL_GLOB, deleting the pattern from the arg list if it doesn't match.
   # m matches files with a given modification time, and h modifies the units to hours.
@@ -61,16 +71,22 @@ __hk_region_names() {
     && ! _retrieve_cache $cache_name; then
     # If we've gotten to this point, the region names aren't cached. Fetch them.
     _region_names=(${(f)"$(hk regions | cut -f 1 -d ' ')"})
-    # Store _region_names in the cache
-    _store_cache $cache_name _region_names
+    # Store _region_names in the cache if this is a default cloud
+    ( _hk_is_default_cloud ) && _store_cache $cache_name _region_names
   fi
 
   compadd $* - $_region_names
+  # don't let this var persist in non-default clouds
+  ( ! _hk_is_default_cloud ) && unset _region_names
 }
 
 _hk_region_names_caching_policy() {
   # Rebuild if cache is older than 2 weeks.
   local -a oldp
+  if ( ! _hk_is_default_cloud ); then
+    return 0 # don't cache data in non-default clouds
+  fi
+
   # This is a glob expansion for file modification time.
   # N sets NULL_GLOB, deleting the pattern from the arg list if it doesn't match.
   # m matches files with a given modification time, and w modifies the units to weeks.
