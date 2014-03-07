@@ -4,6 +4,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"syscall"
 )
 
@@ -18,4 +19,12 @@ func sysExec(path string, args []string, env []string) error {
 
 func homePath() string {
 	return os.Getenv("HOME")
+}
+
+func defaultPluginPath() string {
+	hkpath := "/usr/local/lib/hk/plugin"
+	if fi, err := os.Stat(hkpath); err == nil && fi.IsDir() {
+		return hkpath
+	}
+	return filepath.Join(homePath(), ".hk", "plugins")
 }

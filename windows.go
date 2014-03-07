@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 const (
@@ -32,4 +33,8 @@ func homePath() string {
 		home = os.Getenv("USERPROFILE")
 	}
 	return home
+}
+
+func defaultPluginPath() string {
+	return filepath.Join(homePath(), ".hk", "plugins")
 }
