@@ -127,11 +127,16 @@ _hk_region_names_caching_policy() {
 
 # Completion for any command that takes only the app arg
 _hk_complete_only_app_flag() {
-  # check if word is in array from _hkcmdnames_needing_app:
-  # (${~${(j:|:)$(_hkcmdnames_needing_app)}})
-  _arguments -C -s -S -A "-*" \
+  # -C: modify $curcontext for an action of the form '->state'
+  # -S: no options completed after a --
+  # -A "-*": no options completed after the first non-option
+  _arguments -C -S -A "-*" \
     '-a=[application name]:: :__hk_app_names' \
    && ret=0
+
+  ## If we want to automatically guess which commands take an app flag:
+  # check if word is in array from _hkcmdnames_needing_app:
+  # (${~${(j:|:)$(_hkcmdnames_needing_app)}})
 
   return ret
 }
@@ -148,7 +153,7 @@ _hk-access() {
 _hk-create() {
   local curcontext=$curcontext state line ret=1
 
-  _arguments -C -s -S -A "-*" \
+  _arguments -C -S -A "-*" \
     '-r=[region]::heroku region name:__hk_region_names' \
     '*::app name:' \
    && ret=0
