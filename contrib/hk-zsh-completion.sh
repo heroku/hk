@@ -6,15 +6,44 @@
 # Requires: The hk Heroku client (https://hk.heroku.com)
 # Author: Blake Gentry (https://bgentry.io)
 
-typeset -A opt_args
-
 _hk_is_default_cloud() {
   ( [[ -z $HEROKU_API_URL ]] || [[ "https://api.heroku.com" == $HEROKU_API_URL ]] )
+}
+
+_hkcmdnames() {
+  print -l ${(f)"$(hk help commands | cut -f 2 -d ' ')"}
+}
+
+_hkcmdnames_needing_app() {
+  print -l ${(f)"$(hk help commands | grep -F '[-a <app>]' | cut -f 2 -d ' ')"}
 }
 
 _hkrawcmds() {
   print -l ${(f)"$(hk help commands)"}
 }
+
+__args_for_command() {
+  for i in _hkrawcmds; do
+    if [[ "${${=i}[2]}" == $line[1] ]]; then
+      local arglist; arglist=()
+      #for j in (${^${i#*${line}[1] }}); do
+      # print -l ${=${i#*${${line}[1]} }}
+      for j in ${=${${i#*${${line}[1]} }%*\#*}}; do
+        arglist+=($j)
+      done
+      _describe -t opts 'opts' arglist && ret=0
+
+      # _arguments \
+      #   '-a:appname'
+      # ret=0
+      return
+    fi
+  done
+}
+
+###########################################################
+##       Functions to get data from hk and cache it      ##
+###########################################################
 
 __hk_app_names() {
   # set a local curcontext to use for caching
@@ -96,36 +125,28 @@ _hk_region_names_caching_policy() {
   (( $#oldp ))
 }
 
-_hkcmdnames() {
-  print -l ${(f)"$(hk help commands | cut -f 2 -d ' ')"}
+# Completion for any command that takes only the app arg
+_hk_complete_only_app_flag() {
+  # check if word is in array from _hkcmdnames_needing_app:
+  # (${~${(j:|:)$(_hkcmdnames_needing_app)}})
+  _arguments -C -s -S -A "-*" \
+    '-a=[application name]:: :__hk_app_names' \
+   && ret=0
+
+  return ret
 }
 
-_hkcmdnames_needing_app() {
-  print -l ${(f)"$(hk help commands | grep -F '[-a <app>]' | cut -f 2 -d ' ')"}
-}
+###########################################################
+##                     hk commands                       ##
+###########################################################
 
-__args_for_command() {
-  for i in _hkrawcmds; do
-    if [[ "${${=i}[2]}" == $line[1] ]]; then
-      local arglist; arglist=()
-      #for j in (${^${i#*${line}[1] }}); do
-      # print -l ${=${i#*${${line}[1]} }}
-      for j in ${=${${i#*${${line}[1]} }%*\#*}}; do
-        arglist+=($j)
-      done
-      _describe -t opts 'opts' arglist && ret=0
-
-      # _arguments \
-      #   '-a:appname'
-      # ret=0
-      return
-    fi
-  done
+_hk-access() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
 }
 
 _hk-create() {
   local curcontext=$curcontext state line ret=1
-  declare -A opt_args
 
   _arguments -C -s -S -A "-*" \
     '-r=[region]::heroku region name:__hk_region_names' \
@@ -135,17 +156,24 @@ _hk-create() {
   return ret
 }
 
+_hk-domains() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-drains() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-env() {
   local curcontext=$curcontext state line ret=1
-  declare -A opt_args
+  _hk_complete_only_app_flag
+}
 
-  # check if word is in array from _hkcmdnames_needing_app:
-  # (${~${(j:|:)$(_hkcmdnames_needing_app)}})
-  _arguments -C -s -S -A "-*" \
-    '-a=[application name]:: :__hk_app_names' \
-   && ret=0
-
-  return ret
+_hk-features() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
 }
 
 _hk-help() {
@@ -157,10 +185,73 @@ _hk-help() {
   return ret
 }
 
+_hk-maintenance() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-open() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-pg-list() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-psql() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-releases() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-restart() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-transfer-accept() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-transfer-cancel() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-transfer-decline() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-transfers() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-url() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-which-app() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+# The main command
 _hk() {
   integer ret=1
   local curcontext=$curcontext state line
-  declare -A opt_args
 
   _arguments -C \
     '(-): :->command' \
