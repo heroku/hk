@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/big"
 	"os"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -32,14 +34,13 @@ Examples:
 }
 
 func runAddons(cmd *Command, names []string) {
+	appname := mustApp()
+	addons, err := client.AddonList(appname, nil)
+	must(err)
+
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
-	appname := mustApp()
-	addons, err := client.AddonList(appname, nil)
-	if err != nil {
-		printFatal(err.Error())
-	}
 	for i, s := range names {
 		names[i] = strings.ToLower(s)
 	}
@@ -241,5 +242,104 @@ func checkAddonError(err error) {
 			printFatal(err.Error())
 		}
 		os.Exit(2)
+	}
+}
+
+var cmdAddonServices = &Command{
+	Run:      runAddonServices,
+	Usage:    "addon-services",
+	Category: "add-on",
+	Short:    "list addon services",
+	Long: `
+Lists available addon services.
+
+Examples:
+
+    $ hk addon-services
+    heroku-postgresql
+    newrelic
+    redisgreen
+    ...
+`,
+}
+
+func runAddonServices(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	services, err := client.AddonServiceList(nil)
+	must(err)
+
+	for _, s := range services {
+		fmt.Println(s.Name)
+	}
+}
+
+var cmdAddonPlans = &Command{
+	Run:      runAddonPlans,
+	Usage:    "addon-plans <service>",
+	Category: "add-on",
+	Short:    "list addon plans",
+	Long: `
+Lists available addon plans for an addon provider.
+
+Examples:
+
+    $ hk addon-plans heroku-postgresql
+    hobby-dev        $0/mo
+    hobby-basic      $9/mo
+    standard-yanari  $50/mo
+    standard-tengu   $200/mo
+    premium-yanari   $200/mo
+    premium-tengu    $350/mo
+    standard-ika     $750/mo
+    premium-ika      $1200/mo
+    ...
+`,
+}
+
+func runAddonPlans(cmd *Command, args []string) {
+	if len(args) != 1 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	service := args[0]
+	plans, err := client.PlanList(service, nil)
+	must(err)
+
+	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
+	defer w.Flush()
+
+	sort.Sort(addonPlansByPrice(plans))
+	for _, p := range plans {
+		listRec(w,
+			strings.TrimPrefix(p.Name, service+":"),
+			addonPlanPriceString(p),
+		)
+	}
+}
+
+type addonPlansByPrice []heroku.Plan
+
+func (a addonPlansByPrice) Len() int           { return len(a) }
+func (a addonPlansByPrice) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a addonPlansByPrice) Less(i, j int) bool { return a[i].Price.Cents < a[j].Price.Cents }
+
+func addonPlanPriceString(p heroku.Plan) string {
+	r := big.NewRat(int64(p.Price.Cents), 100)
+	decimals := 2
+	if p.Price.Cents%100 == 0 {
+		decimals = 0
+	}
+	return "$" + r.FloatString(decimals) + "/" + shortenPriceUnit(p.Price.Unit)
+}
+
+func shortenPriceUnit(unit string) string {
+	switch unit {
+	case "month":
+		return "mo"
+	default:
+		return unit
 	}
 }
