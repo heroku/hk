@@ -123,6 +123,8 @@ var commands = []*Command{
 	cmdAccountFeatureEnable,
 	cmdAccountFeatureDisable,
 	cmdAddonOpen,
+	cmdAddonPlans,
+	cmdAddonServices,
 	cmdAPI,
 	cmdCreds,
 	cmdDrains,
