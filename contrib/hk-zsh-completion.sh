@@ -45,6 +45,88 @@ __args_for_command() {
 ##       Functions to get data from hk and cache it      ##
 ###########################################################
 
+__hk_complete_addon_service_and_plan() {
+  local -a suf
+  if compset -P '*:'; then
+    __hk_addon_plans ${IPREFIX%%\:*} # strip : from $IPREFIX to get provider
+  else
+    __hk_addon_services
+  fi
+}
+
+__hk_addon_services() {
+  # set a local curcontext to use for caching
+  local curcontext=${curcontext%:*:*}:hk-__hk_addon_services: state line cache_policy ret=1
+  local cache_name=":completion:${curcontext}:"
+
+  # See if a cache-policy is already set up, and set one if not
+  zstyle -s $cache_name cache-policy cache_policy
+  [[ -z "$cache_policy" ]] && zstyle $cache_name cache-policy _hk_addon_services_caching_policy
+
+  # If _addon_services isn't populated or the cache is invalid, and we fail to
+  # retrieve the cache:
+  if ( ((${#_addon_services} == 0)) || _cache_invalid $cache_name ) \
+    && ! _retrieve_cache $cache_name; then
+    # If we've gotten to this point, the app names aren't cached. Fetch them.
+    _addon_services=(${(f)"$(hk addon-services)"})
+    # Store _addon_services in the cache if this is a default cloud
+    ( _hk_is_default_cloud ) && _store_cache $cache_name _addon_services
+  fi
+
+  # the -S ':' gives us a : suffix after completion
+  compadd -S ':' $* - $_addon_services
+  # don't let this var persist in non-default clouds
+  ( ! _hk_is_default_cloud ) && unset _addon_services
+}
+
+_hk_addon_services_caching_policy() {
+  local -a oldp
+  if ( ! _hk_is_default_cloud ); then
+    return 0 # don't cache data in non-default clouds
+  fi
+  # Rebuild if cache is older than 1 week
+  oldp=( "$1"(Nmw+1) )
+  (( $#oldp ))
+}
+
+__hk_addon_plans() {
+  # set a local curcontext to use for caching. Add service provider name ($1)
+  # as a a suffix for caching.
+  service=$1
+  local curcontext=${curcontext%:*:*}:hk-__hk_addon_plans_$service: state line cache_policy ret=1
+  local cache_name=":completion:${curcontext}:"
+  local varname="_addon_plans_${service//-/_}" # replace - in service name w/ _
+  plans_for_service=${(P)varname}
+
+  # See if a cache-policy is already set up, and set one if not
+  zstyle -s $cache_name cache-policy cache_policy
+  [[ -z "$cache_policy" ]] && zstyle $cache_name cache-policy _hk_addon_plans_caching_policy
+
+  # If $varname isn't populated or the cache is invalid, and we fail to retrieve
+  # the cache:
+  if ( ((${#plans_for_service} == 0)) || _cache_invalid $cache_name ) \
+    && ! _retrieve_cache $cache_name; then
+    # If we've gotten to this point, the plan names aren't cached. Fetch them.
+    plans_for_service=(${(f)"$(hk addon-plans $service | cut -f 1 -d ' ')"})
+    # Store _addon_plans in the cache if this is a default cloud
+    ( _hk_is_default_cloud ) && _store_cache $cache_name plans_for_service
+  fi
+
+  compadd $* $plans_for_service
+  # don't let this var persist in non-default clouds
+  ( ! _hk_is_default_cloud ) && unset $varname
+}
+
+_hk_addon_plans_caching_policy() {
+  local -a oldp
+  if ( ! _hk_is_default_cloud ); then
+    return 0 # don't cache data in non-default clouds
+  fi
+  # Rebuild if cache is older than 2 weeks
+  oldp=( "$1"(Nmw+2) )
+  (( $#oldp ))
+}
+
 __hk_app_names() {
   # set a local curcontext to use for caching
   local curcontext=${curcontext%:*:*}:hk-__hk_app_names: state line cache_policy ret=1
@@ -146,6 +228,43 @@ _hk_complete_only_app_flag() {
 ###########################################################
 
 _hk-access() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-addons() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-addon-add() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+
+  _arguments -C -S -A "-*" \
+    '-a=[application name]:: :__hk_app_names' \
+    ':addon service and plan:__hk_complete_addon_service_and_plan' \
+    '*:config options:' \
+  && ret=0
+
+  return ret
+}
+
+_hk-addon-destroy() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-addon-plans() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-addon-services() {
+  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
 }
