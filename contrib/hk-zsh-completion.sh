@@ -430,6 +430,12 @@ _hk-rollback() {
   _hk_complete_only_app_flag
 }
 
+_hk-run() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-scale() {
   # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
