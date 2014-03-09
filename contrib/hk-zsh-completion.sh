@@ -239,7 +239,6 @@ _hk-addons() {
 }
 
 _hk-addon-add() {
-  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
 
   _arguments -C -S -A "-*" \
@@ -431,9 +430,18 @@ _hk-rollback() {
 }
 
 _hk-run() {
-  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
-  _hk_complete_only_app_flag
+
+  # there is currently no way to list possible dyno sizes, so just use a
+  # constant array for that option
+  _arguments -C -S -A "-*" \
+    '-a=[application name]:: :__hk_app_names' \
+    '-s=[dyno size]:: :(1X 2X PX)' \
+    '-d[run in detached mode]::' \
+    '*:: :->args' \
+  && ret=0
+
+  return ret
 }
 
 _hk-scale() {
