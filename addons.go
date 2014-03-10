@@ -249,7 +249,7 @@ var cmdAddonServices = &Command{
 	Run:      runAddonServices,
 	Usage:    "addon-services",
 	Category: "add-on",
-	Short:    "list addon services",
+	Short:    "list addon services" + extra,
 	Long: `
 Lists available addon services.
 
@@ -280,7 +280,7 @@ var cmdAddonPlans = &Command{
 	Run:      runAddonPlans,
 	Usage:    "addon-plans <service>",
 	Category: "add-on",
-	Short:    "list addon plans",
+	Short:    "list addon plans" + extra,
 	Long: `
 Lists available addon plans for an addon provider.
 
