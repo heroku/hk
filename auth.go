@@ -68,9 +68,10 @@ func runLogin(cmd *Command, args []string) {
 	// NOTE: gopass doesn't support multi-byte chars on Windows
 	password, err := readPassword("Enter password: ")
 	switch {
+	case err == nil:
 	case err.Error() == "unexpected newline":
 		printFatal("password is required.")
-	case err != nil:
+	default:
 		printFatal(err.Error())
 	}
 
