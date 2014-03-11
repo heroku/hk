@@ -56,21 +56,53 @@ CLI.
 
 #### Create an app
 
-`heroku create myapp` -> `hk create myapp`
+```bash
+➜ heroku create myapp
+```
 
-`heroku create --region eu myapp` -> `hk create -r eu myapp`
+```bash
+➜ hk create myapp
+```
+
+With a region specified:
+
+```bash
+➜ heroku create --region eu myapp
+```
+
+```bash
+➜ hk create -r eu myapp
+```
 
 #### List apps
 
-`heroku list` -> `hk apps`
+```bash
+➜ heroku list
+```
+
+```bash
+➜ hk apps
+```
 
 #### Show an app's info
 
-`heroku info` -> `hk info`
+```bash
+➜ heroku info
+```
+
+```bash
+➜ hk info
+```
 
 #### Destroy an app
 
-`heroku destroy -a myapp` -> `hk destroy myapp`
+```bash
+➜ heroku destroy -a myapp
+```
+
+```bash
+➜ hk destroy myapp
+```
 
 The `heroku destroy` command can infer your app name from the current
 directory's git remotes. For safety, however, `hk destroy` always requires you
@@ -80,11 +112,23 @@ This command can permanently destroy data, so it prompts for confirmation.
 
 #### Rename an app
 
-`heroku rename -a oldappname newappname` -> `hk rename oldappname newappname`
+```bash
+➜ heroku rename -a oldappname newappname
+```
+
+```bash
+➜ hk rename oldappname newappname
+```
 
 #### View your application log
 
-`heroku logs --tail` -> `hk log`
+```bash
+➜ heroku logs --tail
+```
+
+```bash
+➜ hk log
+```
 
 The `hk log` command follows your application log stream by default (which
 required a `--tail` flag in the Toolbelt).
@@ -93,14 +137,26 @@ required a `--tail` flag in the Toolbelt).
 
 #### Change dyno scale
 
-`heroku ps:scale web=2 worker=4:PX` -> `hk scale web=2 worker=4:PX`
+```bash
+➜ heroku ps:scale web=2 worker=4:PX
+```
+
+```bash
+➜ hk scale web=2 worker=4:PX
+```
 
 This command is mostly identical in hk, except that it doesn't support scaling
 by relative increments (i.e. `web+2`).
 
 #### List dynos
 
-`heroku ps` -> `hk dynos`
+```bash
+➜ heroku ps
+```
+
+```bash
+➜ hk dynos
+```
 
 ### App configuration (environment)
 
@@ -110,58 +166,135 @@ to modify the environment on a Unix machine.
 
 #### Set an environment variable on an app
 
-`heroku config:set KEY=value` -> `hk set KEY=value`
+```bash
+➜ heroku config:set KEY=value
+```
+
+```bash
+➜ hk set KEY=value
+```
 
 #### List app's environment settings
 
-`heroku config` -> `hk env`
+```bash
+➜ heroku config
+```
+
+```bash
+➜ hk env
+```
 
 #### Show a single environment variable
 
-`heroku config:get KEY` -> `hk get KEY`
+```bash
+➜ heroku config:get KEY
+```
+
+```bash
+➜ hk get KEY
+```
 
 #### Unset an environment variable on an app
 
-`heroku config:unset KEY1 KEY2` -> `hk unset KEY1 KEY2`
+```bash
+➜ heroku config:unset KEY1 KEY2
+```
+
+```bash
+➜ hk unset KEY1 KEY2
+```
 
 ### Domain Names
 
 #### List domain names
 
-`heroku domains` -> `hk domains`
+```bash
+➜ heroku domains
+```
+
+```bash
+➜ hk domains
+```
 
 #### Add a domain name
 
-`heroku domains:add www.test.com` -> `hk domain-add www.test.com`
+```bash
+➜ heroku domains:add www.test.com
+```
+
+```bash
+➜ hk domain-add www.test.com
+```
 
 #### Remove a domain name
 
-`heroku domains:remove www.test.com` -> `hk domain-remove www.test.com`
+```bash
+➜ heroku domains:remove www.test.com
+```
+
+```bash
+➜ hk domain-remove www.test.com
+```
 
 ### Add-ons
 
 #### List add-ons on an app
 
-`heroku addons` -> `hk addons`
+```bash
+➜ heroku addons
+```
+
+```bash
+➜ hk addons
+```
 
 #### Add an add-on
 
-`heroku addons:add heroku-postgresql` -> `hk addon-add heroku-postgresql`
+```bash
+➜ heroku addons:add heroku-postgresql
+```
 
-`heroku addons:add heroku-postgresql --fork RED` -> `hk addon-add heroku-postgresql fork=red`
+```bash
+➜ hk addon-add heroku-postgresql
+```
+
+With additional provisioning options:
+
+```bash
+➜ heroku addons:add heroku-postgresql --fork RED
+```
+
+```bash
+➜ hk addon-add heroku-postgresql fork=red
+```
 
 Additional add-on config is provided as `key=value` pairs rather than
 `--key value` flags.
 
 #### Destroy an add-on
 
-`heroku addons:remove heroku-postgresql:dev` -> `hk addon-remove heroku-postgresql-blue`
+```bash
+➜ heroku addons:remove redistogo
+```
 
-`heroku addons:remove redistogo` -> `hk addon-remove redistogo`
+```bash
+➜ hk addon-remove redistogo
+```
+
+Next, a Heroku Postgres addon:
+
+```bash
+➜ heroku addons:remove heroku-postgresql:dev
+```
+
+```bash
+➜ hk addon-remove heroku-postgresql-blue
+```
 
 Add-ons in hk are referenced by their `name`. Usually this is just the addon
 provider's name, but for Heroku Postgres, it's of the form:
-`heroku-postgresql-color`
+`heroku-postgresql-color`. In either case, the name matches what's displayed in
+`hk addons`.
 
 This command can permanently destroy data, so it prompts for confirmation.
 
@@ -169,25 +302,55 @@ This command can permanently destroy data, so it prompts for confirmation.
 
 #### Add access for a user
 
-`heroku sharing:add user@test.com` -> `hk access-add user@test.com`
+```bash
+➜ heroku sharing:add user@test.com
+```
+
+```bash
+➜ hk access-add user@test.com
+```
 
 #### Remove access for a user
 
-`heroku sharing:remove user@test.com` -> `hk access-remove user@test.com`
+```bash
+➜ heroku sharing:remove user@test.com
+```
+
+```bash
+➜ hk access-remove user@test.com
+```
 
 ### Releases
 
 #### View an app's releases
 
-`heroku releases` -> `hk releases`
+```bash
+➜ heroku releases
+```
+
+```bash
+➜ hk releases
+```
 
 #### View release info
 
-`heroku releases:info v123` -> `hk release-info v123`
+```bash
+➜ heroku releases:info v123
+```
+
+```bash
+➜ hk release-info v123
+```
 
 #### Rollback to a previous release
 
-`heroku rollback` -> `hk rollback v122`
+```bash
+➜ heroku rollback
+```
+
+```bash
+➜ hk rollback v122
+```
 
 The Toolbelt attempts to rollback by one version, but hk requires you to specify
 the version you want to rollback to.
