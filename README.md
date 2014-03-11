@@ -1,24 +1,19 @@
-## hk
+# hk
 
-Fast Heroku client.
+A fast Heroku CLI client.
 
-### Overview
+## Overview
 
 hk is a command line client to the Heroku runtime platform, designed to be as fast as possible.
 
-#### Disclaimer
+### Disclaimer
 
-This is pre-alpha software. It will undergo substantial changes during the
-coming months. Don't be surprised if it is broken or if the interface is
-completely altered without warning.
+This is beta software. It may still undergo substantial changes during the
+coming months. You should expect that some functionality may break or be altered without warning.
 
-Issues and pull requests are still welcome, but please understand that they may
-be rejected if it's an issue we just aren't ready to tackle this early in the
-project.
+## Motivation
 
-### Motivation
-
-#### Fast as a feature
+### Fast as a feature
 
 ```bash
 ## version
@@ -38,35 +33,30 @@ $ time hk apps >/dev/null
 real	0m0.785s
 ```
 
-#### Focus on API
-
-We believe this is evidence that a first-class Heroku API trumps any particular
-client.
-
-#### Iterative Development
+### Iterative Development
 
 A release mechanism was created for hk in the beginning: the binary updates
 itself. This gives us confidence in iterative development, which we value
 highly, because it gives us the ability to release very often knowing users will
 see the updates in a timely manner.
 
-#### The power of Go
+### The power of Go
 
 hk demonstrates the power of the Go language, runtime, systems access, and
 distribution story (a single, statically linked binary with no dependencies)
 which are all very appealing to Heroku.
 
-#### Unix
+### Unix
 
 Heroku loves Unix. This client should reflect that. Commands map to their unix
 ancestors’ names and flags where applicable.
 
-### Installation
+## Installation
 
 > Please note that versions of hk installed from source are unsupported and
 > should only be installed for development purposes.
 
-#### Mac OS X, Linux, BSD
+### Mac OS X, Linux, BSD
 
 Pre-built binaries are available for Mac OS X, Linux, and BSD. Once installed,
 these binaries will automatically update themselves when new releases are
@@ -82,7 +72,7 @@ The URL [https://hk.heroku.com/hk.gz](https://hk.heroku.com/hk.gz) will attempt
 to detect your OS and CPU architecture based on the User-Agent, then redirect
 you to the latest release for your platform.
 
-#### Windows
+### Windows
 
 Currently, you need to have a [Go development environment][go-install] to
 install hk on Windows. Compiled binaries with automatic updating are available
@@ -90,57 +80,34 @@ for Windows, but the installer is not ready yet.
 
 	$ go get github.com/heroku/hk
 
-Again, note that this installation method is unsupported.
+Please note that this installation method is unsupported.
 
-### netrc
+## Usage
 
-You'll need a line like this in $HOME/.netrc
-
-	machine api.heroku.com login <email> password <apitoken>
-
-### Usage
+The basic usage of hk is:
 
 ```
 Usage: hk <command> [-a app] [options] [arguments]
-
-
-Commands:
-
-    create         create an app
-    apps           list apps
-    dynos          list dynos
-    releases       list releases
-    release-info   show release info
-    rollback       roll back to a previous release
-    addons         list addons
-    addon-add      add an addon
-    addon-remove   remove an addon
-    scale          change dyno quantities and sizes
-    restart        restart dynos
-    set            set env var
-    unset          unset env var
-    env            list env vars
-    run            run a process in a dyno
-    log            stream app log lines
-    info           show app info
-    rename         rename an app
-    destroy        destroy an app
-    domains        list domains
-    domain-add     add a domain
-    domain-remove  remove a domain
-    sshkey-add     add ssh public key
-    version        show hk version
-
-Run 'hk help [command]' for details.
-
-
-Additional help topics:
-
-    environ   environment variables used by hk
-    plugins   interface to plugin commands
-    more      additional commands, less frequently used
-    about     information about hk (e.g. copyright, license, etc.)
 ```
+
+For more details, and to learn about differences between hk and the Heroku Ruby
+CLI, please see the [getting started guide](./doc/guide.md).
+
+## Shell Completion
+
+Shell completion scripts for hk have been written for zsh and bash. Both files
+are located in [./contrib](./contrib/).
+
+The zsh completion script completes all command names and help topics. It also
+completes flags and other arguments for many commands:
+
+![](http://cl.ly/image/3n1X0q3y2E17/Screen%20Shot%202014-03-07%20at%201.52.26%20PM.png)
+
+![](http://cl.ly/image/0u3v0T2m352h/Image%202014-03-09%20at%2011.34.17%20AM.png)
+
+![](http://f.cl.ly/items/2X200V0h2M0L1Q1w0x38/Image%202014-03-11%20at%203.12.23%20PM.png)
+
+The bash completion script completes only command names at this time.
 
 ## Plugins
 
@@ -156,7 +123,7 @@ hk will set these environment variables for a plugin:
 * HKPASS - The password from either HEROKU_API_URL or .netrc
 * HKHOST - The hostname for the API endpoint
 
-### Development
+## Development
 
 hk requires Go 1.2 or later and uses [Godep](https://github.com/kr/godep) to manage dependencies.
 
@@ -167,11 +134,5 @@ hk requires Go 1.2 or later and uses [Godep](https://github.com/kr/godep) to man
 
 Please follow the [contribution guidelines](./CONTRIBUTING.md) before submitting
 a pull request.
-
-### Release
-
-	$ cd hk
-	$ vim main.go # edit Version
-	$ godep go build
 
 [go-install]: http://golang.org/doc/install "Golang installation"

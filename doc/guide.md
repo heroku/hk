@@ -16,11 +16,15 @@ To install hk, please use the instructions on [hk.heroku.com][hk-install]. hk is
 currently only being distributed for Mac OS X and Linux users. More
 user-friendly installers, including one for Windows, are planned.
 
+If you've installed hk on a machine that already had the Heroku Ruby CLI, you
+can start using hk immediately. If it's a new machine or you've never logged in,
+you'll need to do so by running `hk login`.
+
 ## Important differences from the Heroku Ruby CLI
 
 The Heroku Ruby CLI organized its commands under nested namespaces, separated
 with colons (i.e. `domains:add`). Most, but not all, of these namespaces were
-pluralizezd.
+pluralized.
 
 hk, however, uses a simple, flat command space (i.e. `domains` and
 `domain-add`). Commands use pluralized nouns where it's logical to do so, such
