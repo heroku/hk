@@ -320,7 +320,7 @@ func recoverPanic() {
 				printError("reporting crash failed: %s", err.Error())
 				panic(rec)
 			}
-			printFatal("hk internal error")
+			printFatal("hk encountered and reported an internal client error")
 		}
 	}
 }
