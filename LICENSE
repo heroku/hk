@@ -1,11 +1,3 @@
-package main
-
-var helpAbout = &Command{
-	Usage:    "about",
-	Category: "hk",
-	Short:    "information about hk (e.g. copyright, license, etc.)",
-	Long: userAgent + `
-
 The MIT License (MIT)
 
 Copyright © 2013 - 2014 Heroku, Keith Rarick and the hk
@@ -37,5 +29,3 @@ For source code, to contribute to hk, or just to say hello:
     https://github.com/heroku/hk
 
 Happy hacking!
-`,
-}
