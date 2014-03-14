@@ -23,23 +23,22 @@ var cmdReleases = &Command{
 	Short:    "list releases",
 	Long: `
 Lists releases. Shows the version of the release (e.g. v1), who
-made the release, git commit id, time of the release, and
-description.
+made the release, time of the release, and description.
 
 Examples:
 
     $ hk releases
-    v1  bob@test.com  3ae20c2  Jun 12 18:28  Deploy 3ae20c2
-    v2  john@me.com   0fda0ae  Jun 13 18:14  Deploy 0fda0ae
-    v3  john@me.com            Jun 13 18:31  Rollback to v2
+    v1  bob@test.com  Jun 12 18:28  Deploy 3ae20c2
+    v2  john@me.com   Jun 13 18:14  Deploy 0fda0ae
+    v3  john@me.com   Jun 13 18:31  Rollback to v2
 
     $ hk releases -n 2
-    v2  john  0fda0ae  Jun 13 18:14  Deploy 0fda0ae
-    v3  john           Jun 13 18:31  Rollback to v2
+    v2  john  Jun 13 18:14  Deploy 0fda0ae
+    v3  john  Jun 13 18:31  Rollback to v2
 
     $ hk releases 1 3
-    v1  bob@test.com  3ae20c2  Jun 12 18:28  Deploy 3ae20c2
-    v3  john@me.com            Jun 13 18:31  Rollback to v2
+    v1  bob@test.com  Jun 12 18:28  Deploy 3ae20c2
+    v3  john@me.com   Jun 13 18:31  Rollback to v2
 `,
 }
 
@@ -131,12 +130,17 @@ func abbrevEmailReleases(rels []*Release) {
 }
 
 func listRelease(w io.Writer, r *Release) {
+	desc := r.Description
+	// add the git tag to the description if it's not a hash (and thus isn't
+	// included already)
+	if r.Commit != "" && !strings.Contains(r.Description, r.Commit) {
+		desc += " (" + abbrev(r.Commit, 12) + ")"
+	}
 	listRec(w,
 		fmt.Sprintf("v%d", r.Version),
 		abbrev(r.Who, 10),
-		abbrev(r.Commit, 10),
 		prettyTime{r.CreatedAt},
-		r.Description,
+		desc,
 	)
 }
 
