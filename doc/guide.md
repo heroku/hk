@@ -227,10 +227,6 @@ $ hk dynos
 
 ### App configuration (environment)
 
-hk aligns with Unix conventions for setting environment (config) variables. As
-such, the hk commands to modify your app's "config vars" are the same as those
-to modify the environment on a Unix machine.
-
 #### Set an environment variable on an app
 
 ```term
