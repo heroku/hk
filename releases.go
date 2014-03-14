@@ -17,13 +17,17 @@ var releaseCount int
 
 var cmdReleases = &Command{
 	Run:      runReleases,
-	Usage:    "releases [<version>...]",
+	Usage:    "releases [-n <limit>] [<version>...]",
 	NeedsApp: true,
 	Category: "release",
 	Short:    "list releases",
 	Long: `
 Lists releases. Shows the version of the release (e.g. v1), who
 made the release, time of the release, and description.
+
+Options:
+
+    -n <limit>  maximum number of recent releases to display
 
 Examples:
 
