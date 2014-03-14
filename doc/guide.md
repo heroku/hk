@@ -9,8 +9,7 @@ hk is distributed as an auto-updating executable. Once you've installed it, hk
 will periodically perform a version check in the background. If a newer version
 is found, hk will update itself automatically.
 
-To install hk, please use the instructions on [hk.heroku.com][hk-install]. hk is
-currently only being distributed for Mac OS X and Linux users. More
+hk is currently only being distributed for Mac OS X and Linux users. More
 user-friendly installers, including one for Windows, are planned.
 
 To install a pre-built binary release, run the following in a command line
@@ -502,5 +501,4 @@ you run into, or any feedback you have. Please email us at
 [hk-feedback@heroku.com](mailto:hk-feedback@heroku.com)
 
 [hk]: https://github.com/heroku/hk "hk on Github"
-[hk-install]: https://hk.heroku.com/ "hk: a fast Heroku CLI"
 [ruby-cli]: https://github.com/heroku/heroku "Heroku Ruby CLI"
