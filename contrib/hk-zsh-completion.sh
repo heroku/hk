@@ -1,7 +1,8 @@
 #compdef hk
 
-# hk Autocomplete plugin for Oh-My-Zsh. To install it, drop this plugin at
-# /usr/local/share/zsh/site-functions/_hk or another directory in your $fpath.
+# hk Autocomplete plugin for Oh-My-Zsh. To install it, drop this plugin into a
+# file called `_hk` within /usr/local/share/zsh/site-functions or another
+# directory in your $fpath.
 #
 # Requires: The hk Heroku client (https://hk.heroku.com)
 # Author: Blake Gentry (https://bgentry.io)
