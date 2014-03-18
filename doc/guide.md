@@ -16,7 +16,7 @@ To install a pre-built binary release, run the following in a command line
 terminal:
 
 ```term
-$ L=/usr/local/bin/hk && curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >$L && chmod +x $L
+L=/usr/local/bin/hk && curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >$L && chmod +x $L
 ```
 
 If you wish, you can customize the install location by modifying the `L=`
