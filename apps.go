@@ -22,11 +22,11 @@ time the app was created, if it's never been released).
 Examples:
 
     $ hk apps
-    myapp   user@test.com         Jan 2 12:34
-    myapp2  user@longdomainname…  Jan 2 12:34
+    myapp     user@test.com         us  Jan 2 12:34
+    myapp-eu  user@longdomainname…  eu  Jan 2 12:35
 
     $ hk apps myapp
-    myapp  user@test.com  Jan 2 12:34
+    myapp  user@test.com  us  Jan 2 12:34
 `,
 }
 
@@ -108,6 +108,7 @@ func listApp(w io.Writer, a heroku.App) {
 	listRec(w,
 		a.Name,
 		abbrev(a.Owner.Email, 20),
+		a.Region.Name,
 		prettyTime{t},
 	)
 }
