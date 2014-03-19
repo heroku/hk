@@ -4,6 +4,13 @@
 # file called `_hk` within /usr/local/share/zsh/site-functions or another
 # directory in your $fpath.
 #
+# You'll also need to enable compinit. Oh-my-zsh does this for you by default:
+# https://github.com/robbyrussell/oh-my-zsh/blob/master/oh-my-zsh.sh#L51-L53
+#
+# Finally, completion of arguments like app names works best if completion
+# caching is enabled. Oh-my-zsh also does this for you:
+# https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/completion.zsh#L34-L36
+#
 # Requires: The hk Heroku client (https://hk.heroku.com)
 # Author: Blake Gentry (https://bgentry.io)
 
