@@ -174,12 +174,21 @@ func printPgInfo(name string, dbi postgresql.DBInfo, addonMap *pgAddonMap) {
 				if n != 0 {
 					label = ""
 				}
+				// try to resolve the value to an addon name if PG API says we should
 				if ie.ResolveDBName {
 					valstr := val.(string)
 					if addonName, ok := addonMap.FindAddonFromValue(valstr); ok {
-						listRec(w, label, addonName)
-						continue
+						// resolved it to an addon name, print that instead
+						valstr = addonName
+					} else {
+						// Couldn't resolve to an addon name. Try to parse the URL so we
+						// can display only its Host and Path (without creds).
+						if u, err := url.Parse(valstr); err == nil && u.User != nil {
+							valstr = u.Host + u.Path
+						}
 					}
+					listRec(w, label, valstr)
+					continue
 				}
 				listRec(w, label, val)
 			}
