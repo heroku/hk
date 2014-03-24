@@ -2,9 +2,10 @@ package heroku
 
 import (
 	"encoding/json"
-	"github.com/bgentry/testnet"
 	"testing"
 	"time"
+
+	"github.com/bgentry/testnet"
 )
 
 //

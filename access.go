@@ -124,7 +124,7 @@ Examples:
 var flagSilent bool
 
 func init() {
-	cmdAccessAdd.Flag.BoolVar(&flagSilent, "s", false, "add user silently with no email notification")
+	cmdAccessAdd.Flag.BoolVarP(&flagSilent, "silent", "s", false, "add user silently with no email notification")
 }
 
 func runAccessAdd(cmd *Command, args []string) {

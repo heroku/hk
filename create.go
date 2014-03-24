@@ -34,7 +34,7 @@ Examples:
 var flagRegion string
 
 func init() {
-	cmdCreate.Flag.StringVar(&flagRegion, "r", "", "region name")
+	cmdCreate.Flag.StringVarP(&flagRegion, "region", "r", "", "region name")
 }
 
 func runCreate(cmd *Command, args []string) {

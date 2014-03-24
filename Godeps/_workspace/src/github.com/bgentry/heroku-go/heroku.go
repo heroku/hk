@@ -6,7 +6,6 @@ package heroku
 
 import (
 	"bytes"
-	"code.google.com/p/go-uuid/uuid"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,10 +17,12 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+
+	"code.google.com/p/go-uuid/uuid"
 )
 
 const (
-	Version          = "0.5.1"
+	Version          = "0.5.2"
 	DefaultAPIURL    = "https://api.heroku.com"
 	DefaultUserAgent = "heroku-go/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 )
@@ -215,12 +216,14 @@ func (c *Client) DoReq(req *http.Request, v interface{}) error {
 // An Error represents a Heroku API error.
 type Error struct {
 	error
-	Id string
+	Id  string
+	URL string
 }
 
 type errorResp struct {
 	Message string
 	Id      string
+	URL     string `json:"url"`
 }
 
 func checkResp(res *http.Response) error {
@@ -230,7 +233,7 @@ func checkResp(res *http.Response) error {
 		if err != nil {
 			return errors.New("Unexpected error: " + res.Status)
 		}
-		return Error{error: errors.New(e.Message), Id: e.Id}
+		return Error{error: errors.New(e.Message), Id: e.Id, URL: e.URL}
 	}
 	if msg := res.Header.Get("X-Heroku-Warning"); msg != "" {
 		fmt.Fprintln(os.Stderr, strings.TrimSpace(msg))
