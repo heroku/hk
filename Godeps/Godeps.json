@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/heroku/hk",
-	"GoVersion": "go1.2",
+	"GoVersion": "go1.2.1",
 	"Packages": [
 		"./..."
 	],
@@ -21,7 +21,11 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
-			"Rev": "ab3320c0b603292a42f39cd41a0a8f71d1b3716b"
+			"Rev": "5f33c5e5af54058634c247c22d6f697a9e397b7a"
+		},
+		{
+			"ImportPath": "github.com/bgentry/pflag",
+			"Rev": "b008717215c7236e20ca2faaf805e54ba6c1d208"
 		},
 		{
 			"ImportPath": "github.com/bgentry/speakeasy",

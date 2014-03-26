@@ -56,9 +56,9 @@ Examples:
 }
 
 func init() {
-	cmdLog.Flag.IntVar(&lines, "n", -1, "max number of log lines to request")
-	cmdLog.Flag.StringVar(&source, "s", "", "only display logs from the given source")
-	cmdLog.Flag.StringVar(&dyno, "d", "", "only display logs from the given dyno or process type")
+	cmdLog.Flag.IntVarP(&lines, "number", "n", -1, "max number of log lines to request")
+	cmdLog.Flag.StringVarP(&source, "source", "s", "", "only display logs from the given source")
+	cmdLog.Flag.StringVarP(&dyno, "dyno", "d", "", "only display logs from the given dyno or process type")
 }
 
 func runLog(cmd *Command, args []string) {

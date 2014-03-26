@@ -24,11 +24,12 @@ var (
 var cmdRun = &Command{
 	Run:      runRun,
 	Usage:    "run [-s <size>] [-d] <command> [<argument>...]",
-	NeedsApp: true,
 	Category: "dyno",
 	Short:    "run a process in a dyno",
 	Long: `
-Run a process on Heroku
+Run a process on Heroku. Flags such as` + " `-a` " + `may be parsed out of
+the command unless the command is quoted or provided after a
+double-dash (--).
 
 Options:
 
@@ -38,30 +39,36 @@ Options:
 Examples:
 
     $ hk run echo "hello"
-    Running ` + "`" + `echo "hello"` + "`" + ` on myapp as run.1234:
+    Running ` + "`echo \"hello\"`" + ` on myapp as run.1234:
     "hello"
 
-    $ hk run -s 2X console
-    Running ` + "`" + `console` + "`" + ` on myapp as run.5678:
+    $ hk run console
+    Running ` + "`console`" + ` on myapp as run.5678:
     Loading production environment (Rails 3.2.14)
     irb(main):001:0> ...
 
-    $ hk run -d bin/my_worker
-    Ran ` + "`" + `bin/my_worker` + "`" + ` on myapp as run.4321, detached.
+    $ hk run -d -s 2X bin/my_worker
+    Ran ` + "`bin/my_worker`" + ` on myapp as run.4321, detached.
+
+    $ hk run -a myapp -- ls -a /
+    Running ` + "`ls -a bin /`" + ` on myapp as run.8650:
+    /:
+    .  ..  app  bin  dev  etc  home  lib  lib64  lost+found  proc  sbin  tmp  usr  var
 `,
 }
 
 func init() {
-	cmdRun.Flag.BoolVar(&detachedRun, "d", false, "detached")
-	cmdRun.Flag.StringVar(&dynoSize, "s", "", "dyno size")
+	cmdRun.Flag.BoolVarP(&detachedRun, "detached", "d", false, "detached")
+	cmdRun.Flag.StringVarP(&dynoSize, "size", "s", "", "dyno size")
+	cmdRun.Flag.StringVarP(&flagApp, "app", "a", "", "app name")
 }
 
 func runRun(cmd *Command, args []string) {
-	appname := mustApp()
 	if len(args) == 0 {
 		cmd.printUsage()
 		os.Exit(2)
 	}
+	appname := mustApp()
 
 	cols, err := term.Cols()
 	if err != nil {

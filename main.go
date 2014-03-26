@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -13,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/bgentry/heroku-go"
+	flag "github.com/bgentry/pflag"
 	"github.com/heroku/hk/postgresql"
 	"github.com/heroku/hk/rollbar"
 	"github.com/heroku/hk/term"
@@ -200,13 +200,16 @@ func main() {
 		if cmd.Name() == args[0] && cmd.Run != nil {
 			defer recoverPanic()
 
+			cmd.Flag.SetDisableDuplicates(true) // disallow duplicate flag options
+			cmd.Flag.SetInterspersed(true)      // allow flags & non-flag args to mix
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()
 			}
 			if cmd.NeedsApp {
-				cmd.Flag.StringVar(&flagApp, "a", "", "app name")
+				cmd.Flag.StringVarP(&flagApp, "app", "a", "", "app name")
 			}
 			if err := cmd.Flag.Parse(args[1:]); err != nil {
+				printError(err.Error())
 				os.Exit(2)
 			}
 			if flagApp != "" {

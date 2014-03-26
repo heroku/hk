@@ -278,7 +278,7 @@ Examples:
 }
 
 func init() {
-	cmdPsql.Flag.StringVar(&commandNamePsql, "c", "", "SQL command to run")
+	cmdPsql.Flag.StringVarP(&commandNamePsql, "command", "c", "", "SQL command to run")
 }
 
 func runPsql(cmd *Command, args []string) {

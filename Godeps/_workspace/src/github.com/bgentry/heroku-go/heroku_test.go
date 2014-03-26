@@ -3,12 +3,13 @@ package heroku
 import (
 	"bytes"
 	"errors"
-	"github.com/bgentry/testnet"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/bgentry/testnet"
 )
 
 // Tests
@@ -140,6 +141,7 @@ var respTests = []respTest{
 		Error{
 			error: errors.New("You do not have access to the app myapp."),
 			Id:    "forbidden",
+			URL:   "",
 		},
 	},
 	{
@@ -147,6 +149,15 @@ var respTests = []respTest{
 		Error{
 			error: errors.New("Long error message."),
 			Id:    "unauthorized",
+			URL:   "",
+		},
+	},
+	{
+		newTestResponse(422, `{"id": "invalid_params", "message": "Cannot scale to more than 5 PX size dynos per process type.", "url": "https://bit.ly/1gK1TvU"}`),
+		Error{
+			error: errors.New("Cannot scale to more than 5 PX size dynos per process type."),
+			Id:    "invalid_params",
+			URL:   "https://bit.ly/1gK1TvU",
 		},
 	},
 	{
