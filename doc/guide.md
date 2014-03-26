@@ -94,23 +94,6 @@ as lists of items (`apps`, `dynos`, `addons`, `releases`). The rest of the
 commands are named with singular nouns because they deal with a single resource
 (`addon-add`, `domain-remove`, `release-info`).
 
-The other major difference is that hk uses strict POSIX ordering on command
-options. That means that any option flags, such as `-a <app>` must come before
-any non-flag arguments. Here are some examples:
-
-```term
-$ hk restart -a myapp web      # valid
-$ hk restart web -a myapp      # not valid
-
-$ hk get -a myapp CONFIG_NAME  # valid
-$ hk get CONFIG_NAME -a myapp  # not valid
-
-$ hk run -a myapp ls           # valid, will run `ls` on myapp
-$ hk run ls -a myapp           # will run the command `ls -a myapp` on whichever
-                               # app is configured in git remotes, which may or
-                               # may not be myapp
-```
-
 ## Guide to hk commands for Heroku users
 
 Many commands are similar in both the Heroku Ruby CLI and hk. However, some
