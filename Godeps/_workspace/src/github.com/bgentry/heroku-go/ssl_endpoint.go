@@ -11,7 +11,7 @@ import (
 // SSL Endpoint is a public address serving custom SSL cert for HTTPS traffic to
 // a Heroku app. Note that an app must have the ssl:endpoint addon installed
 // before it can provision an SSL Endpoint using these APIs.
-type SslEndpoint struct {
+type SSLEndpoint struct {
 	// raw contents of the public certificate chain (eg: .crt or .pem file)
 	CertificateChain string `json:"certificate_chain"`
 
@@ -37,7 +37,7 @@ type SslEndpoint struct {
 // certificateChain is the raw contents of the public certificate chain (eg:
 // .crt or .pem file). privateKey is the contents of the private key (eg .key
 // file).
-func (c *Client) SslEndpointCreate(appIdentity string, certificateChain string, privateKey string) (*SslEndpoint, error) {
+func (c *Client) SSLEndpointCreate(appIdentity string, certificateChain string, privateKey string) (*SSLEndpoint, error) {
 	params := struct {
 		CertificateChain string `json:"certificate_chain"`
 		PrivateKey       string `json:"private_key"`
@@ -45,24 +45,24 @@ func (c *Client) SslEndpointCreate(appIdentity string, certificateChain string, 
 		CertificateChain: certificateChain,
 		PrivateKey:       privateKey,
 	}
-	var sslEndpointRes SslEndpoint
+	var sslEndpointRes SSLEndpoint
 	return &sslEndpointRes, c.Post(&sslEndpointRes, "/apps/"+appIdentity+"/ssl-endpoints", params)
 }
 
 // Delete existing SSL endpoint.
 //
 // appIdentity is the unique identifier of the ssl-endpoint's app.
-// sslEndpointIdentity is the unique identifier of the SslEndpoint.
-func (c *Client) SslEndpointDelete(appIdentity string, sslEndpointIdentity string) error {
+// sslEndpointIdentity is the unique identifier of the SSLEndpoint.
+func (c *Client) SSLEndpointDelete(appIdentity string, sslEndpointIdentity string) error {
 	return c.Delete("/apps/" + appIdentity + "/ssl-endpoints/" + sslEndpointIdentity)
 }
 
 // Info for existing SSL endpoint.
 //
 // appIdentity is the unique identifier of the ssl-endpoint's app.
-// sslEndpointIdentity is the unique identifier of the SslEndpoint.
-func (c *Client) SslEndpointInfo(appIdentity string, sslEndpointIdentity string) (*SslEndpoint, error) {
-	var sslEndpoint SslEndpoint
+// sslEndpointIdentity is the unique identifier of the SSLEndpoint.
+func (c *Client) SSLEndpointInfo(appIdentity string, sslEndpointIdentity string) (*SSLEndpoint, error) {
+	var sslEndpoint SSLEndpoint
 	return &sslEndpoint, c.Get(&sslEndpoint, "/apps/"+appIdentity+"/ssl-endpoints/"+sslEndpointIdentity)
 }
 
@@ -71,7 +71,7 @@ func (c *Client) SslEndpointInfo(appIdentity string, sslEndpointIdentity string)
 // appIdentity is the unique identifier of the ssl-endpoint's app. lr is an
 // optional ListRange that sets the Range options for the paginated list of
 // results.
-func (c *Client) SslEndpointList(appIdentity string, lr *ListRange) ([]SslEndpoint, error) {
+func (c *Client) SSLEndpointList(appIdentity string, lr *ListRange) ([]SSLEndpoint, error) {
 	req, err := c.NewRequest("GET", "/apps/"+appIdentity+"/ssl-endpoints", nil)
 	if err != nil {
 		return nil, err
@@ -81,22 +81,22 @@ func (c *Client) SslEndpointList(appIdentity string, lr *ListRange) ([]SslEndpoi
 		lr.SetHeader(req)
 	}
 
-	var sslEndpointsRes []SslEndpoint
+	var sslEndpointsRes []SSLEndpoint
 	return sslEndpointsRes, c.DoReq(req, &sslEndpointsRes)
 }
 
 // Update an existing SSL endpoint.
 //
 // appIdentity is the unique identifier of the ssl-endpoint's app.
-// sslEndpointIdentity is the unique identifier of the SslEndpoint. options is
+// sslEndpointIdentity is the unique identifier of the SSLEndpoint. options is
 // the struct of optional parameters for this action.
-func (c *Client) SslEndpointUpdate(appIdentity string, sslEndpointIdentity string, options *SslEndpointUpdateOpts) (*SslEndpoint, error) {
-	var sslEndpointRes SslEndpoint
+func (c *Client) SSLEndpointUpdate(appIdentity string, sslEndpointIdentity string, options *SSLEndpointUpdateOpts) (*SSLEndpoint, error) {
+	var sslEndpointRes SSLEndpoint
 	return &sslEndpointRes, c.Patch(&sslEndpointRes, "/apps/"+appIdentity+"/ssl-endpoints/"+sslEndpointIdentity, options)
 }
 
-// SslEndpointUpdateOpts holds the optional parameters for SslEndpointUpdate
-type SslEndpointUpdateOpts struct {
+// SSLEndpointUpdateOpts holds the optional parameters for SSLEndpointUpdate
+type SSLEndpointUpdateOpts struct {
 	// raw contents of the public certificate chain (eg: .crt or .pem file)
 	CertificateChain *string `json:"certificate_chain,omitempty"`
 	// contents of the private key (eg .key file)

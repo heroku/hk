@@ -247,7 +247,8 @@ module Generator
 
   def titlecase(str)
     str.gsub('_','-').gsub(' ','-').split('-').map do |k|
-      if k.downcase == "url" # special case so Url becomes URL
+      # special case so Url becomes URL, Ssl becomes SSL
+      if %w{url ssl}.include?(k.downcase)
         k.upcase
       elsif k.downcase == "oauth" # special case so Oauth becomes OAuth
         "OAuth"
