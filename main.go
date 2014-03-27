@@ -149,6 +149,8 @@ var commands = []*Command{
 	cmdPgUnfollow,
 	cmdPsql,
 	cmdRegions,
+	cmdSSL,
+	cmdSSLCertAdd,
 	cmdStatus,
 	cmdTransfer,
 	cmdTransfers,

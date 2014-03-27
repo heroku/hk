@@ -365,7 +365,7 @@
             },
             {
               "root": "run",
-              "arguments": "[-a <app>] [-s <size>] [-d] <command> [<argument>...]",
+              "arguments": "[-s <size>] [-d] <command> [<argument>...]",
               "comment": "run a process in a dyno"
             },
             {
@@ -500,6 +500,21 @@
             }
           ],
           "title": "release"
+        },
+        {
+          "commands": [
+            {
+              "root": "ssl",
+              "arguments": "[-a <app>]",
+              "comment": "show ssl endpoint info"
+            },
+            {
+              "root": "ssl-cert-add",
+              "arguments": "[-a <app>] <certfile> <keyfile>",
+              "comment": "add a new ssl cert"
+            }
+          ],
+          "title": "ssl"
         }
       ]
 
