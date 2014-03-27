@@ -217,12 +217,9 @@ _hk_region_names_caching_policy() {
 
 # Completion for any command that takes only the app arg
 _hk_complete_only_app_flag() {
-  # -w: combined w/ -s, allows single-letter options to be combined in a single
-  #     word even if one or more of the options take arguments.
   # -C: modify $curcontext for an action of the form '->state'
   # -S: no options completed after a --
-  # -s: options may be single characters, with more than one option per word
-  _arguments -w -C -S -s \
+  _arguments -C -S \
     $app_flag \
     '*:->args:' \
    && ret=0
@@ -451,7 +448,7 @@ _hk-run() {
 
   # there is currently no way to list possible dyno sizes, so just use a
   # constant array for that option
-  _arguments -w -C -S -s \
+  _arguments -C -S \
     $app_flag \
     '(-s --size)'{-s,--size=}'[dyno size]:: :(1X 2X PX)' \
     '(-d --detached)'{-d,--detached}'[run in detached mode]' \
