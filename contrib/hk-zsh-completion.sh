@@ -217,11 +217,14 @@ _hk_region_names_caching_policy() {
 
 # Completion for any command that takes only the app arg
 _hk_complete_only_app_flag() {
+  # -w: combined w/ -s, allows single-letter options to be combined in a single
+  #     word even if one or more of the options take arguments.
   # -C: modify $curcontext for an action of the form '->state'
   # -S: no options completed after a --
-  # -A "-*": no options completed after the first non-option
-  _arguments -C -S -A "-*" \
-    '-a=[application name]:: :__hk_app_names' \
+  # -s: options may be single characters, with more than one option per word
+  _arguments -w -C -S -s \
+    $app_flag \
+    '*:->args:' \
    && ret=0
 
   ## If we want to automatically guess which commands take an app flag:
@@ -249,8 +252,8 @@ _hk-addons() {
 _hk-addon-add() {
   local curcontext=$curcontext state line ret=1
 
-  _arguments -C -S -A "-*" \
-    '-a=[application name]:: :__hk_app_names' \
+  _arguments -w -C -S -s \
+    $app_flag \
     ':addon service and plan:__hk_complete_addon_service_and_plan' \
     '*:config options:' \
   && ret=0
@@ -279,9 +282,9 @@ _hk-addon-services() {
 _hk-create() {
   local curcontext=$curcontext state line ret=1
 
-  _arguments -C -S -A "-*" \
-    '-r=[region]::heroku region name:__hk_region_names' \
-    '*::app name:' \
+  _arguments -w -C -S -s \
+    '(-r --region)'{-r,--region=}'[heroku region name]:: :__hk_region_names' \
+    '*:app name:' \
    && ret=0
 
   return ret
@@ -448,11 +451,11 @@ _hk-run() {
 
   # there is currently no way to list possible dyno sizes, so just use a
   # constant array for that option
-  _arguments -C -S -A "-*" \
-    '-a=[application name]:: :__hk_app_names' \
-    '-s=[dyno size]:: :(1X 2X PX)' \
-    '-d[run in detached mode]::' \
-    '*:: :->args' \
+  _arguments -w -C -S -s \
+    $app_flag \
+    '(-s --size)'{-s,--size=}'[dyno size]:: :(1X 2X PX)' \
+    '(-d --detached)'{-d,--detached}'[run in detached mode]' \
+    '*:->args:' \
   && ret=0
 
   return ret
@@ -539,7 +542,7 @@ _hk() {
       compadd $(_hkcmdnames) && ret=0
     ;;
     (option-or-argument)
-      local -a app_argument; app_argument='-a=[application name]:: :__hk_app_names'
+      local -a app_flag; app_flag=('(-a --app)'{-a,--app=}'[application name]:: :__hk_app_names')
 
       curcontext=${curcontext%:*:*}:hk-$words[1]:
       _call_function ret _hk-$words[1]
