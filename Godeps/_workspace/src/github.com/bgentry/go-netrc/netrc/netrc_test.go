@@ -271,6 +271,12 @@ func testNewMachine(t *testing.T, n *Netrc) {
 			}
 		}
 
+		// test prefix for machine token
+		prefix := "\n"
+		if len(n.tokens) == 0 {
+			prefix = ""
+		}
+
 		m := n.NewMachine(test.name, test.login, test.password, test.account)
 		if m == nil {
 			t.Fatalf("NewMachine() returned nil")
@@ -293,7 +299,7 @@ func testNewMachine(t *testing.T, n *Netrc) {
 			t.Errorf("m.Account expected %q, got %q", test.account, m.Account)
 		}
 		// check tokens
-		checkToken(t, "nametoken", m.nametoken, tkMachine, "\nmachine", test.name)
+		checkToken(t, "nametoken", m.nametoken, tkMachine, prefix+"machine", test.name)
 		checkToken(t, "logintoken", m.logintoken, tkLogin, "\n\tlogin", test.login)
 		checkToken(t, "passtoken", m.passtoken, tkPassword, "\n\tpassword", test.password)
 		checkToken(t, "accounttoken", m.accounttoken, tkAccount, "\n\taccount", test.account)
@@ -507,6 +513,32 @@ func TestUpdatePassword(t *testing.T) {
 		if !strings.Contains(body, test.newpassword) {
 			t.Errorf("MarshalText() after UpdatePassword() did not contain %q as expected", test.newpassword)
 		}
+	}
+}
+
+func TestNewFile(t *testing.T) {
+	var n Netrc
+
+	result, err := n.MarshalText()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(result) != "" {
+		t.Errorf("expected empty result=\"\", got %q", string(result))
+	}
+
+	n.NewMachine("netrctest.heroku.com", "auser", "apassword", "")
+
+	result, err = n.MarshalText()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := `machine netrctest.heroku.com
+	login auser
+	password apassword`
+
+	if string(result) != expected {
+		t.Errorf("expected result:\n%q\ngot:\n%q", expected, string(result))
 	}
 }
 

@@ -90,6 +90,10 @@ func (n *Netrc) NewMachine(name, login, password, account string) *Machine {
 	n.updateLock.Lock()
 	defer n.updateLock.Unlock()
 
+	prefix := "\n"
+	if len(n.tokens) == 0 {
+		prefix = ""
+	}
 	m := &Machine{
 		Name:     name,
 		Login:    login,
@@ -98,7 +102,7 @@ func (n *Netrc) NewMachine(name, login, password, account string) *Machine {
 
 		nametoken: &token{
 			kind:     tkMachine,
-			rawkind:  []byte("\nmachine"),
+			rawkind:  []byte(prefix + "machine"),
 			value:    name,
 			rawvalue: []byte(" " + name),
 		},

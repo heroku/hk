@@ -17,7 +17,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/go-netrc/netrc",
-			"Rev": "13bba5cc3ac0873a3a87f68c4f50d8677adbb30b"
+			"Rev": "2e5e1d1fe4532f987b2c023c3a766c3969e7606d"
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
