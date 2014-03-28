@@ -31,16 +31,16 @@ are due for maintenance.
 Examples:
 
     $ hk pg-list
-    * heroku-postgresql-crimson       crane  Available  5
-      └───> heroku-postgresql-copper  ronin  Available  3
+    * heroku-postgresql-crimson       crane  available  5
+      └───> heroku-postgresql-copper  ronin  available  3
 
     $ hk pg-list
-      heroku-postgresql-green              standard-tengu  Available     3
-    * heroku-postgresql-olive              standard-tengu  Available     3
-      ├───> heroku-postgresql-gray         standard-tengu  Available !!  3
-      ├─ ─┤ heroku-postgresql-rose         standard-tengu  Available     3
-      │     └───> heroku-postgresql-white  standard-tengu  Available     3
-      └─ ─┤ heroku-postgresql-teal         standard-tengu  Available     3
+      heroku-postgresql-green              standard-tengu  available     3
+    * heroku-postgresql-olive              standard-tengu  available     3
+      ├───> heroku-postgresql-gray         standard-tengu  available !!  3
+      ├─ ─┤ heroku-postgresql-rose         standard-tengu  available     3
+      │     └───> heroku-postgresql-white  standard-tengu  available     3
+      └─ ─┤ heroku-postgresql-teal         standard-tengu  available     3
 `,
 }
 

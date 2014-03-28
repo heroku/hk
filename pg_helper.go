@@ -209,7 +209,7 @@ func printDBTree(w io.Writer, dbinfos []*fullDBInfo, addonMap pgAddonMap) {
 		listRec(w,
 			dburlMarker+name,
 			info.DBInfo.Plan,
-			status+info.MaintenanceString(),
+			strings.ToLower(status)+info.MaintenanceString(),
 			info.DBInfo.NumConnections,
 		)
 		if len(info.Children) > 0 {
