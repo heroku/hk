@@ -92,6 +92,9 @@ func runLog(cmd *Command, args []string) {
 	if err != nil {
 		printFatal(err.Error())
 	}
+	if warning := resp.Header.Get("X-Heroku-Warning"); warning != "" {
+		printWarning(warning)
+	}
 	if resp.StatusCode/100 != 2 {
 		if resp.StatusCode/100 == 4 {
 			printFatal("Unauthorized")
