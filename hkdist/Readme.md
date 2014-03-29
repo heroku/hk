@@ -13,13 +13,6 @@ $ go get github.com/kr/godep
 
 ## environment
 
-### ALLOWHTTP (web)
-
-if presnt, allow unencrypted http; otherwise, reject
-non-https access and set HSTS
-
-meant to be set for testing only
-
 ### DISTURL (build)
 
 url for the hk directory server (e.g. https://hk.heroku.com)
