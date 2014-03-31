@@ -245,7 +245,7 @@ func runPgUnfollow(cmd *Command, args []string) {
 	mustConfirm(warning, args[0])
 
 	must(db.Unfollow())
-	fmt.Printf("Unfollowed %s on %s.", addonName, appname)
+	fmt.Printf("Unfollowed %s on %s.\n", addonName, appname)
 }
 
 var commandNamePsql string
