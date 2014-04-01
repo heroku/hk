@@ -234,6 +234,42 @@ func runAddonOpen(cmd *Command, args []string) {
 	must(openURL("https://addons-sso.heroku.com/apps/" + appname + "/addons/" + a.Plan.Name))
 }
 
+var cmdAddonPlan = &Command{
+	Run:      runAddonPlan,
+	Usage:    "addon-plan <name> <plan>",
+	NeedsApp: true,
+	Category: "add-on",
+	Short:    "change an addon's plan" + extra,
+	Long: `
+Change an addon's plan. Not all add-on providers support this
+
+Examples:
+
+    $ hk addon-plan redistogo small
+    Changed redistogo plan to small on myapp.
+`,
+}
+
+func runAddonPlan(cmd *Command, args []string) {
+	appname := mustApp()
+	if len(args) != 2 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	name := args[0]
+	plan := args[1]
+
+	addon, err := client.AddonInfo(appname, name)
+	checkAddonError(err)
+
+	// assemble service:plan string
+	serviceAndPlan := strings.Split(addon.Plan.Name, ":")[0] + ":" + plan
+
+	a, err := client.AddonUpdate(appname, name, serviceAndPlan)
+	checkAddonError(err)
+	log.Printf("Changed %s plan to %s on %s.", a.Name, plan, appname)
+}
+
 func checkAddonError(err error) {
 	if err != nil {
 		if hkerr, ok := err.(heroku.Error); ok && hkerr.Id == "not_found" {

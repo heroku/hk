@@ -122,6 +122,7 @@ var commands = []*Command{
 	cmdAccountFeatureEnable,
 	cmdAccountFeatureDisable,
 	cmdAddonOpen,
+	cmdAddonPlan,
 	cmdAddonPlans,
 	cmdAddonServices,
 	cmdAPI,
