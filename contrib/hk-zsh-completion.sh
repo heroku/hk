@@ -82,7 +82,7 @@ __hk_addon_services() {
   fi
 
   # the -S ':' gives us a : suffix after completion
-  compadd -S ':' $* - $_addon_services
+  compadd -S ':' $_addon_services
   # don't let this var persist in non-default clouds
   ( ! _hk_is_default_cloud ) && unset _addon_services
 }
@@ -249,10 +249,10 @@ _hk-addons() {
 _hk-addon-add() {
   local curcontext=$curcontext state line ret=1
 
-  _arguments -w -C -S -s \
+  _arguments -C -S \
     $app_flag \
-    ':addon service and plan:__hk_complete_addon_service_and_plan' \
-    '*:config options:' \
+    '::addon service and plan:__hk_complete_addon_service_and_plan' \
+    '*::config options:' \
   && ret=0
 
   return ret
