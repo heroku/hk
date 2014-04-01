@@ -120,7 +120,7 @@ __hk_addon_plans() {
     ( _hk_is_default_cloud ) && _store_cache $cache_name plans_for_service
   fi
 
-  compadd $* $plans_for_service
+  compadd $plans_for_service
   # don't let this var persist in non-default clouds
   ( ! _hk_is_default_cloud ) && unset $varname
 }
