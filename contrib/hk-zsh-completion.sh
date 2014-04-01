@@ -539,7 +539,7 @@ _hk() {
       compadd $(_hkcmdnames) && ret=0
     ;;
     (option-or-argument)
-      local -a app_flag; app_flag=('(-a --app)'{-a,--app=}'[application name]:: :__hk_app_names')
+      local -a app_flag; app_flag=('(-a --app)'{-a=,--app=}'[application name]: :__hk_app_names')
 
       curcontext=${curcontext%:*:*}:hk-$words[1]:
       _call_function ret _hk-$words[1]
