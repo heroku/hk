@@ -151,6 +151,7 @@ var commands = []*Command{
 	cmdRegions,
 	cmdSSL,
 	cmdSSLCertAdd,
+	cmdSSLCertRollback,
 	cmdStatus,
 	cmdTransfer,
 	cmdTransfers,

@@ -94,3 +94,40 @@ func runSSLCertAdd(cmd *Command, args []string) {
 	must(err)
 	fmt.Printf("Updated cert for %s at %s.\n", appname, endpoints[0].Cname)
 }
+
+var cmdSSLCertRollback = &Command{
+	Run:      runSSLCertRollback,
+	Usage:    "ssl-cert-rollback",
+	NeedsApp: true,
+	Category: "ssl",
+	Short:    "add a new ssl cert",
+	Long: `
+Rolls back an SSL endpoint's certificate to the previous version.
+
+Examples:
+
+    $ hk ssl-cert-rollback
+    Rolled back cert for myapp.
+`,
+}
+
+func runSSLCertRollback(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.printUsage()
+		os.Exit(2)
+	}
+	appname := mustApp()
+
+	endpoints, err := client.SSLEndpointList(appname, nil)
+	must(err)
+
+	if len(endpoints) == 0 {
+		printFatal("App %s has no SSL endpoint to rollback.", appname)
+	}
+
+	t := true
+	opts := heroku.SSLEndpointUpdateOpts{Rollback: &t}
+	_, err = client.SSLEndpointUpdate(appname, endpoints[0].Id, &opts)
+	must(err)
+	fmt.Printf("Rolled back cert for %s.\n", appname)
+}
