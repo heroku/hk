@@ -2,12 +2,13 @@ package hkclient
 
 import (
 	"crypto/tls"
-	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/postgresql"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/postgresql"
 )
 
 type Clients struct {

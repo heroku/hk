@@ -2,11 +2,12 @@ package hkclient
 
 import (
 	"fmt"
-	"github.com/bgentry/go-netrc/netrc"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
+
+	"github.com/bgentry/go-netrc/netrc"
 )
 
 type NetRc struct {
