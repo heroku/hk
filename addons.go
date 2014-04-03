@@ -197,8 +197,8 @@ func runAddonDestroy(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 
-	warning := fmt.Sprintf("This will destroy %s on %s. Please type %q to continue:", name, appname, appname)
-	mustConfirm(warning, appname)
+	warning := "This will destroy %s on %s. Please type %q to continue:"
+	mustConfirm(fmt.Sprintf(warning, name, appname, appname), appname)
 
 	checkAddonError(client.AddonDelete(appname, name))
 	log.Printf("Destroyed %s on %s.", name, appname)
