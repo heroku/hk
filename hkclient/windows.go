@@ -2,6 +2,8 @@
 
 package hkclient
 
+import "os"
+
 const netrcFilename = "_netrc"
 
 func homePath() string {
