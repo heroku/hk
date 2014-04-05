@@ -2,14 +2,17 @@
 
 package hkclient
 
-import "os"
+import (
+	"log"
+	"os/user"
+)
 
 const netrcFilename = "_netrc"
 
 func homePath() string {
-	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-	if home == "" {
-		home = os.Getenv("USERPROFILE")
+	u, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
 	}
-	return home
+	return u.HomeDir
 }
