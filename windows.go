@@ -3,8 +3,10 @@
 package main
 
 import (
+	"log"
 	"os"
 	"os/exec"
+	"os/user"
 )
 
 const (
@@ -27,9 +29,9 @@ func sysExec(path string, args []string, env []string) error {
 }
 
 func homePath() string {
-	home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-	if home == "" {
-		home = os.Getenv("USERPROFILE")
+	u, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
 	}
-	return home
+	return u.HomeDir
 }
