@@ -30,7 +30,7 @@ Example:
 
 func runDrains(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -131,7 +131,7 @@ Example:
 
 func runDrainInfo(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -173,7 +173,7 @@ Example:
 
 func runDrainAdd(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 
@@ -204,7 +204,7 @@ Example:
 
 func runDrainRemove(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 

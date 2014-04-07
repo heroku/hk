@@ -23,7 +23,7 @@ Example:
 
 func runRename(cmd *Command, args []string) {
 	if len(args) != 2 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	oldname, newname := args[0], args[1]

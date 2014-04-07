@@ -35,7 +35,7 @@ Examples:
 
 func runKeys(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 
@@ -71,7 +71,7 @@ It tries these sources for keys, in order:
 
 func runKeyAdd(cmd *Command, args []string) {
 	if len(args) > 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	if len(args) == 1 {
@@ -155,7 +155,7 @@ Examples:
 
 func runKeyRemove(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	fingerprint := args[0]

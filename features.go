@@ -30,7 +30,7 @@ Example:
 
 func runFeatures(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
@@ -73,7 +73,7 @@ Example:
 
 func runFeatureInfo(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -104,7 +104,7 @@ Example:
 
 func runFeatureEnable(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -132,7 +132,7 @@ Example:
 
 func runFeatureDisable(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()

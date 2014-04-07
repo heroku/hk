@@ -23,7 +23,7 @@ Examples:
 
 func runRegions(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	regions, err := client.RegionList(nil)

@@ -46,7 +46,7 @@ type statusIssue struct {
 
 func runStatus(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	herokuStatusHost := "status.heroku.com"

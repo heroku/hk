@@ -35,11 +35,11 @@ type Command struct {
 	Long     string // `hk help cmd` output
 }
 
-func (c *Command) printUsage() {
-	c.printUsageTo(os.Stderr)
+func (c *Command) PrintUsage() {
+	c.PrintUsageTo(os.Stderr)
 }
 
-func (c *Command) printUsageTo(w io.Writer) {
+func (c *Command) PrintUsageTo(w io.Writer) {
 	if c.Runnable() {
 		fmt.Fprintf(w, "Usage: hk %s\n\n", c.FullUsage())
 	}
@@ -219,7 +219,7 @@ func main() {
 			cmd.Flag.SetDisableDuplicates(true) // disallow duplicate flag options
 			cmd.Flag.SetInterspersed(true)      // allow flags & non-flag args to mix
 			cmd.Flag.Usage = func() {
-				cmd.printUsage()
+				cmd.PrintUsage()
 			}
 			if cmd.NeedsApp {
 				cmd.Flag.StringVarP(&flagApp, "app", "a", "", "app name")
@@ -242,7 +242,7 @@ func main() {
 						msg = err.Error()
 					}
 					printError(msg)
-					cmd.printUsage()
+					cmd.PrintUsage()
 					os.Exit(2)
 				case err != nil:
 					printFatal(err.Error())

@@ -21,7 +21,7 @@ var cmdSSL = &Command{
 
 func runSSL(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	endpoints, err := client.SSLEndpointList(mustApp(), nil)
@@ -59,7 +59,7 @@ Examples:
 
 func runSSLCertAdd(cmd *Command, args []string) {
 	if len(args) != 2 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -121,7 +121,7 @@ Examples:
 
 func runSSLDestroy(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -159,7 +159,7 @@ Examples:
 
 func runSSLCertRollback(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()

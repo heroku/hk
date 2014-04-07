@@ -39,7 +39,7 @@ Example:
 func runScale(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) == 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	todo := make([]heroku.FormationBatchUpdateOpts, len(args))
@@ -47,12 +47,12 @@ func runScale(cmd *Command, args []string) {
 	for i, arg := range args {
 		pstype, qty, size, err := parseScaleArg(arg)
 		if err != nil {
-			cmd.printUsage()
+			cmd.PrintUsage()
 			os.Exit(2)
 		}
 		if _, exists := types[pstype]; exists {
 			// can only specify each process type once
-			cmd.printUsage()
+			cmd.PrintUsage()
 			os.Exit(2)
 		}
 		types[pstype] = true

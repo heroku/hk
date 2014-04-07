@@ -32,7 +32,7 @@ func runAccess(cmd *Command, args []string) {
 	defer w.Flush()
 
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	ma := getMergedAccess(mustApp())
@@ -130,7 +130,7 @@ func init() {
 func runAccessAdd(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	opts := heroku.CollaboratorCreateOpts{Silent: &flagSilent}
@@ -156,7 +156,7 @@ Examples:
 func runAccessRemove(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	must(client.CollaboratorDelete(appname, args[0]))

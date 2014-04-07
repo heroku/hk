@@ -182,7 +182,7 @@ Examples:
 func runReleaseInfo(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	ver := strings.TrimPrefix(args[0], "v")
@@ -218,7 +218,7 @@ Examples:
 func runRollback(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	ver := strings.TrimPrefix(args[0], "v")

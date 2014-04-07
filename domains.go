@@ -32,7 +32,7 @@ func runDomains(cmd *Command, args []string) {
 
 	appname := mustApp()
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	domains, err := client.DomainList(appname, &heroku.ListRange{
@@ -57,7 +57,7 @@ var cmdDomainAdd = &Command{
 func runDomainAdd(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	domain := args[0]
@@ -77,7 +77,7 @@ var cmdDomainRemove = &Command{
 func runDomainRemove(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	domain := args[0]

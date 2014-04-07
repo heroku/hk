@@ -100,7 +100,7 @@ Examples:
 func runAddonAdd(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) == 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	plan := args[0]
@@ -186,14 +186,14 @@ Examples:
 func runAddonDestroy(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	name := args[0]
 	if strings.IndexRune(name, ':') != -1 {
 		// specified an addon with plan name, unsupported in v3
 		log.Println("Please specify an addon name, not a plan name.")
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 
@@ -224,7 +224,7 @@ Examples:
 func runAddonOpen(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	name := args[0]
@@ -253,7 +253,7 @@ Examples:
 func runAddonPlan(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 2 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	name := args[0]
@@ -301,7 +301,7 @@ Examples:
 
 func runAddonServices(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	services, err := client.AddonServiceList(nil)
@@ -337,7 +337,7 @@ Examples:
 
 func runAddonPlans(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	service := args[0]
