@@ -52,6 +52,7 @@ func runScale(cmd *Command, args []string) {
 		}
 		if _, exists := types[pstype]; exists {
 			// can only specify each process type once
+			printError("process type '%s' specified more than once", pstype)
 			cmd.PrintUsage()
 			os.Exit(2)
 		}
