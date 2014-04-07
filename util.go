@@ -21,17 +21,8 @@ import (
 
 var nrc *hkclient.NetRc
 
-// user.Current() requires cgo and thus doesn't work with cross-compiling.
-// The following is an alternative that matches how the Heroku Toolbelt
-// works, though per @fdr it may not be correct for all cases (when users have
-// modified their home dir).
-//
-// homePath() is defined in the platform-specific source files unix.go and
-// windows.go.
-//
-// http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 func hkHome() string {
-	return filepath.Join(homePath(), ".hk")
+	return filepath.Join(hkclient.HomePath(), ".hk")
 }
 
 func netrcPath() string {
@@ -39,7 +30,7 @@ func netrcPath() string {
 		return s
 	}
 
-	return filepath.Join(homePath(), netrcFilename)
+	return filepath.Join(hkclient.HomePath(), netrcFilename)
 }
 
 func loadNetrc() {

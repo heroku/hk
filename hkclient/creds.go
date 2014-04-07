@@ -19,7 +19,7 @@ func netRcPath() string {
 		return s
 	}
 
-	return filepath.Join(homePath(), netrcFilename)
+	return filepath.Join(HomePath(), netrcFilename)
 }
 
 func LoadNetRc() (nrc *NetRc, err error) {
