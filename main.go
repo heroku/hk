@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"runtime"
@@ -36,14 +35,17 @@ type Command struct {
 }
 
 func (c *Command) PrintUsage() {
-	c.PrintUsageTo(os.Stderr)
+	if c.Runnable() {
+		fmt.Fprintf(os.Stderr, "Usage: hk %s\n", c.FullUsage())
+	}
+	fmt.Fprintf(os.Stderr, "Use 'hk help %s' for more information.\n", c.Name())
 }
 
-func (c *Command) PrintUsageTo(w io.Writer) {
+func (c *Command) PrintLongUsage() {
 	if c.Runnable() {
-		fmt.Fprintf(w, "Usage: hk %s\n\n", c.FullUsage())
+		fmt.Printf("Usage: hk %s\n\n", c.FullUsage())
 	}
-	fmt.Fprintln(w, strings.Trim(c.Long, "\n"))
+	fmt.Println(strings.Trim(c.Long, "\n"))
 }
 
 func (c *Command) FullUsage() string {
