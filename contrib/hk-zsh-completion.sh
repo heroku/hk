@@ -480,8 +480,8 @@ _hk-ssl-cert-add() {
 
   _arguments -C -S \
     $app_flag \
-    '1:: :_files -g \*.pem'\
-    '2:: :_files -g \*.pem'\
+    '1:: :_files'\
+    '2:: :_files'\
   && ret=0
 
   return ret
