@@ -470,6 +470,33 @@ _hk-set() {
   _hk_complete_only_app_flag
 }
 
+_hk-ssl() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-ssl-cert-add() {
+  local curcontext=$curcontext state line ret=1
+
+  _arguments -C -S \
+    $app_flag \
+    '1:: :_files -g \*.pem'\
+    '2:: :_files -g \*.pem'\
+  && ret=0
+
+  return ret
+}
+
+_hk-ssl-cert-rollback() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-ssl-destroy() {
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-transfer() {
   # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
