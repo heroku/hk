@@ -51,7 +51,7 @@ func runAPI(cmd *Command, args []string) {
 	}
 	method := strings.ToUpper(args[0])
 	var body io.Reader
-	if method != "GET" {
+	if method == "PATCH" || method == "PUT" || method == "POST" {
 		body = os.Stdin
 	}
 	if err := client.APIReq(os.Stdout, method, args[1], body); err != nil {
