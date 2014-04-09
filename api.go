@@ -14,9 +14,9 @@ var cmdAPI = &Command{
 	Long: `
 The api command is a convenient but low-level way to send requests
 to the Heroku API. It sends an HTTP request to the Heroku API
-using the given method on the given path, using stdin unmodified
-as the request body. It prints the response unmodified on stdout.
-Method GET doesn't read or send a request body.
+using the given method on the given path. For methods PUT, PATCH,
+and POST, it uses stdin unmodified as the request body. It prints
+the response unmodified on stdout.
 
 Method name input will be upcased, so both 'hk api GET /apps' and
 'hk api get /apps' are valid commands.
@@ -51,7 +51,7 @@ func runAPI(cmd *Command, args []string) {
 	}
 	method := strings.ToUpper(args[0])
 	var body io.Reader
-	if method != "GET" {
+	if method == "PATCH" || method == "PUT" || method == "POST" {
 		body = os.Stdin
 	}
 	if err := client.APIReq(os.Stdout, method, args[1], body); err != nil {
