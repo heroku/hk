@@ -26,17 +26,17 @@ func runCreds(cmd *Command, args []string) {
 
 	nrc, err = hkclient.LoadNetRc()
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 
 	u, err := url.Parse(apiURL)
 	if err != nil {
-		printError("could not parse API url: " + err.Error())
+		printFatal("could not parse API url: " + err.Error())
 	}
 
 	user, pass, err := nrc.GetCreds(u)
 	if err != nil {
-		printError("could not get credentials: " + err.Error())
+		printFatal("could not get credentials: " + err.Error())
 	}
 
 	fmt.Println(user, pass)
@@ -66,6 +66,7 @@ func runLogin(cmd *Command, args []string) {
 		cmd.printUsage()
 		os.Exit(2)
 	}
+
 	oldEmail := client.Username
 	var email string
 	if oldEmail == "" {
@@ -111,7 +112,7 @@ func runLogin(cmd *Command, args []string) {
 
 	nrc, err = hkclient.LoadNetRc()
 	if err != nil {
-		printError("loading netrc: " + err.Error())
+		printFatal("loading netrc: " + err.Error())
 	}
 
 	err = nrc.SaveCreds(hostname, email, token)
