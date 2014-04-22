@@ -25,6 +25,9 @@ func netRcPath() string {
 func LoadNetRc() (nrc *NetRc, err error) {
 	onrc, err := netrc.ParseFile(netRcPath())
 	if err != nil {
+		if os.IsNotExist(err) {
+			return &NetRc{}, nil
+		}
 		return nil, err
 	}
 
