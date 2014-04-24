@@ -264,6 +264,12 @@ _hk-addon-destroy() {
   _hk_complete_only_app_flag
 }
 
+_hk-addon-plan() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-addon-plans() {
   # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
