@@ -323,6 +323,10 @@ func runPsql(cmd *Command, args []string) {
 		}
 	}
 
+	if u.User == nil || u.User.Username() == "" {
+		printFatal("Missing credentials in %s", configName)
+	}
+
 	// construct and run psql command
 	psqlArgs := []string{
 		"psql",
