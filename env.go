@@ -19,7 +19,7 @@ var cmdEnv = &Command{
 
 func runEnv(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	config, err := client.ConfigVarInfo(mustApp())
@@ -52,7 +52,7 @@ Example:
 
 func runGet(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	config, err := client.ConfigVarInfo(mustApp())
@@ -83,7 +83,7 @@ Example:
 func runSet(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) == 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	config := make(map[string]*string)
@@ -119,7 +119,7 @@ Example:
 func runUnset(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) == 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	config := make(map[string]*string)

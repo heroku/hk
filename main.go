@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"runtime"
@@ -35,15 +34,18 @@ type Command struct {
 	Long     string // `hk help cmd` output
 }
 
-func (c *Command) printUsage() {
-	c.printUsageTo(os.Stderr)
+func (c *Command) PrintUsage() {
+	if c.Runnable() {
+		fmt.Fprintf(os.Stderr, "Usage: hk %s\n", c.FullUsage())
+	}
+	fmt.Fprintf(os.Stderr, "Use 'hk help %s' for more information.\n", c.Name())
 }
 
-func (c *Command) printUsageTo(w io.Writer) {
+func (c *Command) PrintLongUsage() {
 	if c.Runnable() {
-		fmt.Fprintf(w, "Usage: hk %s\n\n", c.FullUsage())
+		fmt.Printf("Usage: hk %s\n\n", c.FullUsage())
 	}
-	fmt.Fprintln(w, strings.Trim(c.Long, "\n"))
+	fmt.Println(strings.Trim(c.Long, "\n"))
 }
 
 func (c *Command) FullUsage() string {
@@ -219,7 +221,7 @@ func main() {
 			cmd.Flag.SetDisableDuplicates(true) // disallow duplicate flag options
 			cmd.Flag.SetInterspersed(true)      // allow flags & non-flag args to mix
 			cmd.Flag.Usage = func() {
-				cmd.printUsage()
+				cmd.PrintUsage()
 			}
 			if cmd.NeedsApp {
 				cmd.Flag.StringVarP(&flagApp, "app", "a", "", "app name")
@@ -242,7 +244,7 @@ func main() {
 						msg = err.Error()
 					}
 					printError(msg)
-					cmd.printUsage()
+					cmd.PrintUsage()
 					os.Exit(2)
 				case err != nil:
 					printFatal(err.Error())

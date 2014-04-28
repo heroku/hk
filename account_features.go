@@ -27,7 +27,7 @@ Example:
 
 func runAccountFeatures(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
@@ -69,7 +69,7 @@ Example:
 
 func runAccountFeatureInfo(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	feature, err := client.AccountFeatureInfo(args[0])
@@ -97,7 +97,7 @@ Example:
 
 func runAccountFeatureEnable(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	featureName := args[0]
@@ -123,7 +123,7 @@ Example:
 
 func runAccountFeatureDisable(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	featureName := args[0]

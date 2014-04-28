@@ -46,7 +46,7 @@ Examples:
 
 func runAPI(cmd *Command, args []string) {
 	if len(args) != 2 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	method := strings.ToUpper(args[0])

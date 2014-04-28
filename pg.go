@@ -46,7 +46,7 @@ Examples:
 
 func runPgList(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -145,7 +145,7 @@ Examples:
 
 func runPgInfo(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -228,7 +228,7 @@ Examples:
 
 func runPgUnfollow(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -283,7 +283,7 @@ func init() {
 
 func runPsql(cmd *Command, args []string) {
 	if len(args) > 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 

@@ -30,7 +30,7 @@ Example:
 
 func runDestroy(cmd *Command, args []string) {
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := args[0]

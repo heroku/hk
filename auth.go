@@ -63,7 +63,7 @@ Example:
 
 func runLogin(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 
@@ -177,7 +177,7 @@ Example:
 
 func runLogout(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	u, err := url.Parse(client.URL)

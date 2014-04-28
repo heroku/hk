@@ -16,7 +16,7 @@ var cmdInfo = &Command{
 
 func runInfo(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	app, err := client.AppInfo(mustApp())

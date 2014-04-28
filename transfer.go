@@ -20,7 +20,7 @@ var cmdTransfer = &Command{
 func runTransfer(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) != 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	recipient := args[0]
@@ -39,7 +39,7 @@ var cmdTransfers = &Command{
 
 func runTransfers(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	transfers, err := client.AppTransferList(nil)
@@ -72,7 +72,7 @@ var cmdTransferAccept = &Command{
 
 func runTransferAccept(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	xfer, err := client.AppTransferUpdate(mustApp(), "accepted")
@@ -90,7 +90,7 @@ var cmdTransferDecline = &Command{
 
 func runTransferDecline(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	xfer, err := client.AppTransferUpdate(mustApp(), "declined")
@@ -108,7 +108,7 @@ var cmdTransferCancel = &Command{
 
 func runTransferCancel(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()

@@ -22,7 +22,7 @@ Scale changes the quantity of dynos (horizontal scale) and/or the
 dyno size (vertical scale) for each process type. Note that
 changing dyno size will restart all dynos of that type.
 
-Example:
+Examples:
 
     $ hk scale web=2
     Scaled myapp to web=2:1X.
@@ -39,7 +39,7 @@ Example:
 func runScale(cmd *Command, args []string) {
 	appname := mustApp()
 	if len(args) == 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	todo := make([]heroku.FormationBatchUpdateOpts, len(args))
@@ -47,12 +47,13 @@ func runScale(cmd *Command, args []string) {
 	for i, arg := range args {
 		pstype, qty, size, err := parseScaleArg(arg)
 		if err != nil {
-			cmd.printUsage()
+			cmd.PrintUsage()
 			os.Exit(2)
 		}
 		if _, exists := types[pstype]; exists {
 			// can only specify each process type once
-			cmd.printUsage()
+			printError("process type '%s' specified more than once", pstype)
+			cmd.PrintUsage()
 			os.Exit(2)
 		}
 		types[pstype] = true

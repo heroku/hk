@@ -40,7 +40,7 @@ func runDynos(cmd *Command, names []string) {
 	defer w.Flush()
 
 	if len(names) > 1 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	listDynos(w, names)

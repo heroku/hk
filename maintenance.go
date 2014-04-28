@@ -26,7 +26,7 @@ Example:
 
 func runMaintenance(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	app, err := client.AppInfo(mustApp())
@@ -56,7 +56,7 @@ Example:
 
 func runMaintenanceEnable(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	newmode := true
@@ -83,7 +83,7 @@ Example:
 
 func runMaintenanceDisable(cmd *Command, args []string) {
 	if len(args) != 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	newmode := false

@@ -65,7 +65,7 @@ func init() {
 
 func runRun(cmd *Command, args []string) {
 	if len(args) == 0 {
-		cmd.printUsage()
+		cmd.PrintUsage()
 		os.Exit(2)
 	}
 	appname := mustApp()
@@ -91,7 +91,7 @@ func runRun(cmd *Command, args []string) {
 	}
 	if dynoSize != "" {
 		if !strings.HasSuffix(dynoSize, "X") {
-			cmd.printUsage()
+			cmd.PrintUsage()
 			os.Exit(2)
 		}
 		opts.Size = &dynoSize
