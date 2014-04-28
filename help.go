@@ -311,7 +311,7 @@ func (cm commandMap) UsageJSON(prefix string) template.JS {
 	}
 	buf, err := json.MarshalIndent(all, prefix, "  ")
 	if err != nil {
-		return template.JS(fmt.Sprintf("{\"error\": %q}", err.Error))
+		return template.JS(fmt.Sprintf("{\"error\": %q}", err.Error()))
 	}
 	resp := strings.Replace(string(buf), "\\u003c", "<", -1)
 	resp = strings.Replace(resp, "\\u003e", ">", -1)
