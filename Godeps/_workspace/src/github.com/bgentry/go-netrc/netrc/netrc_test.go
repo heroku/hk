@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -119,6 +120,13 @@ func TestParseFile(t *testing.T) {
 		t.Error("expected an error parsing bad_default_order.netrc, got none")
 	} else if !err.(*Error).BadDefaultOrder() {
 		t.Error("expected BadDefaultOrder() to be true, got false")
+	}
+
+	_, err = ParseFile("examples/this_file_doesnt_exist.netrc")
+	if err == nil {
+		t.Error("expected an error loading this_file_doesnt_exist.netrc, got none")
+	} else if _, ok := err.(*os.PathError); !ok {
+		t.Errorf("expected *os.Error, got %v", err)
 	}
 }
 

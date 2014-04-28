@@ -24,6 +24,7 @@ func TestContext(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest("GET", "http://localhost:8080/", nil)
+	emptyR, _ := http.NewRequest("GET", "http://localhost:8080/", nil)
 
 	// Get()
 	assertEqual(Get(r, key1), nil)
@@ -50,6 +51,26 @@ func TestContext(t *testing.T) {
 	value, ok = GetOk(r, "nil value")
 	assertEqual(value, nil)
 	assertEqual(ok, true)
+
+	// GetAll()
+	values := GetAll(r)
+	assertEqual(len(values), 3)
+
+	// GetAll() for empty request
+	values = GetAll(emptyR)
+	if values != nil {
+		t.Error("GetAll didn't return nil value for invalid request")
+	}
+
+	// GetAllOk()
+	values, ok = GetAllOk(r)
+	assertEqual(len(values), 3)
+	assertEqual(ok, true)
+
+	// GetAllOk() for empty request
+	values, ok = GetAllOk(emptyR)
+	assertEqual(value, nil)
+	assertEqual(ok, false)
 
 	// Delete()
 	Delete(r, key1)

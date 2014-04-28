@@ -17,7 +17,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/go-netrc/netrc",
-			"Rev": "2e5e1d1fe4532f987b2c023c3a766c3969e7606d"
+			"Rev": "9fd32a8b3d3d3f9d43c341bfe098430e07609480"
 		},
 		{
 			"ImportPath": "github.com/bgentry/heroku-go",
@@ -29,7 +29,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/speakeasy",
-			"Rev": "62eddfa017d29832a81604b8118bfc0350144270"
+			"Rev": "4646fcfeab6f8c568dc68dfa627552ca40c58b31"
 		},
 		{
 			"ImportPath": "github.com/bgentry/testnet",
@@ -41,7 +41,7 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/context",
-			"Rev": "a08edd30ad9e104612741163dc087a613829a23c"
+			"Rev": "1be7a086a5fd6440ef16fe96baeda0c78282b980"
 		},
 		{
 			"ImportPath": "github.com/gorilla/mux",

@@ -48,6 +48,27 @@ func GetOk(r *http.Request, key interface{}) (interface{}, bool) {
 	return nil, false
 }
 
+// GetAll returns all stored values for the request as a map. Nil is returned for invalid requests.
+func GetAll(r *http.Request) map[interface{}]interface{} {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if context, ok := data[r]; ok {
+		return context
+	}
+	return nil
+}
+
+// GetAllOk returns all stored values for the request as a map. It returns not
+// ok if the request was never registered.
+func GetAllOk(r *http.Request) (map[interface{}]interface{}, bool) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	context, ok := data[r]
+	return context, ok
+}
+
 // Delete removes a value stored for a given key in a given request.
 func Delete(r *http.Request, key interface{}) {
 	mutex.Lock()

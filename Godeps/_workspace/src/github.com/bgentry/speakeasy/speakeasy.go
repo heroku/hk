@@ -1,6 +1,7 @@
 package speakeasy
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 )
@@ -16,12 +17,9 @@ func Ask(prompt string) (password string, err error) {
 }
 
 func readline() (value string, err error) {
-	_, err = fmt.Fscanln(os.Stdin, &value)
-	if err != nil {
-		return
-	}
-
+	s := bufio.NewScanner(os.Stdin)
+	s.Scan()
 	// Carriage return after the user input.
 	fmt.Println("")
-	return
+	return s.Text(), s.Err()
 }
