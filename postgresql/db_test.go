@@ -178,7 +178,7 @@ func TestDBInfo(t *testing.T) {
 		t.Errorf("expected ResourceURL=%s, got %s", "postgres://username:password@ec2-107-12-34-82.compute-1.amazonaws.com:5552/dbname", dbi.ResourceURL)
 	}
 	if dbi.ServicePort != 5552 {
-		t.Errorf("expected ServicePort=%d, got %s", 5552, dbi.ServicePort)
+		t.Errorf("expected ServicePort=%d, got %d", 5552, dbi.ServicePort)
 	}
 	if dbi.Standalone != false {
 		t.Errorf("expected Standalone=%t, got %t", false, dbi.Standalone)

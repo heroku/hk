@@ -114,7 +114,7 @@ func runAddonAdd(cmd *Command, args []string) {
 		// if this is a postgres addon, resolve fork/follow/rollback args
 		provider, _ := splitProviderAndPlan(plan)
 		if provider == hpgAddonName() && config != nil {
-			for k, _ := range *config {
+			for k := range *config {
 				if i := stringsIndex(hpgOptNames, k); i != -1 {
 					// contains an hpgOptNames key, we need to resolve these against envs
 					appEnv, err := client.ConfigVarInfo(appname)

@@ -251,7 +251,7 @@ func (b *Build) build() (err error) {
 	cmd.Env = append(env, os.Environ()...)
 	err = cmd.Run()
 	if err != nil {
-		return fmt.Errorf("godep go build -tags release: ", err)
+		return fmt.Errorf("godep go build -tags release: %s", err)
 	}
 	return nil
 }
