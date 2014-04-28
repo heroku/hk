@@ -29,7 +29,7 @@
 		},
 		{
 			"ImportPath": "github.com/bgentry/speakeasy",
-			"Rev": "4646fcfeab6f8c568dc68dfa627552ca40c58b31"
+			"Rev": "3a0207d7d2fe82a5695edc832ec2710ef3855128"
 		},
 		{
 			"ImportPath": "github.com/bgentry/testnet",
