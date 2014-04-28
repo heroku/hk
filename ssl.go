@@ -41,7 +41,7 @@ func runSSL(cmd *Command, args []string) {
 
 var cmdSSLCertAdd = &Command{
 	Run:      runSSLCertAdd,
-	Usage:    "ssl-cert-add <certfile> <keyfile>",
+	Usage:    "ssl-cert-add [-s] <certfile> <keyfile>",
 	NeedsApp: true,
 	Category: "ssl",
 	Short:    "add a new ssl cert",
@@ -50,11 +50,23 @@ Add a new SSL certificate to an app. An SSL endpoint will be
 created if the app doesn't yet have one. Otherwise, its cert will
 be updated.
 
+Options:
+
+    -s  skip SSL cert optimization and pre-processing
+
 Examples:
 
     $ hk ssl-cert-add cert.pem key.pem
     hobby-dev        $0/mo
 `,
+}
+
+var (
+	skipCertPreprocess bool
+)
+
+func init() {
+	cmdSSLCertAdd.Flag.BoolVarP(&skipCertPreprocess, "skip-preprocess", "s", false, "skip SSL cert preprocessing")
 }
 
 func runSSLCertAdd(cmd *Command, args []string) {
@@ -79,8 +91,11 @@ func runSSLCertAdd(cmd *Command, args []string) {
 	cert := string(certb)
 	key := string(keyb)
 
+	preprocess := !skipCertPreprocess
+
 	if len(endpoints) == 0 {
-		ep, err := client.SSLEndpointCreate(appname, cert, key)
+		opts := heroku.SSLEndpointCreateOpts{Preprocess: &preprocess}
+		ep, err := client.SSLEndpointCreate(appname, cert, key, &opts)
 		must(err)
 		fmt.Printf("Added cert for %s at %s.\n", appname, ep.Cname)
 		return
@@ -88,6 +103,7 @@ func runSSLCertAdd(cmd *Command, args []string) {
 
 	opts := heroku.SSLEndpointUpdateOpts{
 		CertificateChain: &cert,
+		Preprocess:       &preprocess,
 		PrivateKey:       &key,
 	}
 	_, err = client.SSLEndpointUpdate(appname, endpoints[0].Id, &opts)
