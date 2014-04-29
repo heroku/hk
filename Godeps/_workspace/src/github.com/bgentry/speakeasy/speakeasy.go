@@ -1,8 +1,8 @@
 package speakeasy
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -18,22 +18,22 @@ func Ask(prompt string) (password string, err error) {
 }
 
 func readline() (value string, err error) {
-	var pw []byte
+	var valb []byte
+	var n int
 	b := make([]byte, 1)
-	stdin := bufio.NewReader(os.Stdin)
 	for {
 		// read one byte at a time so we don't accidentally read extra bytes
-		_, err = stdin.Read(b)
-		if err != nil {
-			return
+		n, err = os.Stdin.Read(b)
+		if err != nil && err != io.EOF {
+			return "", err
 		}
-		if b[0] == '\n' {
+		if n == 0 || b[0] == '\n' {
 			break
 		}
-		pw = append(pw, b[0])
+		valb = append(valb, b[0])
 	}
 
 	// Carriage return after the user input.
 	fmt.Println("")
-	return strings.TrimSuffix(string(pw), "\r"), nil
+	return strings.TrimSuffix(string(valb), "\r"), nil
 }
