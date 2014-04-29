@@ -94,6 +94,10 @@ as lists of items (`apps`, `dynos`, `addons`, `releases`). The rest of the
 commands are named with singular nouns because they deal with a single resource
 (`addon-add`, `domain-remove`, `release-info`).
 
+The Heroku Ruby CLI allowed users to specify an app for commands via a `-a
+<app>` flag, or via a git remote with `-r <remote>`. hk combines these flags
+into a single `-a <app or remote>` flag.
+
 ## Guide to hk commands for Heroku users
 
 Many commands are similar in both the Heroku Ruby CLI and hk. However, some
@@ -407,74 +411,79 @@ $ hk help commands
 ```
 
 ```
-hk access [-a <app>]                                              # list access permissions
-hk access-add [-a <app>] [-s] <email>                             # give a user access to an app
-hk access-remove [-a <app>] <email>                               # remove a user's access to an app
-hk account-feature-disable <feature>                              # disable an account feature
-hk account-feature-enable <feature>                               # enable an account feature
-hk account-feature-info <feature>                                 # show info for an account feature
-hk account-features                                               # list account features
+hk access [-a <app>]                                              # list access permissions (extra)
+hk access-add [-a <app>] [-s] <email>                             # give a user access to an app (extra)
+hk access-remove [-a <app>] <email>                               # remove a user's access to an app (extra)
+hk account-feature-disable <feature>                              # disable an account feature (extra)
+hk account-feature-enable <feature>                               # enable an account feature (extra)
+hk account-feature-info <feature>                                 # show info for an account feature (extra)
+hk account-features                                               # list account features (extra)
 hk addon-add [-a <app>] <service>[:<plan>] [<config>=<value>...]  # add an addon
 hk addon-destroy [-a <app>] <name>                                # destroy an addon
-hk addon-open [-a <app>] <name>                                   # open an addon
-hk addon-plans <service>                                          # list addon plans
-hk addon-services                                                 # list addon services
+hk addon-open [-a <app>] <name>                                   # open an addon (extra)
+hk addon-plan [-a <app>] <name> <plan>                            # change an addon's plan (extra)
+hk addon-plans <service>                                          # list addon plans (extra)
+hk addon-services                                                 # list addon services (extra)
 hk addons [-a <app>] [<service>:<plan>...]                        # list addons
-hk api <method> <path>                                            # make a single API request
+hk api <method> <path>                                            # make a single API request (extra)
 hk apps [<name>...]                                               # list apps
 hk create [-r <region>] [<name>]                                  # create an app
-hk creds                                                          # show credentials
+hk creds                                                          # show credentials (extra)
 hk destroy <name>                                                 # destroy an app
 hk domain-add [-a <app>] <domain>                                 # add a domain
 hk domain-remove [-a <app>] <domain>                              # remove a domain
 hk domains [-a <app>]                                             # list domains
-hk drain-add [-a <app>] <url>                                     # add a log drain
-hk drain-info [-a <app>] <id or url>                              # show info for a log drain
-hk drain-remove [-a <app>] <id or url>                            # remove a log drain
-hk drains [-a <app>]                                              # list log drains
+hk drain-add [-a <app>] <url>                                     # add a log drain (extra)
+hk drain-info [-a <app>] <id or url>                              # show info for a log drain (extra)
+hk drain-remove [-a <app>] <id or url>                            # remove a log drain (extra)
+hk drains [-a <app>]                                              # list log drains (extra)
 hk dynos [-a <app>] [<name>...]                                   # list dynos
 hk env [-a <app>]                                                 # list env vars
-hk feature-disable [-a <app>] <feature>                           # disable an app feature
-hk feature-enable [-a <app>] <feature>                            # enable an app feature
-hk feature-info [-a <app>] <feature>                              # show info for an app feature
-hk features [-a <app>]                                            # list app features
-hk get [-a <app>] <name>                                          # get env var
+hk feature-disable [-a <app>] <feature>                           # disable an app feature (extra)
+hk feature-enable [-a <app>] <feature>                            # enable an app feature (extra)
+hk feature-info [-a <app>] <feature>                              # show info for an app feature (extra)
+hk features [-a <app>]                                            # list app features (extra)
+hk get [-a <app>] <name>                                          # get env var (extra)
 hk help [<topic>]                                                 # 
 hk info [-a <app>]                                                # show app info
-hk key-add [<public-key-file>]                                    # add ssh public key
-hk key-remove <fingerprint>                                       # remove an ssh public key
-hk keys                                                           # list ssh public keys
+hk key-add [<public-key-file>]                                    # add ssh public key (extra)
+hk key-remove <fingerprint>                                       # remove an ssh public key (extra)
+hk keys                                                           # list ssh public keys (extra)
 hk log [-a <app>] [-n <lines>] [-s <source>] [-d <dyno>]          # stream app log lines
-hk login                                                          # log in to your Heroku account
-hk logout                                                         # log out of your Heroku account
-hk maintenance [-a <app>]                                         # show app maintenance mode
-hk maintenance-disable [-a <app>]                                 # disable maintenance mode
-hk maintenance-enable [-a <app>]                                  # enable maintenance mode
-hk open [-a <app>]                                                # open app in a web browser
-hk pg-info [-a <app>] <dbname>                                    # show Heroku Postgres database info
-hk pg-list [-a <app>]                                             # list Heroku Postgres databases
-hk pg-unfollow [-a <app>] <dbname>                                # stop a replica postgres database from following
-hk psql [-a <app>] [-c <command>] [<dbname>]                      # open a psql shell to a Heroku Postgres database
-hk regions                                                        # list regions
+hk login                                                          # log in to your Heroku account (extra)
+hk logout                                                         # log out of your Heroku account (extra)
+hk maintenance [-a <app>]                                         # show app maintenance mode (extra)
+hk maintenance-disable [-a <app>]                                 # disable maintenance mode (extra)
+hk maintenance-enable [-a <app>]                                  # enable maintenance mode (extra)
+hk open [-a <app>]                                                # open app in a web browser (extra)
+hk pg-info [-a <app>] <dbname>                                    # show Heroku Postgres database info (extra)
+hk pg-list [-a <app>]                                             # list Heroku Postgres databases (extra)
+hk pg-unfollow [-a <app>] <dbname>                                # stop a replica postgres database from following (extra)
+hk psql [-a <app>] [-c <command>] [<dbname>]                      # open a psql shell to a Heroku Postgres database (extra)
+hk regions                                                        # list regions (extra)
 hk release-info [-a <app>] <version>                              # show release info
-hk releases [-a <app>] [<version>...]                             # list releases
+hk releases [-a <app>] [-n <limit>] [<version>...]                # list releases
 hk rename <oldname> <newname>                                     # rename an app
 hk restart [-a <app>] [<type or name>]                            # restart dynos
 hk rollback [-a <app>] <version>                                  # roll back to a previous release
-hk run [-a <app>] [-s <size>] [-d] <command> [<argument>...]      # run a process in a dyno
+hk run [-s <size>] [-d] <command> [<argument>...]                 # run a process in a dyno
 hk scale [-a <app>] <type>=[<qty>]:[<size>]...                    # change dyno quantities and sizes
 hk set [-a <app>] <name>=<value>...                               # set env var
-hk status                                                         # display heroku platform status
-hk transfer [-a <app>] <email>                                    # transfer app ownership to a collaborator
-hk transfer-accept [-a <app>]                                     # accept an inbound app transfer
-hk transfer-cancel [-a <app>]                                     # cancel an outbound app transfer
-hk transfer-decline [-a <app>]                                    # decline an inbound app transfer
-hk transfers [-a <app>]                                           # list existing app transfers
+hk ssl [-a <app>]                                                 # show ssl endpoint info
+hk ssl-cert-add [-a <app>] <certfile> <keyfile>                   # add a new ssl cert
+hk ssl-cert-rollback [-a <app>]                                   # add a new ssl cert
+hk ssl-destroy [-a <app>]                                         # destroy ssl endpoint
+hk status                                                         # display heroku platform status (extra)
+hk transfer [-a <app>] <email>                                    # transfer app ownership to a collaborator (extra)
+hk transfer-accept [-a <app>]                                     # accept an inbound app transfer (extra)
+hk transfer-cancel [-a <app>]                                     # cancel an outbound app transfer (extra)
+hk transfer-decline [-a <app>]                                    # decline an inbound app transfer (extra)
+hk transfers [-a <app>]                                           # list existing app transfers (extra)
 hk unset [-a <app>] <name>...                                     # unset env var
 hk update                                                         # 
-hk url [-a <app>]                                                 # show app url
+hk url [-a <app>]                                                 # show app url (extra)
 hk version                                                        # show hk version
-hk which-app [-a <app>]                                           # show which app is selected, if any
+hk which-app [-a <app>]                                           # show which app is selected, if any (extra)
 ```
 
 ## Feedback

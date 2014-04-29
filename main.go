@@ -50,7 +50,7 @@ func (c *Command) PrintLongUsage() {
 
 func (c *Command) FullUsage() string {
 	if c.NeedsApp {
-		return c.Name() + " [-a <app>]" + strings.TrimPrefix(c.Usage, c.Name())
+		return c.Name() + " [-a <app or remote>]" + strings.TrimPrefix(c.Usage, c.Name())
 	}
 	return c.Usage
 }

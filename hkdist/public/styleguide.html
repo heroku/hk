@@ -85,17 +85,17 @@
           "commands": [
             {
               "root": "access",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list access permissions (extra)"
             },
             {
               "root": "access-add",
-              "arguments": "[-a <app>] [-s] <email>",
+              "arguments": "[-a <app or remote>] [-s] <email>",
               "comment": "give a user access to an app (extra)"
             },
             {
               "root": "access-remove",
-              "arguments": "[-a <app>] <email>",
+              "arguments": "[-a <app or remote>] <email>",
               "comment": "remove a user's access to an app (extra)"
             }
           ],
@@ -145,22 +145,22 @@
           "commands": [
             {
               "root": "addon-add",
-              "arguments": "[-a <app>] <service>[:<plan>] [<config>=<value>...]",
+              "arguments": "[-a <app or remote>] <service>[:<plan>] [<config>=<value>...]",
               "comment": "add an addon"
             },
             {
               "root": "addon-destroy",
-              "arguments": "[-a <app>] <name>",
+              "arguments": "[-a <app or remote>] <name>",
               "comment": "destroy an addon"
             },
             {
               "root": "addon-open",
-              "arguments": "[-a <app>] <name>",
+              "arguments": "[-a <app or remote>] <name>",
               "comment": "open an addon (extra)"
             },
             {
               "root": "addon-plan",
-              "arguments": "[-a <app>] <name> <plan>",
+              "arguments": "[-a <app or remote>] <name> <plan>",
               "comment": "change an addon's plan (extra)"
             },
             {
@@ -175,7 +175,7 @@
             },
             {
               "root": "addons",
-              "arguments": "[-a <app>] [<service>:<plan>...]",
+              "arguments": "[-a <app or remote>] [<service>:<plan>...]",
               "comment": "list addons"
             }
           ],
@@ -200,72 +200,72 @@
             },
             {
               "root": "drain-add",
-              "arguments": "[-a <app>] <url>",
+              "arguments": "[-a <app or remote>] <url>",
               "comment": "add a log drain (extra)"
             },
             {
               "root": "drain-info",
-              "arguments": "[-a <app>] <id or url>",
+              "arguments": "[-a <app or remote>] <id or url>",
               "comment": "show info for a log drain (extra)"
             },
             {
               "root": "drain-remove",
-              "arguments": "[-a <app>] <id or url>",
+              "arguments": "[-a <app or remote>] <id or url>",
               "comment": "remove a log drain (extra)"
             },
             {
               "root": "drains",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list log drains (extra)"
             },
             {
               "root": "feature-disable",
-              "arguments": "[-a <app>] <feature>",
+              "arguments": "[-a <app or remote>] <feature>",
               "comment": "disable an app feature (extra)"
             },
             {
               "root": "feature-enable",
-              "arguments": "[-a <app>] <feature>",
+              "arguments": "[-a <app or remote>] <feature>",
               "comment": "enable an app feature (extra)"
             },
             {
               "root": "feature-info",
-              "arguments": "[-a <app>] <feature>",
+              "arguments": "[-a <app or remote>] <feature>",
               "comment": "show info for an app feature (extra)"
             },
             {
               "root": "features",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list app features (extra)"
             },
             {
               "root": "info",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "show app info"
             },
             {
               "root": "log",
-              "arguments": "[-a <app>] [-n <lines>] [-s <source>] [-d <dyno>]",
+              "arguments": "[-a <app or remote>] [-n <lines>] [-s <source>] [-d <dyno>]",
               "comment": "stream app log lines"
             },
             {
               "root": "maintenance",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "show app maintenance mode (extra)"
             },
             {
               "root": "maintenance-disable",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "disable maintenance mode (extra)"
             },
             {
               "root": "maintenance-enable",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "enable maintenance mode (extra)"
             },
             {
               "root": "open",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "open app in a web browser (extra)"
             },
             {
@@ -275,37 +275,37 @@
             },
             {
               "root": "transfer",
-              "arguments": "[-a <app>] <email>",
+              "arguments": "[-a <app or remote>] <email>",
               "comment": "transfer app ownership to a collaborator (extra)"
             },
             {
               "root": "transfer-accept",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "accept an inbound app transfer (extra)"
             },
             {
               "root": "transfer-cancel",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "cancel an outbound app transfer (extra)"
             },
             {
               "root": "transfer-decline",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "decline an inbound app transfer (extra)"
             },
             {
               "root": "transfers",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list existing app transfers (extra)"
             },
             {
               "root": "url",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "show app url (extra)"
             },
             {
               "root": "which-app",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "show which app is selected, if any (extra)"
             }
           ],
@@ -315,22 +315,22 @@
           "commands": [
             {
               "root": "env",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list env vars"
             },
             {
               "root": "get",
-              "arguments": "[-a <app>] <name>",
+              "arguments": "[-a <app or remote>] <name>",
               "comment": "get env var (extra)"
             },
             {
               "root": "set",
-              "arguments": "[-a <app>] <name>=<value>...",
+              "arguments": "[-a <app or remote>] <name>=<value>...",
               "comment": "set env var"
             },
             {
               "root": "unset",
-              "arguments": "[-a <app>] <name>...",
+              "arguments": "[-a <app or remote>] <name>...",
               "comment": "unset env var"
             }
           ],
@@ -340,17 +340,17 @@
           "commands": [
             {
               "root": "domain-add",
-              "arguments": "[-a <app>] <domain>",
+              "arguments": "[-a <app or remote>] <domain>",
               "comment": "add a domain"
             },
             {
               "root": "domain-remove",
-              "arguments": "[-a <app>] <domain>",
+              "arguments": "[-a <app or remote>] <domain>",
               "comment": "remove a domain"
             },
             {
               "root": "domains",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list domains"
             }
           ],
@@ -360,12 +360,12 @@
           "commands": [
             {
               "root": "dynos",
-              "arguments": "[-a <app>] [<name>...]",
+              "arguments": "[-a <app or remote>] [<name>...]",
               "comment": "list dynos"
             },
             {
               "root": "restart",
-              "arguments": "[-a <app>] [<type or name>]",
+              "arguments": "[-a <app or remote>] [<type or name>]",
               "comment": "restart dynos"
             },
             {
@@ -375,7 +375,7 @@
             },
             {
               "root": "scale",
-              "arguments": "[-a <app>] <type>=[<qty>]:[<size>]...",
+              "arguments": "[-a <app or remote>] <type>=[<qty>]:[<size>]...",
               "comment": "change dyno quantities and sizes"
             }
           ],
@@ -465,22 +465,22 @@
           "commands": [
             {
               "root": "pg-info",
-              "arguments": "[-a <app>] <dbname>",
+              "arguments": "[-a <app or remote>] <dbname>",
               "comment": "show Heroku Postgres database info (extra)"
             },
             {
               "root": "pg-list",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "list Heroku Postgres databases (extra)"
             },
             {
               "root": "pg-unfollow",
-              "arguments": "[-a <app>] <dbname>",
+              "arguments": "[-a <app or remote>] <dbname>",
               "comment": "stop a replica postgres database from following (extra)"
             },
             {
               "root": "psql",
-              "arguments": "[-a <app>] [-c <command>] [<dbname>]",
+              "arguments": "[-a <app or remote>] [-c <command>] [<dbname>]",
               "comment": "open a psql shell to a Heroku Postgres database (extra)"
             }
           ],
@@ -490,17 +490,17 @@
           "commands": [
             {
               "root": "release-info",
-              "arguments": "[-a <app>] <version>",
+              "arguments": "[-a <app or remote>] <version>",
               "comment": "show release info"
             },
             {
               "root": "releases",
-              "arguments": "[-a <app>] [-n <limit>] [<version>...]",
+              "arguments": "[-a <app or remote>] [-n <limit>] [<version>...]",
               "comment": "list releases"
             },
             {
               "root": "rollback",
-              "arguments": "[-a <app>] <version>",
+              "arguments": "[-a <app or remote>] <version>",
               "comment": "roll back to a previous release"
             }
           ],
@@ -510,22 +510,22 @@
           "commands": [
             {
               "root": "ssl",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "show ssl endpoint info"
             },
             {
               "root": "ssl-cert-add",
-              "arguments": "[-a <app>] <certfile> <keyfile>",
+              "arguments": "[-a <app or remote>] <certfile> <keyfile>",
               "comment": "add a new ssl cert"
             },
             {
               "root": "ssl-cert-rollback",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "add a new ssl cert"
             },
             {
               "root": "ssl-destroy",
-              "arguments": "[-a <app>]",
+              "arguments": "[-a <app or remote>]",
               "comment": "destroy ssl endpoint"
             }
           ],
