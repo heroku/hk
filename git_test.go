@@ -1,10 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
-	"os/exec"
-	"strings"
 	"testing"
 )
 
@@ -26,23 +23,6 @@ func TestGitHost(t *testing.T) {
 	if res := gitHost(); res != "stillnotheroku.com" {
 		t.Errorf("expected stillnotheroku.com, got %s", res)
 	}
-
-	fi, err := ioutil.TempFile("", "config")
-	if err != nil {
-		t.Errorf("expected alsonotheroku.com, but couldn't create temp config file")
-	}
-	if _, err := fi.WriteString("[heroku]\n\thost = alsonotheroku.com\n"); err != nil {
-		t.Errorf("expected alsonotheroku.com, but couldn't write temp config file")
-	}
-	b, _ := exec.Command("git", "config", "--file", fi.Name(), "heroku.host").Output()
-	if res := strings.TrimSpace(string(b)); res != "alsonotheroku.com" {
-		t.Errorf("expected alsonotheroku.com, got %s", res)
-	}
-	defer func() {
-		fi.Close()
-		os.Remove(fi.Name())
-	}()
-
 }
 
 var gitRemoteTestOutput = `
