@@ -29,7 +29,7 @@ type Collaborator struct {
 
 // Create a new collaborator.
 //
-// appIdentity is the unique identifier of the collaborator's app. user is the
+// appIdentity is the unique identifier of the Collaborator's App. user is the
 // unique email address of account or unique identifier of an account. options
 // is the struct of optional parameters for this action.
 func (c *Client) CollaboratorCreate(appIdentity string, user string, options *CollaboratorCreateOpts) (*Collaborator, error) {
@@ -54,7 +54,7 @@ type CollaboratorCreateOpts struct {
 
 // Delete an existing collaborator.
 //
-// appIdentity is the unique identifier of the collaborator's app.
+// appIdentity is the unique identifier of the Collaborator's App.
 // collaboratorIdentity is the unique identifier of the Collaborator.
 func (c *Client) CollaboratorDelete(appIdentity string, collaboratorIdentity string) error {
 	return c.Delete("/apps/" + appIdentity + "/collaborators/" + collaboratorIdentity)
@@ -62,7 +62,7 @@ func (c *Client) CollaboratorDelete(appIdentity string, collaboratorIdentity str
 
 // Info for existing collaborator.
 //
-// appIdentity is the unique identifier of the collaborator's app.
+// appIdentity is the unique identifier of the Collaborator's App.
 // collaboratorIdentity is the unique identifier of the Collaborator.
 func (c *Client) CollaboratorInfo(appIdentity string, collaboratorIdentity string) (*Collaborator, error) {
 	var collaborator Collaborator
@@ -71,7 +71,7 @@ func (c *Client) CollaboratorInfo(appIdentity string, collaboratorIdentity strin
 
 // List existing collaborators.
 //
-// appIdentity is the unique identifier of the collaborator's app. lr is an
+// appIdentity is the unique identifier of the Collaborator's App. lr is an
 // optional ListRange that sets the Range options for the paginated list of
 // results.
 func (c *Client) CollaboratorList(appIdentity string, lr *ListRange) ([]Collaborator, error) {

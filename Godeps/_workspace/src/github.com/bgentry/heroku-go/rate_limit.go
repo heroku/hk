@@ -12,8 +12,6 @@ type RateLimit struct {
 }
 
 // Info for rate limits.
-//
-// rateLimitIdentity is the unique identifier of the RateLimit.
 func (c *Client) RateLimitInfo() (*RateLimit, error) {
 	var rateLimit RateLimit
 	return &rateLimit, c.Get(&rateLimit, "/account/rate-limits")

@@ -25,7 +25,7 @@ type LogSession struct {
 
 // Create a new log session.
 //
-// appIdentity is the unique identifier of the log-session's app. options is the
+// appIdentity is the unique identifier of the LogSession's App. options is the
 // struct of optional parameters for this action.
 func (c *Client) LogSessionCreate(appIdentity string, options *LogSessionCreateOpts) (*LogSession, error) {
 	var logSessionRes LogSession

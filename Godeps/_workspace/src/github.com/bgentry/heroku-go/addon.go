@@ -37,7 +37,7 @@ type Addon struct {
 
 // Create a new add-on.
 //
-// appIdentity is the unique identifier of the addon's app. plan is the unique
+// appIdentity is the unique identifier of the Addon's App. plan is the unique
 // identifier of this plan or unique name of this plan. options is the struct of
 // optional parameters for this action.
 func (c *Client) AddonCreate(appIdentity string, plan string, options *AddonCreateOpts) (*Addon, error) {
@@ -62,7 +62,7 @@ type AddonCreateOpts struct {
 
 // Delete an existing add-on.
 //
-// appIdentity is the unique identifier of the addon's app. addonIdentity is the
+// appIdentity is the unique identifier of the Addon's App. addonIdentity is the
 // unique identifier of the Addon.
 func (c *Client) AddonDelete(appIdentity string, addonIdentity string) error {
 	return c.Delete("/apps/" + appIdentity + "/addons/" + addonIdentity)
@@ -70,7 +70,7 @@ func (c *Client) AddonDelete(appIdentity string, addonIdentity string) error {
 
 // Info for an existing add-on.
 //
-// appIdentity is the unique identifier of the addon's app. addonIdentity is the
+// appIdentity is the unique identifier of the Addon's App. addonIdentity is the
 // unique identifier of the Addon.
 func (c *Client) AddonInfo(appIdentity string, addonIdentity string) (*Addon, error) {
 	var addon Addon
@@ -79,7 +79,7 @@ func (c *Client) AddonInfo(appIdentity string, addonIdentity string) (*Addon, er
 
 // List existing add-ons.
 //
-// appIdentity is the unique identifier of the addon's app. lr is an optional
+// appIdentity is the unique identifier of the Addon's App. lr is an optional
 // ListRange that sets the Range options for the paginated list of results.
 func (c *Client) AddonList(appIdentity string, lr *ListRange) ([]Addon, error) {
 	req, err := c.NewRequest("GET", "/apps/"+appIdentity+"/addons", nil)
@@ -95,9 +95,10 @@ func (c *Client) AddonList(appIdentity string, lr *ListRange) ([]Addon, error) {
 	return addonsRes, c.DoReq(req, &addonsRes)
 }
 
-// Update an existing add-on.
+// Change add-on plan. Some add-ons may not support changing plans. In that
+// case, an error will be returned.
 //
-// appIdentity is the unique identifier of the addon's app. addonIdentity is the
+// appIdentity is the unique identifier of the Addon's App. addonIdentity is the
 // unique identifier of the Addon. plan is the unique identifier of this plan or
 // unique name of this plan.
 func (c *Client) AddonUpdate(appIdentity string, addonIdentity string, plan string) (*Addon, error) {

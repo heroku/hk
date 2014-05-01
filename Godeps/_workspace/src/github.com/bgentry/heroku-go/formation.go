@@ -25,7 +25,7 @@ type Formation struct {
 	// number of processes to maintain
 	Quantity int `json:"quantity"`
 
-	// dyno size (default: "1")
+	// dyno size (default: "1X")
 	Size string `json:"size"`
 
 	// type of process to maintain
@@ -37,7 +37,7 @@ type Formation struct {
 
 // Info for a process type
 //
-// appIdentity is the unique identifier of the formation's app.
+// appIdentity is the unique identifier of the Formation's App.
 // formationIdentity is the unique identifier of the Formation.
 func (c *Client) FormationInfo(appIdentity string, formationIdentity string) (*Formation, error) {
 	var formation Formation
@@ -46,7 +46,7 @@ func (c *Client) FormationInfo(appIdentity string, formationIdentity string) (*F
 
 // List process type formation
 //
-// appIdentity is the unique identifier of the formation's app. lr is an
+// appIdentity is the unique identifier of the Formation's App. lr is an
 // optional ListRange that sets the Range options for the paginated list of
 // results.
 func (c *Client) FormationList(appIdentity string, lr *ListRange) ([]Formation, error) {
@@ -65,8 +65,7 @@ func (c *Client) FormationList(appIdentity string, lr *ListRange) ([]Formation, 
 
 // Batch update process types
 //
-// appIdentity is the unique identifier of the formation's app.
-// formationIdentity is the unique identifier of the Formation. updates is the
+// appIdentity is the unique identifier of the Formation's App. updates is the
 // Array with formation updates. Each element must have "process", the id or
 // name of the process type to be updated, and can optionally update its
 // "quantity" or "size".
@@ -87,13 +86,13 @@ type FormationBatchUpdateOpts struct {
 	// number of processes to maintain
 	Quantity *int `json:"quantity,omitempty"`
 
-	// dyno size (default: "1")
+	// dyno size (default: "1X")
 	Size *string `json:"size,omitempty"`
 }
 
 // Update process type
 //
-// appIdentity is the unique identifier of the formation's app.
+// appIdentity is the unique identifier of the Formation's App.
 // formationIdentity is the unique identifier of the Formation. options is the
 // struct of optional parameters for this action.
 func (c *Client) FormationUpdate(appIdentity string, formationIdentity string, options *FormationUpdateOpts) (*Formation, error) {
@@ -105,6 +104,6 @@ func (c *Client) FormationUpdate(appIdentity string, formationIdentity string, o
 type FormationUpdateOpts struct {
 	// number of processes to maintain
 	Quantity *int `json:"quantity,omitempty"`
-	// dyno size (default: "1")
+	// dyno size (default: "1X")
 	Size *string `json:"size,omitempty"`
 }

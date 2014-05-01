@@ -25,7 +25,7 @@ type Domain struct {
 
 // Create a new domain.
 //
-// appIdentity is the unique identifier of the domain's app. hostname is the
+// appIdentity is the unique identifier of the Domain's App. hostname is the
 // full hostname.
 func (c *Client) DomainCreate(appIdentity string, hostname string) (*Domain, error) {
 	params := struct {
@@ -39,7 +39,7 @@ func (c *Client) DomainCreate(appIdentity string, hostname string) (*Domain, err
 
 // Delete an existing domain
 //
-// appIdentity is the unique identifier of the domain's app. domainIdentity is
+// appIdentity is the unique identifier of the Domain's App. domainIdentity is
 // the unique identifier of the Domain.
 func (c *Client) DomainDelete(appIdentity string, domainIdentity string) error {
 	return c.Delete("/apps/" + appIdentity + "/domains/" + domainIdentity)
@@ -47,7 +47,7 @@ func (c *Client) DomainDelete(appIdentity string, domainIdentity string) error {
 
 // Info for existing domain.
 //
-// appIdentity is the unique identifier of the domain's app. domainIdentity is
+// appIdentity is the unique identifier of the Domain's App. domainIdentity is
 // the unique identifier of the Domain.
 func (c *Client) DomainInfo(appIdentity string, domainIdentity string) (*Domain, error) {
 	var domain Domain
@@ -56,7 +56,7 @@ func (c *Client) DomainInfo(appIdentity string, domainIdentity string) (*Domain,
 
 // List existing domains.
 //
-// appIdentity is the unique identifier of the domain's app. lr is an optional
+// appIdentity is the unique identifier of the Domain's App. lr is an optional
 // ListRange that sets the Range options for the paginated list of results.
 func (c *Client) DomainList(appIdentity string, lr *ListRange) ([]Domain, error) {
 	req, err := c.NewRequest("GET", "/apps/"+appIdentity+"/domains", nil)

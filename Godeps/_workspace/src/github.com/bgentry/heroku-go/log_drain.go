@@ -37,7 +37,7 @@ type LogDrain struct {
 
 // Create a new log drain.
 //
-// appIdentity is the unique identifier of the log-drain's app. url is the url
+// appIdentity is the unique identifier of the LogDrain's App. url is the url
 // associated with the log drain.
 func (c *Client) LogDrainCreate(appIdentity string, url string) (*LogDrain, error) {
 	params := struct {
@@ -52,7 +52,7 @@ func (c *Client) LogDrainCreate(appIdentity string, url string) (*LogDrain, erro
 // Delete an existing log drain. Log drains added by add-ons can only be removed
 // by removing the add-on.
 //
-// appIdentity is the unique identifier of the log-drain's app. logDrainIdentity
+// appIdentity is the unique identifier of the LogDrain's App. logDrainIdentity
 // is the unique identifier of the LogDrain.
 func (c *Client) LogDrainDelete(appIdentity string, logDrainIdentity string) error {
 	return c.Delete("/apps/" + appIdentity + "/log-drains/" + logDrainIdentity)
@@ -60,7 +60,7 @@ func (c *Client) LogDrainDelete(appIdentity string, logDrainIdentity string) err
 
 // Info for existing log drain.
 //
-// appIdentity is the unique identifier of the log-drain's app. logDrainIdentity
+// appIdentity is the unique identifier of the LogDrain's App. logDrainIdentity
 // is the unique identifier of the LogDrain.
 func (c *Client) LogDrainInfo(appIdentity string, logDrainIdentity string) (*LogDrain, error) {
 	var logDrain LogDrain
@@ -69,9 +69,8 @@ func (c *Client) LogDrainInfo(appIdentity string, logDrainIdentity string) (*Log
 
 // List existing log drains.
 //
-// appIdentity is the unique identifier of the log-drain's app. lr is an
-// optional ListRange that sets the Range options for the paginated list of
-// results.
+// appIdentity is the unique identifier of the LogDrain's App. lr is an optional
+// ListRange that sets the Range options for the paginated list of results.
 func (c *Client) LogDrainList(appIdentity string, lr *ListRange) ([]LogDrain, error) {
 	req, err := c.NewRequest("GET", "/apps/"+appIdentity+"/log-drains", nil)
 	if err != nil {

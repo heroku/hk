@@ -40,7 +40,7 @@ type Release struct {
 
 // Info for existing release.
 //
-// appIdentity is the unique identifier of the release's app. releaseIdentity is
+// appIdentity is the unique identifier of the Release's App. releaseIdentity is
 // the unique identifier of the Release.
 func (c *Client) ReleaseInfo(appIdentity string, releaseIdentity string) (*Release, error) {
 	var release Release
@@ -49,7 +49,7 @@ func (c *Client) ReleaseInfo(appIdentity string, releaseIdentity string) (*Relea
 
 // List existing releases.
 //
-// appIdentity is the unique identifier of the release's app. lr is an optional
+// appIdentity is the unique identifier of the Release's App. lr is an optional
 // ListRange that sets the Range options for the paginated list of results.
 func (c *Client) ReleaseList(appIdentity string, lr *ListRange) ([]Release, error) {
 	req, err := c.NewRequest("GET", "/apps/"+appIdentity+"/releases", nil)
@@ -67,7 +67,7 @@ func (c *Client) ReleaseList(appIdentity string, lr *ListRange) ([]Release, erro
 
 // Create new release. The API cannot be used to create releases on Bamboo apps.
 //
-// appIdentity is the unique identifier of the release's app. slug is the unique
+// appIdentity is the unique identifier of the Release's App. slug is the unique
 // identifier of slug. options is the struct of optional parameters for this
 // action.
 func (c *Client) ReleaseCreate(appIdentity string, slug string, options *ReleaseCreateOpts) (*Release, error) {
@@ -92,7 +92,7 @@ type ReleaseCreateOpts struct {
 
 // Rollback to an existing release.
 //
-// appIdentity is the unique identifier of the release's app. release is the
+// appIdentity is the unique identifier of the Release's App. release is the
 // unique identifier of release.
 func (c *Client) ReleaseRollback(appIdentity string, release string) (*Release, error) {
 	params := struct {

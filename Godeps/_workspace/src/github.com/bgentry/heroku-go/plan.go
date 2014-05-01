@@ -41,7 +41,7 @@ type Plan struct {
 
 // Info for existing plan.
 //
-// addonServiceIdentity is the unique identifier of the plan's addon-service.
+// addonServiceIdentity is the unique identifier of the Plan's AddonService.
 // planIdentity is the unique identifier of the Plan.
 func (c *Client) PlanInfo(addonServiceIdentity string, planIdentity string) (*Plan, error) {
 	var plan Plan
@@ -50,7 +50,7 @@ func (c *Client) PlanInfo(addonServiceIdentity string, planIdentity string) (*Pl
 
 // List existing plans.
 //
-// addonServiceIdentity is the unique identifier of the plan's addon-service. lr
+// addonServiceIdentity is the unique identifier of the Plan's AddonService. lr
 // is an optional ListRange that sets the Range options for the paginated list
 // of results.
 func (c *Client) PlanList(addonServiceIdentity string, lr *ListRange) ([]Plan, error) {

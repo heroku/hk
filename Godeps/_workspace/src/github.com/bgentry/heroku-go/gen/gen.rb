@@ -26,15 +26,7 @@ import (
     <%- resolved_propdef = resolve_propdef(propdef) %>
     // <%= resolved_propdef["description"] %>
     <%- type = resolve_typedef(resolved_propdef) %>
-    <%- if type =~ /\\*?struct/ %>
-      <%= titlecase(propname) %> <%= type %> {
-        <%- resolved_propdef["properties"].each do |subpropname, subpropdef| %>
-          <%= titlecase(subpropname) %> <%= resolve_typedef(subpropdef) %> `json:"<%= subpropname %>"`
-        <%- end %>
-      } `json:"<%= propname %>"`
-    <%- else %>
-      <%= titlecase(propname) %> <%= resolve_typedef(propdef) %> `json:"<%= propname %>"`
-    <%- end %>
+    <%= Erubis::Eruby.new(STRUCT_FIELD_TEMPLATE).result({type: type, propdef: propdef, resolved_propdef: resolved_propdef, propname: propname}).strip %>
 
   <%- end %>
   }
@@ -43,22 +35,23 @@ import (
 <%- definition["links"].each do |link| %>
   <%- func_name = titlecase(key.downcase. + "-" + link["title"]) %>
   <%- func_args = [] %>
-  <%- func_args << (variablecase(parent_resource_instance) + 'Identity string') if parent_resource_instance %>
   <%- func_args += func_args_from_model_and_link(definition, key, link) %>
   <%- return_values = return_values_from_link(key, link) %>
-  <%- path = link['href'].gsub("{(%23%2Fdefinitions%2F\#{key}%2Fdefinitions%2Fidentity)}", '"+' + variablecase(resource_instance) + 'Identity') %>
+  <%- path = link['href'] %>
   <%- if parent_resource_instance %>
     <%- path = path.gsub("{(%23%2Fdefinitions%2F" + parent_resource_instance + "%2Fdefinitions%2Fidentity)}", '" + ' + variablecase(parent_resource_instance) + 'Identity + "') %>
   <%- end %>
+  <%- path = substitute_resource_identity(path) %>
   <%- path = ensure_balanced_end_quote(ensure_open_quote(path)) %>
 
   <%- word_wrap(markdown_free(link["description"]), line_width: 77).split("\n").each do |line| %>
     // <%= line %>
   <%- end %>
   <%- func_arg_comments = [] %>
-  <%- func_arg_comments << (variablecase(parent_resource_instance) + "Identity is the unique identifier of the " + key + "'s " + parent_resource_instance + ".") if parent_resource_instance %>
   <%- func_arg_comments += func_arg_comments_from_model_and_link(definition, key, link) %>
-  //
+  <%- unless func_arg_comments.empty? %>
+    //
+  <%- end %>
   <%- word_wrap(func_arg_comments.join(" "), line_width: 77).split("\n").each do |comment| %>
     // <%= comment %>
   <%- end %>
@@ -86,7 +79,7 @@ import (
     <%- when "self" %>
       var <%= variablecase(key) %> <%= hasCustomType ? titlecase(key) : "map[string]string" %>
       return <%= "&" if hasCustomType%><%= variablecase(key) %>, c.Get(&<%= variablecase(key) %>, <%= path %>)
-    <%- when "destroy" %>
+    <%- when "destroy", "empty" %>
       return c.Delete(<%= path %>)
     <%- when "update" %>
       <%- if !required.empty? %>
@@ -174,6 +167,29 @@ import (
 <%- end %>
 RESOURCE_TEMPLATE
 
+STRUCT_FIELD_TEMPLATE = <<-STRUCT_FIELD_TEMPLATE
+<%- if type =~ /\\*?struct/ %>
+  <%- is_array = propdef["type"].is_a?(Array) && propdef["type"].first == "array" %>
+  <%= titlecase(propname) %> <%= "[]" if is_array %><%= type %> {
+    <%- resolved_propdef["properties"].each do |subpropname, subpropdef| %>
+      <%- resolved_subpropdef = resolve_propdef(subpropdef) %>
+      <%- subtype = resolve_typedef(resolved_subpropdef) %>
+      <%- if subtype =~ /\\*?struct/ %>
+        <%= Erubis::Eruby.new(STRUCT_FIELD_TEMPLATE).result({type: subtype, propdef: subpropdef, resolved_propdef: resolved_subpropdef, propname: subpropname}).strip %>
+      <%- else %>
+        <%= Erubis::Eruby.new(FLAT_STRUCT_FIELD_TEMPLATE).result({type: subtype, propname: subpropname}).strip %>
+      <%- end %>
+    <%- end %>
+  } `json:"<%= propname %>"`
+<%- else %>
+  <%= Erubis::Eruby.new(FLAT_STRUCT_FIELD_TEMPLATE).result({type: type, propname: propname}).strip %>
+<%- end %>
+STRUCT_FIELD_TEMPLATE
+
+FLAT_STRUCT_FIELD_TEMPLATE = <<-FLAT_STRUCT_FIELD_TEMPLATE
+  <%= titlecase(propname) %> <%= type %> `json:"<%= propname %>"`
+FLAT_STRUCT_FIELD_TEMPLATE
+
 LINK_PARAMS_TEMPLATE = <<-LINK_PARAMS_TEMPLATE
 params := struct {
 <%- required.each do |propname| %>
@@ -221,6 +237,10 @@ module Generator
 
   def ensure_balanced_end_quote(str)
     (str.count('"') % 2) == 1 ? "#{str}\"" : str
+  end
+
+  def strip_unnecessary_end_plusquote(str)
+    str.gsub(/ \+ "$/, "")
   end
 
   def must_end_with(str, ending)
@@ -284,9 +304,9 @@ module Generator
                 arraytype = if propdef["items"]["$ref"]
                   resolve_typedef(propdef["items"])
                 else
-                  puts "propdef[items][type]: #{propdef["items"]["type"].inspect}"
                   propdef["items"]["type"]
                 end
+                arraytype = arraytype.first if arraytype.is_a?(Array)
                 "[]#{arraytype}"
               else
                 types.first
@@ -336,7 +356,7 @@ module Generator
       "(map[string]string, error)"
     else
       case link["rel"]
-      when "destroy"
+      when "destroy", "empty"
         "error"
       when "instances"
         "([]#{titlecase(modelname)}, error)"
@@ -355,10 +375,10 @@ module Generator
     required = (link["schema"] && link["schema"]["required"]) || []
     optional = ((link["schema"] && link["schema"]["properties"]) || {}).keys - required
 
-    # check if this link's href requires the model's identity
-    match = link["href"].match(%r{%23%2Fdefinitions%2F#{modelname}%2Fdefinitions%2Fidentity})
-    if %w{update destroy self}.include?(link["rel"]) && match
-      args << "#{variablecase(modelname)}Identity string"
+    # get all of the model identities required by this link's href
+    reg = /{\(%23%2Fdefinitions%2F(?<keyname>[\w-]+)%2Fdefinitions%2Fidentity\)}/
+    link["href"].scan(reg) do |match|
+      args << "#{variablecase(match.first)}Identity string"
     end
 
     if %w{create update}.include?(link["rel"])
@@ -394,9 +414,15 @@ module Generator
     if propdef["description"]
       [propdef]
     elsif ref = propdef["$ref"]
-      matches = ref.match(/#\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
-      schemaname, fieldname = matches[1..2]
-      resolve_all_propdefs(schemas[schemaname]["definitions"][fieldname])
+      # handle embedded structs
+      if matches = ref.match(/#\/definitions\/([\w-]+)\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
+        schemaname, structname, fieldname = matches[1..3]
+        resolve_all_propdefs(schemas[schemaname]["definitions"][structname]["definitions"][fieldname])
+      else
+        matches = ref.match(/#\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
+        schemaname, fieldname = matches[1..2]
+        resolve_all_propdefs(schemas[schemaname]["definitions"][fieldname])
+      end
     elsif anyof = propdef["anyOf"]
       # Identity
       anyof.map do |refhash|
@@ -404,6 +430,11 @@ module Generator
         schemaname, fieldname = matches[1..2]
         resolve_all_propdefs(schemas[schemaname]["definitions"][fieldname])
       end.flatten
+    elsif propdef["items"] && ref = propdef["items"]["$ref"]
+      # special case for params which are embedded structs, like build-result
+      matches = ref.match(/#\/definitions\/([\w-]+)\/definitions\/([\w-]+)/)
+      schemaname, fieldname = matches[1..2]
+      resolve_all_propdefs(schemas[schemaname]["definitions"][fieldname])
     elsif propdef["type"] && propdef["type"].is_a?(Array) && propdef["type"].first == "object"
       # special case for params which are nested objects, like oauth-grant
       [propdef]
@@ -413,20 +444,27 @@ module Generator
   end
 
   def func_arg_comments_from_model_and_link(definition, modelname, link)
+#   <%- func_arg_comments << (variablecase(parent_resource_instance) + "Identity is the unique identifier of the " + key + "'s " + parent_resource_instance + ".") if parent_resource_instance %>
     args = []
     flat_postval = link["schema"] && link["schema"]["additionalProperties"] == false
     properties = (link["schema"] && link["schema"]["properties"]) || {}
     required_keys = (link["schema"] && link["schema"]["required"]) || []
     optional_keys = properties.keys - required_keys
 
-    if %w{update destroy self}.include?(link["rel"])
-      if flat_postval
-        # special case for ConfigVar update w/ flat param struct
-        desc = markdown_free(link["schema"]["description"])
-        args << "options is the #{desc}."
-      else
+    # get all of the model identities required by this link's href
+    reg = /{\(%23%2Fdefinitions%2F(?<keyname>[\w-]+)%2Fdefinitions%2Fidentity\)}/
+    link["href"].scan(reg) do |match|
+      if match.first == modelname
         args << "#{variablecase(modelname)}Identity is the unique identifier of the #{titlecase(modelname)}."
+      else
+        args << "#{variablecase(match.first)}Identity is the unique identifier of the #{titlecase(modelname)}'s #{titlecase(match.first)}."
       end
+    end
+
+    if flat_postval
+      # special case for ConfigVar update w/ flat param struct
+      desc = markdown_free(link["schema"]["description"])
+      args << "options is the #{desc}."
     end
 
     if %w{create update}.include?(link["rel"])
@@ -457,7 +495,7 @@ module Generator
     when "update"
       ["#{variablecase(modelname)}Identity is the unique identifier of the #{titlecase(modelname)}.",
        "options is the struct of optional parameters for this action."]
-    when "destroy", "self"
+    when "destroy", "self", "empty"
       ["#{variablecase(modelname)}Identity is the unique identifier of the #{titlecase(modelname)}."]
     when "instances"
       ["lr is an optional ListRange that sets the Range options for the paginated list of results."]
@@ -465,6 +503,15 @@ module Generator
       []
     end
     args
+  end
+
+  def substitute_resource_identity(path)
+    reg = /{\(%23%2Fdefinitions%2F(?<keyname>[\w-]+)%2Fdefinitions%2Fidentity\)}/
+    matches = path.match(reg)
+    return path unless matches
+
+    gsubbed = path.gsub(reg, '"+' + variablecase(matches['keyname']) + 'Identity + "')
+    strip_unnecessary_end_plusquote(gsubbed)
   end
 
   def resource_instance_from_model(modelname)

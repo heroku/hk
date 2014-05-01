@@ -38,7 +38,7 @@ type AppFeature struct {
 
 // Info for an existing app feature.
 //
-// appIdentity is the unique identifier of the app-feature's app.
+// appIdentity is the unique identifier of the AppFeature's App.
 // appFeatureIdentity is the unique identifier of the AppFeature.
 func (c *Client) AppFeatureInfo(appIdentity string, appFeatureIdentity string) (*AppFeature, error) {
 	var appFeature AppFeature
@@ -47,7 +47,7 @@ func (c *Client) AppFeatureInfo(appIdentity string, appFeatureIdentity string) (
 
 // List existing app features.
 //
-// appIdentity is the unique identifier of the app-feature's app. lr is an
+// appIdentity is the unique identifier of the AppFeature's App. lr is an
 // optional ListRange that sets the Range options for the paginated list of
 // results.
 func (c *Client) AppFeatureList(appIdentity string, lr *ListRange) ([]AppFeature, error) {
@@ -66,7 +66,7 @@ func (c *Client) AppFeatureList(appIdentity string, lr *ListRange) ([]AppFeature
 
 // Update an existing app feature.
 //
-// appIdentity is the unique identifier of the app-feature's app.
+// appIdentity is the unique identifier of the AppFeature's App.
 // appFeatureIdentity is the unique identifier of the AppFeature. enabled is the
 // whether or not app feature has been enabled.
 func (c *Client) AppFeatureUpdate(appIdentity string, appFeatureIdentity string, enabled bool) (*AppFeature, error) {
