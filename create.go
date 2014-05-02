@@ -47,25 +47,28 @@ func runCreate(cmd *Command, args []string) {
 	}
 
 	orgName := ""
-	orgs, err := client.OrganizationList(nil)
-	must(err)
-	for _, org := range orgs {
-		if flagOrgName != "" {
-			// match org in orgs list
-			if org.Name == flagOrgName {
-				orgName = org.Name
-			}
-		} else {
-			// check for default org
-			if org.Default {
-				orgName = org.Name
-				break
+	// "personal" means "no org", skip the org lookup stuff
+	if flagOrgName != "personal" {
+		orgs, err := client.OrganizationList(nil)
+		must(err)
+		for _, org := range orgs {
+			if flagOrgName != "" {
+				// match org in orgs list
+				if org.Name == flagOrgName {
+					orgName = org.Name
+				}
+			} else {
+				// check for default org
+				if org.Default {
+					orgName = org.Name
+					break
+				}
 			}
 		}
-	}
-	if flagOrgName != "" && flagOrgName != orgName {
-		// flagOrgName was provided but not found in orgs list
-		printFatal("Heroku organization %s not found", flagOrgName)
+		if flagOrgName != "" && flagOrgName != orgName {
+			// flagOrgName was provided but not found in orgs list
+			printFatal("Heroku organization %s not found", flagOrgName)
+		}
 	}
 
 	if orgName == "" {
