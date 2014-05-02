@@ -96,6 +96,6 @@ func runCreate(cmd *Command, args []string) {
 		app, err := client.OrganizationAppCreate(orgName, &opts)
 		must(err)
 		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-		log.Printf("Created %s.", app.Name)
+		log.Printf("Created %s in the %s org.", app.Name, orgName)
 	}
 }
