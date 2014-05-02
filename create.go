@@ -38,15 +38,47 @@ func init() {
 }
 
 func runCreate(cmd *Command, args []string) {
-	var opts heroku.AppCreateOpts
-	if flagRegion != "" {
-		opts.Region = &flagRegion
-	}
+	appname := ""
 	if len(args) > 0 {
-		opts.Name = &args[0]
+		appname = args[0]
 	}
-	app, err := client.AppCreate(&opts)
+
+	// check for default org
+	defaultOrgName := ""
+	orgs, err := client.OrganizationList(nil)
 	must(err)
-	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-	log.Printf("Created %s.", app.Name)
+	for _, org := range orgs {
+		if org.Default {
+			defaultOrgName = org.Name
+			break
+		}
+	}
+
+	if defaultOrgName == "" {
+		var opts heroku.AppCreateOpts
+		if flagRegion != "" {
+			opts.Region = &flagRegion
+		}
+		if appname != "" {
+			opts.Name = &appname
+		}
+
+		app, err := client.AppCreate(&opts)
+		must(err)
+		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
+		log.Printf("Created %s.", app.Name)
+	} else {
+		var opts heroku.OrganizationAppCreateOpts
+		if flagRegion != "" {
+			opts.Region = &flagRegion
+		}
+		if appname != "" {
+			opts.Name = &appname
+		}
+
+		app, err := client.OrganizationAppCreate(defaultOrgName, &opts)
+		must(err)
+		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
+		log.Printf("Created %s.", app.Name)
+	}
 }
