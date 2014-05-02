@@ -47,7 +47,7 @@ Examples:
 }
 
 func init() {
-	cmdReleases.Flag.IntVar(&releaseCount, "n", 20, "max number of recent releases to display")
+	cmdReleases.Flag.IntVarP(&releaseCount, "number", "n", 20, "max number of recent releases to display")
 }
 
 func runReleases(cmd *Command, versions []string) {
