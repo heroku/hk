@@ -9,7 +9,7 @@ import (
 
 var cmdCreate = &Command{
 	Run:      runCreate,
-	Usage:    "create [-r <region>] [<name>]",
+	Usage:    "create [-r <region>] [-o <org>] [<name>]",
 	Category: "app",
 	Short:    "create an app",
 	Long: `
@@ -19,6 +19,7 @@ app is created with a random haiku name.
 Options:
 
     -r <region>  Heroku region to create app in
+    -o <org>     Name of Heroku organization to create app in
     <name>       optional name for the app
 
 Examples:
@@ -32,9 +33,11 @@ Examples:
 }
 
 var flagRegion string
+var flagOrgName string
 
 func init() {
 	cmdCreate.Flag.StringVarP(&flagRegion, "region", "r", "", "region name")
+	cmdCreate.Flag.StringVarP(&flagOrgName, "org", "o", "", "organization name")
 }
 
 func runCreate(cmd *Command, args []string) {
@@ -43,18 +46,29 @@ func runCreate(cmd *Command, args []string) {
 		appname = args[0]
 	}
 
-	// check for default org
-	defaultOrgName := ""
+	orgName := ""
 	orgs, err := client.OrganizationList(nil)
 	must(err)
 	for _, org := range orgs {
-		if org.Default {
-			defaultOrgName = org.Name
-			break
+		if flagOrgName != "" {
+			// match org in orgs list
+			if org.Name == flagOrgName {
+				orgName = org.Name
+			}
+		} else {
+			// check for default org
+			if org.Default {
+				orgName = org.Name
+				break
+			}
 		}
 	}
+	if flagOrgName != "" && flagOrgName != orgName {
+		// flagOrgName was provided but not found in orgs list
+		printFatal("Heroku organization %s not found", flagOrgName)
+	}
 
-	if defaultOrgName == "" {
+	if orgName == "" {
 		var opts heroku.AppCreateOpts
 		if flagRegion != "" {
 			opts.Region = &flagRegion
@@ -76,7 +90,7 @@ func runCreate(cmd *Command, args []string) {
 			opts.Name = &appname
 		}
 
-		app, err := client.OrganizationAppCreate(defaultOrgName, &opts)
+		app, err := client.OrganizationAppCreate(orgName, &opts)
 		must(err)
 		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
 		log.Printf("Created %s.", app.Name)
