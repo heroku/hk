@@ -19,7 +19,7 @@ app is created with a random haiku name.
 Options:
 
     -r <region>  Heroku region to create app in
-    -o <org>     Name of Heroku organization to create app in
+    -o <org>     name of Heroku organization to create app in
     <name>       optional name for the app
 
 Examples:
@@ -47,28 +47,18 @@ func runCreate(cmd *Command, args []string) {
 	}
 
 	orgName := ""
-	// "personal" means "no org", skip the org lookup stuff
-	if flagOrgName != "personal" {
+	if flagOrgName == "" {
+		// check for default org
 		orgs, err := client.OrganizationList(nil)
 		must(err)
 		for _, org := range orgs {
-			if flagOrgName != "" {
-				// match org in orgs list
-				if org.Name == flagOrgName {
-					orgName = org.Name
-				}
-			} else {
-				// check for default org
-				if org.Default {
-					orgName = org.Name
-					break
-				}
+			if org.Default {
+				orgName = org.Name
+				break
 			}
 		}
-		if flagOrgName != "" && flagOrgName != orgName {
-			// flagOrgName was provided but not found in orgs list
-			printFatal("Heroku organization %s not found", flagOrgName)
-		}
+	} else if flagOrgName != "personal" { // "personal" means "no org"
+		orgName = flagOrgName
 	}
 
 	if orgName == "" {
