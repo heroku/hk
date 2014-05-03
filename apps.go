@@ -30,13 +30,17 @@ Examples:
 `,
 }
 
+func init() {
+	cmdApps.Flag.StringVarP(&flagOrgName, "org", "o", "", "organization name")
+}
+
 func runApps(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 	var apps []heroku.App
 	if len(names) == 0 {
 		var err error
-		apps, err = client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
+		apps, err = getAppList(flagOrgName)
 		must(err)
 	} else {
 		appch := make(chan *heroku.App, len(names))
@@ -66,6 +70,18 @@ func runApps(cmd *Command, names []string) {
 		}
 	}
 	printAppList(w, apps)
+}
+
+func getAppList(orgName string) ([]heroku.App, error) {
+	if orgName != "" {
+		apps, err := client.OrganizationAppList(orgName, &heroku.ListRange{Field: "name", Max: 1000})
+		if err != nil {
+			return nil, err
+		}
+		return fromOrgApps(apps), nil
+	}
+
+	return client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
 }
 
 func printAppList(w io.Writer, apps []heroku.App) {
@@ -118,3 +134,31 @@ type appsByName []heroku.App
 func (a appsByName) Len() int           { return len(a) }
 func (a appsByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a appsByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
+func fromOrgApp(oapp heroku.OrganizationApp) (happ heroku.App) {
+	return heroku.App{
+		ArchivedAt:                   oapp.ArchivedAt,
+		BuildpackProvidedDescription: oapp.BuildpackProvidedDescription,
+		CreatedAt:                    oapp.CreatedAt,
+		GitURL:                       oapp.GitURL,
+		Id:                           oapp.Id,
+		Maintenance:                  oapp.Maintenance,
+		Name:                         oapp.Name,
+		Owner:                        oapp.Owner,
+		Region:                       oapp.Region,
+		ReleasedAt:                   oapp.ReleasedAt,
+		RepoSize:                     oapp.RepoSize,
+		SlugSize:                     oapp.SlugSize,
+		Stack:                        oapp.Stack,
+		UpdatedAt:                    oapp.UpdatedAt,
+		WebURL:                       oapp.WebURL,
+	}
+}
+
+func fromOrgApps(oapps []heroku.OrganizationApp) (apps []heroku.App) {
+	apps = make([]heroku.App, len(oapps))
+	for i := range oapps {
+		apps[i] = fromOrgApp(oapps[i])
+	}
+	return
+}
