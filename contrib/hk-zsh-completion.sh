@@ -175,6 +175,46 @@ _hk_app_names_caching_policy() {
   (( $#oldp ))
 }
 
+__hk_org_names() {
+  # set a local curcontext to use for caching
+  local curcontext=${curcontext%:*:*}:hk-__hk_org_names: state line cache_policy ret=1
+  local cache_name=":completion:${curcontext}:"
+
+  # See if a cache-policy is already set up, and set one if not
+  zstyle -s $cache_name cache-policy cache_policy
+  [[ -z "$cache_policy" ]] && zstyle $cache_name cache-policy _hk_org_names_caching_policy
+
+  # If _org_names isn't populated or the cache is invalid, and we fail to
+  # retrieve the cache:
+  if ( ((${#_org_names} == 0)) || _cache_invalid $cache_name ) \
+    && ! _retrieve_cache $cache_name; then
+    # If we've gotten to this point, the org names aren't cached. Fetch them.
+    _org_names=(${(f)"$(hk orgs | cut -f 1 -d ' ')"})
+    # Store _org_names in the cache if this is a default cloud
+    ( _hk_is_default_cloud ) && _store_cache $cache_name _org_names
+  fi
+
+  compadd $* - $_org_names
+  # don't let this var persist in non-default clouds
+  ( ! _hk_is_default_cloud ) && unset _region_names
+}
+
+_hk_org_names_caching_policy() {
+  # Rebuild if cache is older than 2 weeks.
+  local -a oldp
+  if ( ! _hk_is_default_cloud ); then
+    return 0 # don't cache data in non-default clouds
+  fi
+
+  # This is a glob expansion for file modification time.
+  # N sets NULL_GLOB, deleting the pattern from the arg list if it doesn't match.
+  # m matches files with a given modification time, and w modifies the units to weeks.
+  # Finally, the +1 makes this match files modified at least 2 weeks ago.
+  oldp=( "$1"(Nmw+2) )
+  # return the length of oldp (given by #)
+  (( $#oldp ))
+}
+
 __hk_region_names() {
   # set a local curcontext to use for caching
   local curcontext=${curcontext%:*:*}:hk-__hk_region_names: state line cache_policy ret=1
@@ -282,10 +322,21 @@ _hk-addon-services() {
   _hk_complete_only_app_flag
 }
 
+_hk-apps() {
+  local curcontext=$curcontext state line ret=1
+
+  _arguments -w -C -S -s \
+    '(-o --org)'{-o,--org=}'[heroku organization name]:: :__hk_org_names' \
+   && ret=0
+
+  return ret
+}
+
 _hk-create() {
   local curcontext=$curcontext state line ret=1
 
   _arguments -w -C -S -s \
+    '(-o --org)'{-o,--org=}'[heroku organization name]:: :__hk_org_names' \
     '(-r --region)'{-r,--region=}'[heroku region name]:: :__hk_region_names' \
     '*:app name:' \
    && ret=0
