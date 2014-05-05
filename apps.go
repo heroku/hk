@@ -109,9 +109,10 @@ func abbrevEmailApps(apps []heroku.App) {
 			nmax = n
 		}
 	}
-	for _, a := range apps {
-		if strings.HasSuffix(a.Owner.Email, smax) {
-			a.Owner.Email = a.Owner.Email[:len(a.Owner.Email)-len(smax)]
+	for i := range apps {
+		// reference the app directly in the slice so we're not modifying a copy
+		if strings.HasSuffix(apps[i].Owner.Email, smax) {
+			apps[i].Owner.Email = apps[i].Owner.Email[:len(apps[i].Owner.Email)-len(smax)]
 		}
 	}
 }
