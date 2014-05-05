@@ -227,7 +227,10 @@ func main() {
 			if cmd.NeedsApp {
 				cmd.Flag.StringVarP(&flagApp, "app", "a", "", "app name")
 			}
-			if err := cmd.Flag.Parse(args[1:]); err != nil {
+			if err := cmd.Flag.Parse(args[1:]); err == flag.ErrHelp {
+				cmdHelp.Run(cmdHelp, args[:1])
+				return
+			} else if err != nil {
 				printError(err.Error())
 				os.Exit(2)
 			}
