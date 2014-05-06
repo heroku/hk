@@ -220,7 +220,9 @@ func main() {
 			defer recoverPanic()
 
 			cmd.Flag.SetDisableDuplicates(true) // disallow duplicate flag options
-			cmd.Flag.SetInterspersed(true)      // allow flags & non-flag args to mix
+			if !gitConfigBool("hk.strict-flag-ordering") {
+				cmd.Flag.SetInterspersed(true) // allow flags & non-flag args to mix
+			}
 			cmd.Flag.Usage = func() {
 				cmd.PrintUsage()
 			}

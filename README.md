@@ -109,6 +109,24 @@ completes flags and other arguments for many commands:
 
 The bash completion script completes only command names at this time.
 
+## Config
+
+hk allows some configuration using git config.
+
+### Use strict flag ordering / disable interspersed flags and non-flag arguments
+
+Enable:
+
+```
+$ git config --global --bool hk.strict-flag-ordering true
+```
+
+Disable:
+
+```
+$ git config --global --unset hk.strict-flag-ordering
+```
+
 ## Plugins
 
 hk currently has a minimal plugin system. It may see substantial changes in the future, and those changes may break existing plugins or change the architecture at any time. Use this functionality at your own risk.

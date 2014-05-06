@@ -115,6 +115,14 @@ func parseGitRemoteOutput(b []byte) (results map[string]string, err error) {
 	return
 }
 
+func gitConfigBool(name string) bool {
+	b, err := exec.Command("git", "config", name).Output()
+	if err != nil {
+		return false
+	}
+	return strings.TrimSpace(string(b)) == "true"
+}
+
 func remoteFromGitConfig() string {
 	b, err := exec.Command("git", "config", "heroku.remote").Output()
 	if err != nil {
