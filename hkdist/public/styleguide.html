@@ -275,28 +275,28 @@
             },
             {
               "root": "transfer",
-              "arguments": "[-a <app or remote>] <email>",
-              "comment": "transfer app ownership to a collaborator (extra)"
+              "arguments": "[-a <app or remote>] <email or org name>",
+              "comment": "transfer app ownership to a collaborator or an org (extra)"
             },
             {
               "root": "transfer-accept",
               "arguments": "[-a <app or remote>]",
-              "comment": "accept an inbound app transfer (extra)"
+              "comment": "accept an inbound app transfer request (extra)"
             },
             {
               "root": "transfer-cancel",
               "arguments": "[-a <app or remote>]",
-              "comment": "cancel an outbound app transfer (extra)"
+              "comment": "cancel an outbound app transfer request (extra)"
             },
             {
               "root": "transfer-decline",
               "arguments": "[-a <app or remote>]",
-              "comment": "decline an inbound app transfer (extra)"
+              "comment": "decline an inbound app transfer request (extra)"
             },
             {
               "root": "transfers",
               "arguments": "[-a <app or remote>]",
-              "comment": "list existing app transfers (extra)"
+              "comment": "list existing app transfer requests (extra)"
             },
             {
               "root": "url",
@@ -460,6 +460,16 @@
             }
           ],
           "title": "misc"
+        },
+        {
+          "commands": [
+            {
+              "root": "orgs",
+              "arguments": "",
+              "comment": "list Heroku orgs"
+            }
+          ],
+          "title": "orgs"
         },
         {
           "commands": [

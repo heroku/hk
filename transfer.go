@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/bgentry/heroku-go"
@@ -11,10 +12,22 @@ import (
 
 var cmdTransfer = &Command{
 	Run:      runTransfer,
-	Usage:    "transfer <email>",
+	Usage:    "transfer <email or org name>",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "transfer app ownership to a collaborator" + extra,
+	Short:    "transfer app ownership to a collaborator or an org" + extra,
+	Long: `
+Transfer an app's ownership to a collaborator or a Heroku
+organization.
+
+Examples:
+
+    $ hk transfer user@test.com
+    Requested transfer of myapp to user@test.com.
+
+    $ hk transfer myorg
+    Transferred ownership of myapp to myorg.
+`,
 }
 
 func runTransfer(cmd *Command, args []string) {
@@ -24,9 +37,32 @@ func runTransfer(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	recipient := args[0]
-	xfer, err := client.AppTransferCreate(appname, recipient)
-	must(err)
-	log.Printf("Requested transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
+
+	// get app info
+	app, err := client.AppInfo(appname)
+	if err != nil {
+		// Unfortunately, the API makes us rely on this hack to know which app
+		// transfer endpoint to use (orgs or non-orgs). If we get a proper error
+		// back from the API, then we just have to assume that we should use the
+		// Orgs endpoint on this request (which may yet fail, if the app name is
+		// misspelled or the user doesn't have permissions).
+		if _, ok := err.(heroku.Error); !ok {
+			printFatal(err.Error())
+		}
+	}
+
+	// if this user is the owner AND they're transferring to another user (email)
+	// then we use the regular app transfer endpoint, otherwise use the org
+	// endpoint.
+	if err == nil && app.Owner.Email == client.Username && strings.Contains(recipient, "@") {
+		xfer, err := client.AppTransferCreate(appname, recipient)
+		must(err)
+		log.Printf("Requested transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)
+	} else {
+		_, err := client.OrganizationAppTransferToAccount(appname, recipient)
+		must(err)
+		log.Printf("Transferred ownership of %s to %s.", appname, recipient)
+	}
 }
 
 var cmdTransfers = &Command{
@@ -34,7 +70,7 @@ var cmdTransfers = &Command{
 	Usage:    "transfers",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "list existing app transfers" + extra,
+	Short:    "list existing app transfer requests" + extra,
 }
 
 func runTransfers(cmd *Command, args []string) {
@@ -67,7 +103,7 @@ var cmdTransferAccept = &Command{
 	Usage:    "transfer-accept",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "accept an inbound app transfer" + extra,
+	Short:    "accept an inbound app transfer request" + extra,
 }
 
 func runTransferAccept(cmd *Command, args []string) {
@@ -85,7 +121,7 @@ var cmdTransferDecline = &Command{
 	Usage:    "transfer-decline",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "decline an inbound app transfer" + extra,
+	Short:    "decline an inbound app transfer request" + extra,
 }
 
 func runTransferDecline(cmd *Command, args []string) {
@@ -103,7 +139,7 @@ var cmdTransferCancel = &Command{
 	Usage:    "transfer-cancel",
 	NeedsApp: true,
 	Category: "app",
-	Short:    "cancel an outbound app transfer" + extra,
+	Short:    "cancel an outbound app transfer request" + extra,
 }
 
 func runTransferCancel(cmd *Command, args []string) {
