@@ -280,6 +280,18 @@ _hk-access() {
   _hk_complete_only_app_flag
 }
 
+_hk-access-add() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
+_hk-access-remove() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-addons() {
   # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
