@@ -4,7 +4,6 @@ import (
 	"os"
 	"sort"
 	"text/tabwriter"
-	"time"
 
 	"github.com/bgentry/heroku-go"
 )
@@ -35,69 +34,27 @@ func runAccess(cmd *Command, args []string) {
 		cmd.PrintUsage()
 		os.Exit(2)
 	}
-	ma := getMergedAccess(mustApp())
-	for _, m := range ma {
+
+	// Org collaborators works for all apps and gives us exactly the data we need.
+	orgCollaborators, err := client.OrganizationAppCollaboratorList(mustApp(), nil)
+	must(err)
+
+	sort.Sort(accessByRoleAndEmail(orgCollaborators))
+	for _, oc := range orgCollaborators {
 		listRec(w,
-			m.User,
-			m.Role,
-			prettyTime{m.Time},
+			oc.User.Email,
+			oc.Role,
+			prettyTime{oc.UpdatedAt},
 		)
 	}
 }
 
-type mergedAccess struct {
-	User string
-	Role string
-	Time time.Time
-}
+type accessByRoleAndEmail []heroku.OrganizationAppCollaborator
 
-func getMergedAccess(appname string) []*mergedAccess {
-	var collaborators []heroku.Collaborator
-	var app *heroku.App
-	ch := make(chan error)
-	go func() {
-		var err error
-		collaborators, err = client.CollaboratorList(appname, nil)
-		ch <- err
-	}()
-	go func() {
-		var err error
-		app, err = client.AppInfo(appname)
-		ch <- err
-	}()
-	if err := <-ch; err != nil {
-		printFatal(err.Error())
-	}
-	if err := <-ch; err != nil {
-		printFatal(err.Error())
-	}
-	return mergeAccess(app, collaborators)
-}
-
-type accessByRoleAndUser []*mergedAccess
-
-func (a accessByRoleAndUser) Len() int      { return len(a) }
-func (a accessByRoleAndUser) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a accessByRoleAndUser) Less(i, j int) bool {
-	return a[i].Role == "owner" || a[i].User < a[j].User
-}
-
-func mergeAccess(app *heroku.App, collaborators []heroku.Collaborator) (ma []*mergedAccess) {
-	// User, Role, Time
-	for _, c := range collaborators {
-		role := "collaborator"
-		if app.Owner.Email == c.User.Email {
-			role = "owner"
-		}
-		m := &mergedAccess{
-			User: c.User.Email,
-			Role: role,
-			Time: c.UpdatedAt,
-		}
-		ma = append(ma, m)
-	}
-	sort.Sort(accessByRoleAndUser(ma))
-	return ma
+func (a accessByRoleAndEmail) Len() int      { return len(a) }
+func (a accessByRoleAndEmail) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a accessByRoleAndEmail) Less(i, j int) bool {
+	return a[i].Role == "owner" || a[i].User.Email < a[j].User.Email
 }
 
 var cmdAccessAdd = &Command{
