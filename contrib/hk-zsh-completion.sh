@@ -451,6 +451,12 @@ _hk-info() {
   _hk_complete_only_app_flag
 }
 
+_hk-log() {
+  # TODO: other optional args besides app flag
+  local curcontext=$curcontext state line ret=1
+  _hk_complete_only_app_flag
+}
+
 _hk-maintenance() {
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
