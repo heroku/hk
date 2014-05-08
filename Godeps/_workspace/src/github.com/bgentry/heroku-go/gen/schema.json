@@ -2036,6 +2036,14 @@
         "object"
       ],
       "definitions": {
+        "comment": {
+          "description": "comment on the key",
+          "example": "username@host",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
         "created_at": {
           "description": "when key was created",
           "example": "2012-01-01T12:00:00Z",
@@ -2046,9 +2054,9 @@
           ]
         },
         "email": {
-          "description": "email address provided in key contents",
-          "example": "username@example.com",
-          "format": "email",
+          "deprecated": true,
+          "description": "deprecated. Please refer to 'comment' instead",
+          "example": "username@host",
           "readOnly": true,
           "type": [
             "string"
@@ -2143,6 +2151,9 @@
         }
       ],
       "properties": {
+        "comment": {
+          "$ref": "#/definitions/key/definitions/comment"
+        },
         "created_at": {
           "$ref": "#/definitions/key/definitions/created_at"
         },
@@ -3234,6 +3245,13 @@
           "title": "List"
         },
         {
+          "description": "Info for an organization app.",
+          "href": "/organizations/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}",
+          "method": "GET",
+          "rel": "self",
+          "title": "Info"
+        },
+        {
           "description": "Lock or unlock an organization app.",
           "href": "/organizations/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}",
           "method": "PATCH",
@@ -3322,17 +3340,15 @@
         "name": {
           "$ref": "#/definitions/app/definitions/name"
         },
-        "owner": {
-          "description": "identity of app owner",
+        "organization": {
+          "description": "organization that owns this app",
           "properties": {
-            "email": {
-              "$ref": "#/definitions/account/definitions/email"
-            },
-            "id": {
-              "$ref": "#/definitions/account/definitions/id"
+            "name": {
+              "$ref": "#/definitions/organization/definitions/name"
             }
           },
           "type": [
+            "null",
             "object"
           ]
         },

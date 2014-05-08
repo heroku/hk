@@ -38,11 +38,10 @@ type OrganizationApp struct {
 	// unique name of app
 	Name string `json:"name"`
 
-	// identity of app owner
-	Owner struct {
-		Email string `json:"email"`
-		Id    string `json:"id"`
-	} `json:"owner"`
+	// organization that owns this app
+	Organization *struct {
+		Name string `json:"name"`
+	} `json:"organization"`
 
 	// identity of app region
 	Region struct {
@@ -112,6 +111,14 @@ func (c *Client) OrganizationAppList(organizationIdentity string, lr *ListRange)
 
 	var organizationAppsRes []OrganizationApp
 	return organizationAppsRes, c.DoReq(req, &organizationAppsRes)
+}
+
+// Info for an organization app.
+//
+// appIdentity is the unique identifier of the OrganizationApp's App.
+func (c *Client) OrganizationAppInfo(appIdentity string) (*OrganizationApp, error) {
+	var organizationApp OrganizationApp
+	return &organizationApp, c.Get(&organizationApp, "/organizations/apps/"+appIdentity)
 }
 
 // Lock or unlock an organization app.

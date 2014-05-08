@@ -39,22 +39,13 @@ func runTransfer(cmd *Command, args []string) {
 	recipient := args[0]
 
 	// get app info
-	app, err := client.AppInfo(appname)
-	if err != nil {
-		// Unfortunately, the API makes us rely on this hack to know which app
-		// transfer endpoint to use (orgs or non-orgs). If we get a proper error
-		// back from the API, then we just have to assume that we should use the
-		// Orgs endpoint on this request (which may yet fail, if the app name is
-		// misspelled or the user doesn't have permissions).
-		if _, ok := err.(heroku.Error); !ok {
-			printFatal(err.Error())
-		}
-	}
+	app, err := client.OrganizationAppInfo(appname)
+	must(err)
 
-	// if this user is the owner AND they're transferring to another user (email)
+	// if this app has no org AND it's being transferred to another user (email)
 	// then we use the regular app transfer endpoint, otherwise use the org
 	// endpoint.
-	if err == nil && app.Owner.Email == client.Username && strings.Contains(recipient, "@") {
+	if app.Organization == nil && strings.Contains(recipient, "@") {
 		xfer, err := client.AppTransferCreate(appname, recipient)
 		must(err)
 		log.Printf("Requested transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)

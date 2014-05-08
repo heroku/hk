@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"github.com/bgentry/heroku-go"
 )
@@ -37,7 +38,7 @@ func init() {
 func runApps(cmd *Command, names []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
-	var apps []heroku.App
+	var apps []hkapp
 	if len(names) == 0 {
 		var err error
 		apps, err = getAppList(flagOrgName)
@@ -64,7 +65,7 @@ func runApps(cmd *Command, names []string) {
 				printFatal(err.Error())
 			case app := <-appch:
 				if app != nil {
-					apps = append(apps, *app)
+					apps = append(apps, fromApp(*app))
 				}
 			}
 		}
@@ -72,7 +73,7 @@ func runApps(cmd *Command, names []string) {
 	printAppList(w, apps)
 }
 
-func getAppList(orgName string) ([]heroku.App, error) {
+func getAppList(orgName string) ([]hkapp, error) {
 	if orgName != "" {
 		apps, err := client.OrganizationAppList(orgName, &heroku.ListRange{Field: "name", Max: 1000})
 		if err != nil {
@@ -81,10 +82,14 @@ func getAppList(orgName string) ([]heroku.App, error) {
 		return fromOrgApps(apps), nil
 	}
 
-	return client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
+	apps, err := client.AppList(&heroku.ListRange{Field: "name", Max: 1000})
+	if err != nil {
+		return nil, err
+	}
+	return fromApps(apps), nil
 }
 
-func printAppList(w io.Writer, apps []heroku.App) {
+func printAppList(w io.Writer, apps []hkapp) {
 	sort.Sort(appsByName(apps))
 	abbrevEmailApps(apps)
 	for _, a := range apps {
@@ -94,12 +99,14 @@ func printAppList(w io.Writer, apps []heroku.App) {
 	}
 }
 
-func abbrevEmailApps(apps []heroku.App) {
+func abbrevEmailApps(apps []hkapp) {
 	domains := make(map[string]int)
 	for _, a := range apps {
-		parts := strings.SplitN(a.Owner.Email, "@", 2)
-		if len(parts) == 2 {
-			domains["@"+parts[1]]++
+		if a.Organization != "" {
+			parts := strings.SplitN(a.OwnerEmail, "@", 2)
+			if len(parts) == 2 {
+				domains["@"+parts[1]]++
+			}
 		}
 	}
 	smax, nmax := "", 0
@@ -110,34 +117,96 @@ func abbrevEmailApps(apps []heroku.App) {
 		}
 	}
 	for i := range apps {
-		// reference the app directly in the slice so we're not modifying a copy
-		if strings.HasSuffix(apps[i].Owner.Email, smax) {
-			apps[i].Owner.Email = apps[i].Owner.Email[:len(apps[i].Owner.Email)-len(smax)]
+		if apps[i].Organization != "" {
+			// reference the app directly in the slice so we're not modifying a copy
+			if strings.HasSuffix(apps[i].OwnerEmail, smax) {
+				apps[i].OwnerEmail = apps[i].OwnerEmail[:len(apps[i].OwnerEmail)-len(smax)]
+			}
 		}
 	}
 }
 
-func listApp(w io.Writer, a heroku.App) {
+func listApp(w io.Writer, a hkapp) {
 	t := a.CreatedAt
 	if a.ReleasedAt != nil {
 		t = *a.ReleasedAt
 	}
+	orgOrEmail := a.Organization
+	if orgOrEmail == "" {
+		orgOrEmail = a.OwnerEmail
+	}
 	listRec(w,
 		a.Name,
-		abbrev(a.Owner.Email, 20),
-		a.Region.Name,
+		abbrev(orgOrEmail, 20),
+		a.Region,
 		prettyTime{t},
 	)
 }
 
-type appsByName []heroku.App
+type appsByName []hkapp
 
 func (a appsByName) Len() int           { return len(a) }
 func (a appsByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a appsByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
-func fromOrgApp(oapp heroku.OrganizationApp) (happ heroku.App) {
-	return heroku.App{
+type hkapp struct {
+	ArchivedAt                   *time.Time
+	BuildpackProvidedDescription *string
+	CreatedAt                    time.Time
+	GitURL                       string
+	Id                           string
+	Maintenance                  bool
+	Name                         string
+	Organization                 string
+	OwnerEmail                   string
+	Region                       string
+	ReleasedAt                   *time.Time
+	RepoSize                     *int
+	SlugSize                     *int
+	Stack                        string
+	UpdatedAt                    time.Time
+	WebURL                       string
+}
+
+func fromApp(app heroku.App) (happ hkapp) {
+	orgName := ""
+	if strings.HasSuffix(app.Owner.Email, "@herokumanager.com") {
+		orgName = strings.TrimSuffix(app.Owner.Email, "@herokumanager.com")
+	}
+	return hkapp{
+		ArchivedAt:                   app.ArchivedAt,
+		BuildpackProvidedDescription: app.BuildpackProvidedDescription,
+		CreatedAt:                    app.CreatedAt,
+		GitURL:                       app.GitURL,
+		Id:                           app.Id,
+		Maintenance:                  app.Maintenance,
+		Name:                         app.Name,
+		Organization:                 orgName,
+		OwnerEmail:                   app.Owner.Email,
+		Region:                       app.Region.Name,
+		ReleasedAt:                   app.ReleasedAt,
+		RepoSize:                     app.RepoSize,
+		SlugSize:                     app.SlugSize,
+		Stack:                        app.Stack.Name,
+		UpdatedAt:                    app.UpdatedAt,
+		WebURL:                       app.WebURL,
+	}
+}
+
+func fromApps(apps []heroku.App) (happs []hkapp) {
+	happs = make([]hkapp, len(apps))
+	for i := range apps {
+		happs[i] = fromApp(apps[i])
+	}
+	return
+}
+
+func fromOrgApp(oapp heroku.OrganizationApp) (happ hkapp) {
+	orgName := ""
+	if oapp.Organization != nil {
+		orgName = oapp.Organization.Name
+	}
+	return hkapp{
 		ArchivedAt:                   oapp.ArchivedAt,
 		BuildpackProvidedDescription: oapp.BuildpackProvidedDescription,
 		CreatedAt:                    oapp.CreatedAt,
@@ -145,21 +214,21 @@ func fromOrgApp(oapp heroku.OrganizationApp) (happ heroku.App) {
 		Id:                           oapp.Id,
 		Maintenance:                  oapp.Maintenance,
 		Name:                         oapp.Name,
-		Owner:                        oapp.Owner,
-		Region:                       oapp.Region,
+		Organization:                 orgName,
+		Region:                       oapp.Region.Name,
 		ReleasedAt:                   oapp.ReleasedAt,
 		RepoSize:                     oapp.RepoSize,
 		SlugSize:                     oapp.SlugSize,
-		Stack:                        oapp.Stack,
+		Stack:                        oapp.Stack.Name,
 		UpdatedAt:                    oapp.UpdatedAt,
 		WebURL:                       oapp.WebURL,
 	}
 }
 
-func fromOrgApps(oapps []heroku.OrganizationApp) (apps []heroku.App) {
-	apps = make([]heroku.App, len(oapps))
+func fromOrgApps(oapps []heroku.OrganizationApp) (happs []hkapp) {
+	happs = make([]hkapp, len(oapps))
 	for i := range oapps {
-		apps[i] = fromOrgApp(oapps[i])
+		happs[i] = fromOrgApp(oapps[i])
 	}
 	return
 }

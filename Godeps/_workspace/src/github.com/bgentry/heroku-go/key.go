@@ -11,10 +11,13 @@ import (
 // Keys represent public SSH keys associated with an account and are used to
 // authorize accounts as they are performing git operations.
 type Key struct {
+	// comment on the key
+	Comment string `json:"comment"`
+
 	// when key was created
 	CreatedAt time.Time `json:"created_at"`
 
-	// email address provided in key contents
+	// deprecated. Please refer to 'comment' instead
 	Email string `json:"email"`
 
 	// a unique identifying string based on contents
