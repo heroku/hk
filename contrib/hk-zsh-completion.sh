@@ -452,9 +452,16 @@ _hk-info() {
 }
 
 _hk-log() {
-  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
-  _hk_complete_only_app_flag
+
+  _arguments -C -S \
+    $app_flag \
+    '(-n --number)'{-n,--number=}'[print at most N log lines]:: :' \
+    '(-s --source)'{-s,--source=}'[filter log source]:: :(heroku app)' \
+    '(-d --dyno)'{-d,--dyno=}'[filter dyno or process type]:: :' \
+  && ret=0
+
+  return ret
 }
 
 _hk-maintenance() {
