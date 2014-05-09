@@ -8,6 +8,7 @@ import (
 
 type DB struct {
 	Id     string
+	Name   string
 	Plan   string
 	client *Client
 }

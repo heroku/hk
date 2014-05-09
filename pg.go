@@ -10,7 +10,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/bgentry/heroku-go"
-	"github.com/heroku/hk/postgresql"
 )
 
 var cmdPgList = &Command{
@@ -158,16 +157,16 @@ func runPgInfo(cmd *Command, args []string) {
 	printPgInfo(addonName, dbi, &addonMap)
 }
 
-func printPgInfo(name string, dbi postgresql.DBInfo, addonMap *pgAddonMap) {
+func printPgInfo(name string, dbi fullDBInfo, addonMap *pgAddonMap) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
-	listRec(w, "Name:", name)
-	envNames := strings.Join(addonMap.FindEnvsFromValue(dbi.ResourceURL), ", ")
+	listRec(w, "Name:", dbi.Name)
+	envNames := strings.Join(addonMap.FindEnvsFromValue(dbi.DBInfo.ResourceURL), ", ")
 	listRec(w, "Env Vars:", envNames)
 
 	// List info items returned by PG API
-	for _, ie := range dbi.Info {
+	for _, ie := range dbi.DBInfo.Info {
 		if len(ie.Values) == 0 {
 			listRec(w, ie.Name+":", "none")
 		} else {
@@ -237,10 +236,10 @@ func runPgUnfollow(cmd *Command, args []string) {
 	addonName := ensurePrefix(args[0], hpgAddonName()+"-")
 
 	db, dbi, addonMap := mustGetDBInfoAndAddonMap(addonName, appname)
-	if !dbi.IsFollower() {
+	if !dbi.DBInfo.IsFollower() {
 		printFatal("%s is not following another database.", addonName)
 	}
-	parentName := getResolvedInfoValue(dbi, "Following", &addonMap)
+	parentName := getResolvedInfoValue(dbi.DBInfo, "Following", &addonMap)
 
 	printWarning("%s on %s will permanently stop following %s.", addonName, appname, parentName)
 	warning := fmt.Sprintf("This cannot be undone. Please type %q to continue:", args[0])

@@ -75,7 +75,11 @@ func (c *Client) Put(isStarterPlan bool, path string, v interface{}) error {
 
 // Creates a new DB struct initialized with this Client.
 func (c *Client) NewDB(id, plan string) DB {
-	return DB{Id: id, Plan: strings.TrimLeft(plan, "heroku-postgresql:"), client: c}
+	return DB{
+		Id:     id,
+		Plan:   strings.TrimLeft(plan, "heroku-postgresql:"),
+		client: c,
+	}
 }
 
 // Generates an HTTP request for the Heroku Postgres API, but does not

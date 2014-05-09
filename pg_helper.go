@@ -105,7 +105,7 @@ func newPgAddonMap(addons []heroku.Addon, appConf map[string]string) pgAddonMap 
 // Fetches an app's addon list and config, and returns the postgres database
 // info (and addon map) for the database specified by addonName. If addonName is
 // "", default to whichever addon matches DATABASE_URL, if any.
-func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, postgresql.DBInfo, pgAddonMap) {
+func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, fullDBInfo, pgAddonMap) {
 	// fetch app's config concurrently in case we need to resolve DB names
 	var appConf map[string]string
 	confch := make(chan map[string]string, 1)
@@ -168,7 +168,7 @@ func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, postgre
 		waitForAddonMap() // might not have this yet if addonName was "" to start
 	}
 
-	return db, dbi, addonMap
+	return db, fullDBInfo{Name: addonName, DBInfo: dbi}, addonMap
 }
 
 type fullDBInfo struct {
