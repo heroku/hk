@@ -96,7 +96,7 @@ func runAccessAdd(cmd *Command, args []string) {
 	user := args[0]
 
 	var err error
-	if isOrgApp(appname) {
+	if isAppInOrg(mustGetOrgApp(appname)) {
 		opts := heroku.OrganizationAppCollaboratorCreateOpts{Silent: &flagSilent}
 		_, err = client.OrganizationAppCollaboratorCreate(appname, user, &opts)
 	} else {
@@ -131,7 +131,7 @@ func runAccessRemove(cmd *Command, args []string) {
 	}
 	user := args[0]
 
-	if isOrgApp(appname) {
+	if isAppInOrg(mustGetOrgApp(appname)) {
 		must(client.OrganizationAppCollaboratorDelete(appname, user))
 	} else {
 		must(client.CollaboratorDelete(appname, user))
