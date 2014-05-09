@@ -102,6 +102,9 @@ func newPgAddonMap(addons []heroku.Addon, appConf map[string]string) pgAddonMap 
 	return pgAddonMap{m, appConf}
 }
 
+// Fetches an app's addon list and config, and returns the postgres database
+// info (and addon map) for the database specified by addonName. If addonName is
+// "", default to whichever addon matches DATABASE_URL, if any.
 func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, postgresql.DBInfo, pgAddonMap) {
 	// fetch app's config concurrently in case we need to resolve DB names
 	var appConf map[string]string
@@ -119,8 +122,34 @@ func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, postgre
 	addons, err := client.AddonList(appname, nil)
 	must(err)
 
+	// we'll need this from a couple places below
+	var addonMap pgAddonMap
+	waitForAddonMap := func() {
+		select {
+		case appConf = <-confch:
+			addonMap = newPgAddonMap(addons, appConf)
+		case err := <-errch:
+			printFatal(err.Error())
+		}
+	}
+
 	// locate specific addon
 	var addon *heroku.Addon
+	// default to whichever addon is DATABASE_URL if one isn't specified
+	if addonName == "" {
+		// block on getting the addon map since we need it to determine which addon
+		// is the DATABASE_URL
+		waitForAddonMap()
+		dbURL := appConf["DATABASE_URL"]
+		if dbURL == "" {
+			printFatal("app has no DATABASE_URL, please specify a database name")
+		}
+		var ok bool
+		addonName, ok = addonMap.FindAddonFromValue(dbURL)
+		if !ok {
+			printFatal("no addon matches DATABASE_URL")
+		}
+	}
 	for i := range addons {
 		if addons[i].Name == addonName {
 			addon = &addons[i]
@@ -135,13 +164,10 @@ func mustGetDBInfoAndAddonMap(addonName, appname string) (postgresql.DB, postgre
 	dbi, err := db.Info()
 	must(err)
 
-	select {
-	case err := <-errch:
-		printFatal(err.Error())
-	case appConf = <-confch:
+	if appConf == nil {
+		waitForAddonMap() // might not have this yet if addonName was "" to start
 	}
 
-	addonMap := newPgAddonMap(addons, appConf)
 	return db, dbi, addonMap
 }
 
