@@ -281,9 +281,15 @@ _hk-access() {
 }
 
 _hk-access-add() {
-  # TODO: other optional args besides app flag
   local curcontext=$curcontext state line ret=1
-  _hk_complete_only_app_flag
+
+  _arguments -C -S \
+    $app_flag \
+    '(-s --silent)'{-s,--silent}'[add user silently with no email notification]' \
+    '*:user email:' \
+      && ret=0
+
+  return ret
 }
 
 _hk-access-remove() {
