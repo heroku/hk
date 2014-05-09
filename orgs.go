@@ -41,3 +41,12 @@ type orgsByName []heroku.Organization
 func (o orgsByName) Len() int           { return len(o) }
 func (o orgsByName) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 func (o orgsByName) Less(i, j int) bool { return o[i].Name < o[j].Name }
+
+// Fetches the app's info and returns true if the app is in an org, and false
+// otherwise. This function uses must(err), so the program will exit if an error
+// is encountered.
+func isOrgApp(appname string) bool {
+	app, err := client.OrganizationAppInfo(appname)
+	must(err)
+	return app.Organization != nil
+}

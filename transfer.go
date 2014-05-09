@@ -38,14 +38,10 @@ func runTransfer(cmd *Command, args []string) {
 	}
 	recipient := args[0]
 
-	// get app info
-	app, err := client.OrganizationAppInfo(appname)
-	must(err)
-
 	// if this app has no org AND it's being transferred to another user (email)
 	// then we use the regular app transfer endpoint, otherwise use the org
 	// endpoint.
-	if app.Organization == nil && strings.Contains(recipient, "@") {
+	if !isOrgApp(appname) && strings.Contains(recipient, "@") {
 		xfer, err := client.AppTransferCreate(appname, recipient)
 		must(err)
 		log.Printf("Requested transfer of %s to %s.", xfer.App.Name, xfer.Recipient.Email)

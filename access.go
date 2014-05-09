@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"sort"
 	"text/tabwriter"
@@ -73,8 +74,10 @@ Options:
 Examples:
 
     $ hk access-add user@me.com
+    Granted user@me.com access to myapp.
 
     $ hk access-add -s anotheruser@me.com
+    Granted anotheruser@me.com access to myapp.
 `,
 }
 
@@ -90,9 +93,18 @@ func runAccessAdd(cmd *Command, args []string) {
 		cmd.PrintUsage()
 		os.Exit(2)
 	}
-	opts := heroku.CollaboratorCreateOpts{Silent: &flagSilent}
-	_, err := client.CollaboratorCreate(appname, args[0], &opts)
+	user := args[0]
+
+	var err error
+	if isOrgApp(appname) {
+		opts := heroku.OrganizationAppCollaboratorCreateOpts{Silent: &flagSilent}
+		_, err = client.OrganizationAppCollaboratorCreate(appname, user, &opts)
+	} else {
+		opts := heroku.CollaboratorCreateOpts{Silent: &flagSilent}
+		_, err = client.CollaboratorCreate(appname, user, &opts)
+	}
 	must(err)
+	log.Printf("Granted %s access to %s.", user, appname)
 }
 
 var cmdAccessRemove = &Command{
@@ -107,6 +119,7 @@ Remove another Heroku user's access to an app.
 Examples:
 
     $ hk access-remove user@me.com
+    Removed user@me.com from access to myapp.
 `,
 }
 
@@ -116,5 +129,12 @@ func runAccessRemove(cmd *Command, args []string) {
 		cmd.PrintUsage()
 		os.Exit(2)
 	}
-	must(client.CollaboratorDelete(appname, args[0]))
+	user := args[0]
+
+	if isOrgApp(appname) {
+		must(client.OrganizationAppCollaboratorDelete(appname, user))
+	} else {
+		must(client.CollaboratorDelete(appname, user))
+	}
+	log.Printf("Removed %s from access to %s.", user, appname)
 }
