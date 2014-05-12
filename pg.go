@@ -111,17 +111,18 @@ func runPgList(cmd *Command, args []string) {
 
 var cmdPgInfo = &Command{
 	Run:      runPgInfo,
-	Usage:    "pg-info <dbname>",
+	Usage:    "pg-info [<dbname>]",
 	NeedsApp: true,
 	Category: "pg",
 	Short:    "show Heroku Postgres database info" + extra,
 	Long: `
 Pg-info shows general information about a Heroku Postgres
-database.
+database. If no dbname is provided, the command defaults to the
+app's primary database (DATABASE_URL).
 
 Examples:
 
-    $ hk pg-info heroku-postgresql-crimson
+    $ hk pg-info
     Name:         heroku-postgresql-crimson
     Env Vars:     DATABASE_URL, HEROKU_POSTGRESQL_CRIMSON_URL
     Plan:         Crane
@@ -136,6 +137,9 @@ Examples:
     Followers:    none
     Forks:        heroku-postgresql-copper
     Maintenance:  not required
+
+    $ hk pg-info heroku-postgresql-crimson
+    ...
 
     $ hk pg-info crimson
     ...
