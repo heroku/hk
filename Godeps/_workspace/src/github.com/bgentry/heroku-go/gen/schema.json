@@ -3208,6 +3208,14 @@
           "type": [
             "boolean"
           ]
+        },
+        "personal": {
+          "default": false,
+          "description": "force creation of the app in the user account even if a default org is set.",
+          "example": false,
+          "type": [
+            "boolean"
+          ]
         }
       },
       "links": [
@@ -3226,6 +3234,9 @@
               },
               "organization": {
                 "$ref": "#/definitions/organization/definitions/name"
+              },
+              "personal": {
+                "$ref": "#/definitions/organization-app/definitions/personal"
               },
               "region": {
                 "$ref": "#/definitions/region/definitions/name"

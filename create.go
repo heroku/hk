@@ -46,27 +46,14 @@ func runCreate(cmd *Command, args []string) {
 		appname = args[0]
 	}
 
-	if flagOrgName == "personal" { // "personal" means "no org"
-		var opts heroku.AppCreateOpts
-		if flagRegion != "" {
-			opts.Region = &flagRegion
-		}
-		if appname != "" {
-			opts.Name = &appname
-		}
-
-		app, err := client.AppCreate(&opts)
-		must(err)
-		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-		printCreateSuccess(fromApp(*app))
-		return
-	}
-
 	var opts heroku.OrganizationAppCreateOpts
 	if appname != "" {
 		opts.Name = &appname
 	}
-	if flagOrgName != "" {
+	if flagOrgName == "personal" { // "personal" means "no org"
+		personal := true
+		opts.Personal = &personal
+	} else if flagOrgName != "" {
 		opts.Organization = &flagOrgName
 	}
 	if flagRegion != "" {
@@ -76,12 +63,9 @@ func runCreate(cmd *Command, args []string) {
 	app, err := client.OrganizationAppCreate(&opts)
 	must(err)
 	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-	printCreateSuccess(fromOrgApp(*app))
-}
 
-func printCreateSuccess(app hkapp) {
-	if app.Organization != "" {
-		log.Printf("Created %s in the %s org.", app.Name, app.Organization)
+	if app.Organization != nil {
+		log.Printf("Created %s in the %s org.", app.Name, app.Organization.Name)
 	} else {
 		log.Printf("Created %s.", app.Name)
 	}

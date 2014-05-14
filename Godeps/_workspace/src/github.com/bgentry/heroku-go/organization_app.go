@@ -94,6 +94,8 @@ type OrganizationAppCreateOpts struct {
 	Name *string `json:"name,omitempty"`
 	// organization that owns this app
 	Organization *string `json:"organization,omitempty"`
+	// force creation of the app in the user account even if a default org is set.
+	Personal *bool `json:"personal,omitempty"`
 	// identity of app region
 	Region *string `json:"region,omitempty"`
 	// identity of app stack
