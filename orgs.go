@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"os"
-	"sort"
 	"text/tabwriter"
 
 	"github.com/bgentry/heroku-go"
@@ -21,13 +20,12 @@ func runOrgs(cmd *Command, args []string) {
 	w := tabwriter.NewWriter(os.Stdout, 1, 2, 2, ' ', 0)
 	defer w.Flush()
 
-	orgs, err := client.OrganizationList(nil)
+	orgs, err := client.OrganizationList(&heroku.ListRange{Field: "name"})
 	must(err)
 	printOrgsList(w, orgs)
 }
 
 func printOrgsList(w io.Writer, orgs []heroku.Organization) {
-	sort.Sort(orgsByName(orgs))
 	for _, org := range orgs {
 		listRec(w,
 			org.Name,
@@ -35,12 +33,6 @@ func printOrgsList(w io.Writer, orgs []heroku.Organization) {
 		)
 	}
 }
-
-type orgsByName []heroku.Organization
-
-func (o orgsByName) Len() int           { return len(o) }
-func (o orgsByName) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-func (o orgsByName) Less(i, j int) bool { return o[i].Name < o[j].Name }
 
 // Returns true if the app is in an org, and false otherwise.
 func isAppInOrg(app *heroku.OrganizationApp) bool {
