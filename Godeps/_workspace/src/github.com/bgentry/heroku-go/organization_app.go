@@ -43,6 +43,12 @@ type OrganizationApp struct {
 		Name string `json:"name"`
 	} `json:"organization"`
 
+	// identity of app owner
+	Owner *struct {
+		Email string `json:"email"`
+		Id    string `json:"id"`
+	} `json:"owner"`
+
 	// identity of app region
 	Region struct {
 		Id   string `json:"id"`
@@ -71,15 +77,13 @@ type OrganizationApp struct {
 	WebURL string `json:"web_url"`
 }
 
-// Create a new organization app. Use this endpoint instead of the /apps
-// endpoint when you want to create an app that will be owned by an organization
-// in which you are a member, rather than your personal account.
+// Create a new app in the specified organization, in the default organization
+// if unspecified,  or in personal account, if default organization is not set.
 //
-// organizationIdentity is the unique identifier of the OrganizationApp's
-// Organization. options is the struct of optional parameters for this action.
-func (c *Client) OrganizationAppCreate(organizationIdentity string, options *OrganizationAppCreateOpts) (*OrganizationApp, error) {
+// options is the struct of optional parameters for this action.
+func (c *Client) OrganizationAppCreate(options *OrganizationAppCreateOpts) (*OrganizationApp, error) {
 	var organizationAppRes OrganizationApp
-	return &organizationAppRes, c.Post(&organizationAppRes, "/organizations/"+organizationIdentity+"/apps", options)
+	return &organizationAppRes, c.Post(&organizationAppRes, "/organizations/apps", options)
 }
 
 // OrganizationAppCreateOpts holds the optional parameters for OrganizationAppCreate
@@ -88,10 +92,31 @@ type OrganizationAppCreateOpts struct {
 	Locked *bool `json:"locked,omitempty"`
 	// unique name of app
 	Name *string `json:"name,omitempty"`
+	// organization that owns this app
+	Organization *string `json:"organization,omitempty"`
 	// identity of app region
 	Region *string `json:"region,omitempty"`
 	// identity of app stack
 	Stack *string `json:"stack,omitempty"`
+}
+
+// List apps in the default organization, or in personal account, if default
+// organization is not set.
+//
+// lr is an optional ListRange that sets the Range options for the paginated
+// list of results.
+func (c *Client) OrganizationAppList(lr *ListRange) ([]OrganizationApp, error) {
+	req, err := c.NewRequest("GET", "/organizations/apps", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if lr != nil {
+		lr.SetHeader(req)
+	}
+
+	var organizationAppsRes []OrganizationApp
+	return organizationAppsRes, c.DoReq(req, &organizationAppsRes)
 }
 
 // List organization apps.
@@ -99,7 +124,7 @@ type OrganizationAppCreateOpts struct {
 // organizationIdentity is the unique identifier of the OrganizationApp's
 // Organization. lr is an optional ListRange that sets the Range options for the
 // paginated list of results.
-func (c *Client) OrganizationAppList(organizationIdentity string, lr *ListRange) ([]OrganizationApp, error) {
+func (c *Client) OrganizationAppListForOrganization(organizationIdentity string, lr *ListRange) ([]OrganizationApp, error) {
 	req, err := c.NewRequest("GET", "/organizations/"+organizationIdentity+"/apps", nil)
 	if err != nil {
 		return nil, err

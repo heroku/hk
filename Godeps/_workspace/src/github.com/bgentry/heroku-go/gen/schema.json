@@ -3212,8 +3212,8 @@
       },
       "links": [
         {
-          "description": "Create a new organization app. Use this endpoint instead of the `/apps` endpoint when you want to create an app that will be owned by an organization in which you are a member, rather than your personal account.",
-          "href": "/organizations/{(%23%2Fdefinitions%2Forganization%2Fdefinitions%2Fidentity)}/apps",
+          "description": "Create a new app in the specified organization, in the default organization if unspecified,  or in personal account, if default organization is not set.",
+          "href": "/organizations/apps",
           "method": "POST",
           "rel": "create",
           "schema": {
@@ -3223,6 +3223,9 @@
               },
               "name": {
                 "$ref": "#/definitions/app/definitions/name"
+              },
+              "organization": {
+                "$ref": "#/definitions/organization/definitions/name"
               },
               "region": {
                 "$ref": "#/definitions/region/definitions/name"
@@ -3238,11 +3241,18 @@
           "title": "Create"
         },
         {
+          "description": "List apps in the default organization, or in personal account, if default organization is not set.",
+          "href": "/organizations/apps",
+          "method": "GET",
+          "rel": "instances",
+          "title": "List"
+        },
+        {
           "description": "List organization apps.",
           "href": "/organizations/{(%23%2Fdefinitions%2Forganization%2Fdefinitions%2Fidentity)}/apps",
           "method": "GET",
           "rel": "instances",
-          "title": "List"
+          "title": "List For Organization"
         },
         {
           "description": "Info for an organization app.",
@@ -3345,6 +3355,21 @@
           "properties": {
             "name": {
               "$ref": "#/definitions/organization/definitions/name"
+            }
+          },
+          "type": [
+            "null",
+            "object"
+          ]
+        },
+        "owner": {
+          "description": "identity of app owner",
+          "properties": {
+            "email": {
+              "$ref": "#/definitions/account/definitions/email"
+            },
+            "id": {
+              "$ref": "#/definitions/account/definitions/id"
             }
           },
           "type": [

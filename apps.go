@@ -75,7 +75,7 @@ func runApps(cmd *Command, names []string) {
 
 func getAppList(orgName string) ([]hkapp, error) {
 	if orgName != "" {
-		apps, err := client.OrganizationAppList(orgName, &heroku.ListRange{Field: "name", Max: 1000})
+		apps, err := client.OrganizationAppListForOrganization(orgName, &heroku.ListRange{Field: "name", Max: 1000})
 		if err != nil {
 			return nil, err
 		}

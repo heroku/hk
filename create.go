@@ -46,22 +46,7 @@ func runCreate(cmd *Command, args []string) {
 		appname = args[0]
 	}
 
-	orgName := ""
-	if flagOrgName == "" {
-		// check for default org
-		orgs, err := client.OrganizationList(nil)
-		must(err)
-		for _, org := range orgs {
-			if org.Default {
-				orgName = org.Name
-				break
-			}
-		}
-	} else if flagOrgName != "personal" { // "personal" means "no org"
-		orgName = flagOrgName
-	}
-
-	if orgName == "" {
+	if flagOrgName == "personal" { // "personal" means "no org"
 		var opts heroku.AppCreateOpts
 		if flagRegion != "" {
 			opts.Region = &flagRegion
@@ -73,19 +58,31 @@ func runCreate(cmd *Command, args []string) {
 		app, err := client.AppCreate(&opts)
 		must(err)
 		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-		log.Printf("Created %s.", app.Name)
-	} else {
-		var opts heroku.OrganizationAppCreateOpts
-		if flagRegion != "" {
-			opts.Region = &flagRegion
-		}
-		if appname != "" {
-			opts.Name = &appname
-		}
+		printCreateSuccess(fromApp(*app))
+		return
+	}
 
-		app, err := client.OrganizationAppCreate(orgName, &opts)
-		must(err)
-		exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
-		log.Printf("Created %s in the %s org.", app.Name, orgName)
+	var opts heroku.OrganizationAppCreateOpts
+	if appname != "" {
+		opts.Name = &appname
+	}
+	if flagOrgName != "" {
+		opts.Organization = &flagOrgName
+	}
+	if flagRegion != "" {
+		opts.Region = &flagRegion
+	}
+
+	app, err := client.OrganizationAppCreate(&opts)
+	must(err)
+	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
+	printCreateSuccess(fromOrgApp(*app))
+}
+
+func printCreateSuccess(app hkapp) {
+	if app.Organization != "" {
+		log.Printf("Created %s in the %s org.", app.Name, app.Organization)
+	} else {
+		log.Printf("Created %s.", app.Name)
 	}
 }
