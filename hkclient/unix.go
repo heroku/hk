@@ -2,7 +2,10 @@
 
 package hkclient
 
-import "os"
+import (
+	"os"
+	"os/user"
+)
 
 const netrcFilename = ".netrc"
 
@@ -13,5 +16,9 @@ const netrcFilename = ".netrc"
 //
 // http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 func homePath() string {
-	return os.Getenv("HOME")
+	u, err := user.Current()
+	if err != nil {
+		return os.Getenv("HOME")
+	}
+	return u.HomeDir
 }
