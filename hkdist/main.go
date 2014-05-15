@@ -34,14 +34,15 @@ import (
 )
 
 var (
-	distURL      = os.Getenv("DISTURL")
-	s3DistURL    = os.Getenv("S3DISTURL")
-	s3PatchURL   = os.Getenv("S3PATCHURL")
-	buildName    = os.Getenv("BUILDNAME")
-	netrcPath    = filepath.Join(os.Getenv("HOME"), ".netrc")
-	buildbranch  = os.Getenv("BUILDBRANCH")
-	hkgenAppName = os.Getenv("HKGENAPPNAME")
-	s3keys       = s3.Keys{
+	gonativeGoPath = os.Getenv("GONATIVE_GOPATH")
+	distURL        = os.Getenv("DISTURL")
+	s3DistURL      = os.Getenv("S3DISTURL")
+	s3PatchURL     = os.Getenv("S3PATCHURL")
+	buildName      = os.Getenv("BUILDNAME")
+	netrcPath      = filepath.Join(os.Getenv("HOME"), ".netrc")
+	buildbranch    = os.Getenv("BUILDBRANCH")
+	hkgenAppName   = os.Getenv("HKGENAPPNAME")
+	s3keys         = s3.Keys{
 		AccessKey: os.Getenv("S3_ACCESS_KEY"),
 		SecretKey: os.Getenv("S3_SECRET_KEY"),
 	}

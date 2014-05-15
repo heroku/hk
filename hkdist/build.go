@@ -29,7 +29,6 @@ var allPlatforms = []string{
 	"darwin-amd64",
 	"freebsd-386",
 	"freebsd-amd64",
-	"freebsd-arm",
 	"linux-386",
 	"linux-amd64",
 	"linux-arm",
@@ -61,6 +60,7 @@ func cloneRepo(repo, branch, dir string) error {
 }
 
 func build(args []string) {
+	mustHaveEnv("GONATIVE_GOPATH")
 	mustHaveEnv("S3DISTURL")
 	mustHaveEnv("S3PATCHURL")
 	mustHaveEnv("S3_ACCESS_KEY")
@@ -69,6 +69,10 @@ func build(args []string) {
 	mustHaveEnv("BUILDNAME")
 	mustHaveEnv("DISTURL")
 	mustHaveEnv("HKGENAPPNAME")
+
+	// prioritize GONATIVE_GOPATH in PATH so we're building off a native
+	// cross-compiling capable installation
+	os.Setenv("PATH", gonativeGoPath+":"+os.Getenv("PATH"))
 
 	// determine list of platforms to be built
 	platforms := allPlatforms
