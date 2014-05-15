@@ -2,3 +2,4 @@ hk
 *.exe
 *.*~
 *.swp
+.env*
