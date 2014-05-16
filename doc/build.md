@@ -28,35 +28,7 @@ the hkdist executable, hk's build tool and update distribution server.
 ## hkdist Overview
 
 hkdist is hk's build tool and distribution server. It's a subpackage within the
-hk repo.
-
-### Web server
-
-`hkdist web` is the web server for [hk.heroku.com](https://hk.heroku.com). It
-serves intial downloads of hk. It also has an API that tracks hk's versions for
-each OS.
-
-It's this API that hk talks to when it needs to check for an update. If
-there is a new version available, the server will return the new version number
-and the SHA256 hash for the full binary on the given platform.
-
-### Build tool
-
-`hkdist build` runs the cross-compiled builds for hk, which currently must be
-built from a Mac OS X environment. When you run it, it clones a fresh copy of hk
-to the current directory (I usually run from `/tmp`). It then finds the latest
-git tag on the repo to determine which version is the current. It will only
-build from tags of the format `vYYYYMMDD` or `vYYYYMMDD.X`, corresponding to the
-date of the tag and an optional point release for that day (useful if you're
-releasing more than once in a day).
-
-Once it knows which version to build, the tool will build for each platform,
-upload the resulting binary, then generate binary diffs for the past 8 versions.
-The diffs are actually generated in parallel using Heroku apps called `hkgen`
-and `hkgen-staging`.
-
-This command is idempotent, so you can just re-run it if anything goes wrong,
-and it will figure out which steps haven't been completed.
+hk repo. You should read about it in the [hkdist readme](./hkdist/Readme.md).
 
 ## Install a cross-compilation Go environment
 
@@ -97,14 +69,16 @@ etc.
 
 ## Creating a release
 
-### Update commit for staging branch
+### Preparing a staging build
+
+#### Update commit for staging branch
 
 ```
 git co staging
 git rebase master
 ```
 
-### Add a git tag
+#### Add a git tag
 
 GPG signing is not strictly required yet, because there is no verification of
 these signatures, but it's still best practice.
@@ -114,7 +88,7 @@ git tag -sam "fix pg-info display of name when defaulting" v20140509.1
 git push && git push —tags
 ```
 
-### Make staging build
+#### Make staging build
 
 You'll need to export the required environment variables for hkdist to run
 locally. Once you've got those, just `cd /tmp` and run:
@@ -131,7 +105,22 @@ errors during diff generation, because users can still update without those.
 This function is also idempotent, so you can just re-run it if anything goes
 wrong, and it will figure out which steps haven't been completed.
 
-### Update commit for release branch
+#### Optional: verify staging build
+
+If you've made changes that have any chance of affecting the auto-updating
+process, you should definitely verify that you can update and run the staging
+build of hk.
+
+Regardless, it's a good idea to have a copy of the staging build installed so
+you can test with it:
+
+```bash
+L=/usr/local/bin/hks && curl -sL -A "`uname -sp`" https://hkdist-staging.herokuapp.com/hkstaging.gz | zcat >$L && chmod +x $L
+```
+
+### Preparing a staging build
+
+#### Update commit for release branch
 
 ```
 git co release
@@ -139,7 +128,7 @@ git rebase staging
 git push
 ```
 
-## Make production build
+#### Make production build
 
 Just as before, you'll need to export the required environment variables (this
 time for production) and run the following:
@@ -147,3 +136,8 @@ time for production) and run the following:
 ```bash
 $ hkdist build
 ```
+
+#### Verify production release
+
+If you run `hk update`, you should now see it update to the latest hk version
+that you just released.

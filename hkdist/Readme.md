@@ -11,6 +11,44 @@ install [godep](https://github.com/kr/godep) to manage dependencies:
 $ go get github.com/kr/godep
 ```
 
+## Functions of hkdist
+
+### Web server
+
+`hkdist web` is the web server for [hk.heroku.com](https://hk.heroku.com). It
+serves intial downloads of hk. It also has an API that tracks hk's versions for
+each OS.
+
+It's this API that hk talks to when it needs to check for an update. If
+there is a new version available, the server will return the new version number
+and the SHA256 hash for the full binary on the given platform.
+
+### Build tool
+
+`hkdist build` runs the cross-compiled builds for hk. When you run it, it clones
+a fresh copy of hk to the current directory (I usually run from `/tmp`). It then
+finds the latest git tag on the repo to determine which version is the current.
+It will only build from tags of the format `vYYYYMMDD` or `vYYYYMMDD.X`,
+corresponding to the date of the tag and an optional point release for that day
+(useful if you're releasing more than once in a day).
+
+Once it knows which version to build, the tool will build for each platform,
+upload the resulting binary, then generate binary diffs for the past 8 versions.
+The diffs are actually generated in parallel using Heroku apps called `hkgen`
+and `hkgen-staging`.
+
+This command is idempotent, so you can just re-run it if anything goes wrong,
+and it will figure out which steps haven't been completed.
+
+### Diff generation
+
+`hkdist gen` will generate and upload a binary diff (bsdiff) file for the given
+command, on the specified platform, between the two versions specified. Example:
+
+```bash
+$ hkdist gen hkstaging darwin-amd64 v20140501 v20140529
+```
+
 ## environment
 
 ### DISTURL (build)
