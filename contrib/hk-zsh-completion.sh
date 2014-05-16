@@ -485,6 +485,16 @@ _hk-maintenance-enable() {
   _hk_complete_only_app_flag
 }
 
+_hk-members() {
+  local curcontext=$curcontext state line ret=1
+
+  _arguments -w -C -S -s \
+    '1:: :__hk_org_names' \
+   && ret=0
+
+  return ret
+}
+
 _hk-open() {
   local curcontext=$curcontext state line ret=1
   _hk_complete_only_app_flag
