@@ -81,7 +81,8 @@ func main() {
 	} else if os.Args[1] == "web" && len(os.Args) != 2 {
 		usage()
 	} else if os.Args[1] == "gen" && len(os.Args) != 6 {
-		usage()
+		fmt.Fprintln(os.Stderr, "Usage: hkdist gen <cmdname> <platform> <from-version> <to-version>")
+		os.Exit(2)
 	}
 	f := subcmds[os.Args[1]]
 	if f == nil {
