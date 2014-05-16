@@ -146,6 +146,7 @@ var commands = []*Command{
 	cmdMaintenance,
 	cmdMaintenanceEnable,
 	cmdMaintenanceDisable,
+	cmdMembers,
 	cmdOpen,
 	cmdOrgs,
 	cmdPgList,
