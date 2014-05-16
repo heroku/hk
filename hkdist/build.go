@@ -70,10 +70,6 @@ func build(args []string) {
 	mustHaveEnv("DISTURL")
 	mustHaveEnv("HKGENAPPNAME")
 
-	// prioritize GONATIVE_GOPATH in PATH so we're building off a native
-	// cross-compiling capable installation
-	os.Setenv("PATH", gonativeGoPath+":"+os.Getenv("PATH"))
-
 	// determine list of platforms to be built
 	platforms := allPlatforms
 	if len(args) > 0 {
@@ -251,8 +247,19 @@ func (b *Build) build() (err error) {
 	cmd := exec.Command("godep", "go", "build", "-tags", "release", "-o", b.filename())
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
+	// prefix PATH with GONATIVE_GOPATH so we're building off a native
+	// cross-compiling capable installation
+	osEnv := os.Environ()
+	for i := range osEnv {
+		if strings.HasPrefix(osEnv[i], "PATH=") {
+			osEnv[i] = "PATH=" + gonativeGoPath + ":" + strings.TrimPrefix(osEnv[i], "PATH=")
+			break
+		}
+	}
+
 	env := []string{"GOOS=" + b.OS, "GOARCH=" + b.Arch}
-	cmd.Env = append(env, os.Environ()...)
+	cmd.Env = append(env, osEnv...)
 	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("godep go build -tags release: %s", err)
