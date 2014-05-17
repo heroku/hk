@@ -67,8 +67,8 @@ var cmdMemberAdd = &Command{
 	Category: "members",
 	Short:    "add a member to an organization" + extra,
 	Long: `
-Make another Heroku user to an organization. If no role
-is provided, the command defaults to adding the user with
+Add a Heroku user to an organization. If no role is
+provided, the command defaults to adding the user with
 the role "member".
 
 Options:
