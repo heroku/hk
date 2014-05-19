@@ -37,7 +37,7 @@ func (c *Client) OrganizationMemberCreateOrUpdate(organizationIdentity string, e
 		Role:  role,
 	}
 	var organizationMemberRes OrganizationMember
-	return &organizationMemberRes, c.Post(&organizationMemberRes, "/organizations/"+organizationIdentity+"/members", params)
+	return &organizationMemberRes, c.Put(&organizationMemberRes, "/organizations/"+organizationIdentity+"/members", params)
 }
 
 // Remove a member from the organization.
