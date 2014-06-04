@@ -28,7 +28,7 @@ the hkdist executable, hk's build tool and update distribution server.
 ## hkdist Overview
 
 hkdist is hk's build tool and distribution server. It's a subpackage within the
-hk repo. You should read about it in the [hkdist readme](./hkdist/Readme.md).
+hk repo. You should read about it in the [hkdist readme](./../hkdist/Readme.md).
 
 ## Install a cross-compilation Go environment
 
