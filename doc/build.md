@@ -90,7 +90,7 @@ git push && git push —tags
 
 #### Make staging build
 
-You'll need to export the required environment variables for hkdist to run
+You'll need to export the [required environment variables](./staging.md) for hkdist to run
 locally. Once you've got those, just `cd /tmp` and run:
 
 ```bash
@@ -130,7 +130,7 @@ git push
 
 #### Make production build
 
-Just as before, you'll need to export the required environment variables (this
+Just as before, you'll need to export the [required environment variables](./production.md) (this
 time for production) and run the following:
 
 ```bash
