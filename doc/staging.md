@@ -13,4 +13,4 @@ export S3_ACCESS_KEY=xxxxxx
 export S3_SECRET_KEY=xxxxxx
 ```
 
-The `S3DISTURL`, `S3_ACCESS_KEY` and `S3_SECRET_KEY` values can be found on the relevant instance of `hkdist` on Heroku.
+The `S3DISTURL`, `S3_ACCESS_KEY` and `S3_SECRET_KEY` values can be found on the relevant instance of `hkdist-staging` on Heroku.
