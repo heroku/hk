@@ -1,6 +1,6 @@
 # Production configuration
 
-To release a staging version of hk, export the follow variables to the local environment in which you'll be running the `hkdist` command.
+To release a production version of hk, export the follow variables to the local environment in which you'll be running the `hkdist` command.
 
 ```
 export BUILDBRANCH=release
