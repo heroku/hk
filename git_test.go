@@ -25,6 +25,22 @@ func TestGitHost(t *testing.T) {
 	}
 }
 
+func testAppNameFromGitURL(t *testing.T) {
+
+	os.Setenv("HEROKU_GIT_HOST", "heroku\\.com(\\..*)")
+
+	if res := appNameFromGitURL("git@heroku.com.company_name:myapp.git"); res != "company_name" {
+		t.Errorf("expected company_name, got %s", res)
+	}
+
+	os.Setenv("HEROKU_GIT_HOST_REGEX", "heroku(\\..*)\\.com")
+
+	if res := appNameFromGitURL("git@heroku.account.com:myapp.git"); res != "account" {
+		t.Errorf("expected account, got %s", res)
+	}
+
+}
+
 var gitRemoteTestOutput = `
 heroku	git@heroku.com:myappfetch.git (fetch)
 heroku	git@heroku.com:myapp.git (push)
