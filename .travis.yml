@@ -1,6 +1,7 @@
 language: go
 go:
   - 1.2
+  - 1.3
 install:
   - export PATH=$PATH:$HOME/gopath/bin
   - go get -v -u github.com/kr/godep
