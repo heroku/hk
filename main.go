@@ -183,7 +183,7 @@ func initClients() {
 	loadNetrc()
 	suite, err := hkclient.New(nrc, hkAgent)
 	if err != nil {
-		printError(err.Error())
+		printFatal(err.Error())
 	}
 
 	client = suite.Client
