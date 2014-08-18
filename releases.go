@@ -194,7 +194,9 @@ func runReleaseInfo(cmd *Command, args []string) {
 	fmt.Printf("Change:   %s\n", rel.Description)
 	fmt.Printf("When:     %s\n", rel.CreatedAt.UTC().Format(time.RFC3339))
 	fmt.Printf("Id:       %s\n", rel.Id)
-	fmt.Printf("Slug:     %s\n", rel.Slug.Id)
+	if rel.Slug != nil {
+		fmt.Printf("Slug:     %s\n", rel.Slug.Id)
+	}
 }
 
 var cmdRollback = &Command{
