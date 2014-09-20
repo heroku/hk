@@ -92,6 +92,11 @@ func New(nrc *NetRc, agent string) (*Clients, error) {
 
 	herokuAgentSocket := os.Getenv("HEROKU_AGENT_SOCK")
 	if herokuAgentSocket != "" {
+		// expand a tilde (i.e. `~/.heroku-agent.sock`)
+		if herokuAgentSocket[0] == '~' {
+			herokuAgentSocket = homePath() + herokuAgentSocket[1:]
+		}
+
 		tr.Dial = func(_ string, _ string) (net.Conn, error) {
 			sock, err := net.Dial("unix", herokuAgentSocket)
 			if err != nil {
