@@ -2,6 +2,7 @@ package hkclient
 
 import (
 	"crypto/tls"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -54,14 +55,14 @@ func New(nrc *NetRc, agent string) (*Clients, error) {
 		Debug:     debug,
 	}
 
+	tr := http.DefaultTransport.(*http.Transport)
+	ste.Client.HTTP = &http.Client{Transport: tr}
+	ste.PgClient.HTTP = &http.Client{Transport: tr}
+
 	if disableSSLVerify || os.Getenv("HEROKU_SSL_VERIFY") == "disable" {
-		tr := http.DefaultTransport.(*http.Transport)
 		tr.TLSClientConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
-
-		ste.Client.HTTP = &http.Client{Transport: tr}
-		ste.PgClient.HTTP = &http.Client{Transport: tr}
 	}
 	if s := os.Getenv("HEROKU_POSTGRESQL_HOST"); s != "" {
 		ste.PgClient.StarterURL = "https://" + s +
@@ -87,6 +88,20 @@ func New(nrc *NetRc, agent string) (*Clients, error) {
 				strings.TrimSpace(h[i+1:]),
 			)
 		}
+	}
+
+	herokuAgentSocket := os.Getenv("HEROKU_AGENT_SOCK")
+	if herokuAgentSocket != "" {
+		tr.Dial = func(_ string, _ string) (net.Conn, error) {
+			sock, err := net.Dial("unix", herokuAgentSocket)
+			if err != nil {
+				panic(err)
+			}
+			return sock, err
+		}
+
+		ste.Client.HerokuAgentSocket = herokuAgentSocket
+		ste.PgClient.HerokuAgentSocket = herokuAgentSocket
 	}
 
 	return &ste, nil
