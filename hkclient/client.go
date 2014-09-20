@@ -98,11 +98,7 @@ func New(nrc *NetRc, agent string) (*Clients, error) {
 		}
 
 		tr.Dial = func(_ string, _ string) (net.Conn, error) {
-			sock, err := net.Dial("unix", herokuAgentSocket)
-			if err != nil {
-				panic(err)
-			}
-			return sock, err
+			return net.Dial("unix", herokuAgentSocket)
 		}
 
 		ste.Client.HerokuAgentSocket = herokuAgentSocket
