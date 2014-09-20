@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	Version          = "0.10.1"
+	Version          = "0.10.2"
 	DefaultAPIURL    = "https://api.heroku.com"
 	DefaultUserAgent = "heroku-go/" + Version + " (" + runtime.GOOS + "; " + runtime.GOARCH + ")"
 )
@@ -59,6 +59,9 @@ type Client struct {
 	// AdditionalHeaders are extra headers to add to each HTTP request sent by
 	// this Client.
 	AdditionalHeaders http.Header
+
+	// Path to the Unix domain socket or a running heroku-agent.
+	HerokuAgentSocket string
 }
 
 func (c *Client) Get(v interface{}, path string) error {
@@ -132,6 +135,12 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	req, err := http.NewRequest(method, apiURL+path, rbody)
 	if err != nil {
 		return nil, err
+	}
+	// If we're talking to heroku-agent over a local Unix socket, downgrade to
+	// HTTP; heroku-agent will establish a secure connection between itself and
+	// the Heroku API.
+	if c.HerokuAgentSocket != "" {
+		req.URL.Scheme = "http"
 	}
 	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
 	req.Header.Set("Request-Id", uuid.New())
