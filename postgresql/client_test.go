@@ -96,6 +96,19 @@ func TestAdditionalHeaders(t *testing.T) {
 	}
 }
 
+func TestHerokuAgent(t *testing.T) {
+	c := &Client{
+		HerokuAgentSocket: "~/.heroku-agent.sock",
+	}
+	req, err := c.NewRequest(false, "GET", "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if req.URL.Scheme != "http" {
+		t.Error("Expected http scheme, got %s", req.URL.Scheme)
+	}
+}
+
 func TestUserAgent(t *testing.T) {
 	c := &Client{}
 	req, err := c.NewRequest(false, "GET", "/")

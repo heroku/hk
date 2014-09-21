@@ -59,6 +59,9 @@ type Client struct {
 	// AdditionalHeaders are extra headers to add to each HTTP request sent by
 	// this Client.
 	AdditionalHeaders http.Header
+
+	// Path to the Unix domain socket or a running heroku-agent.
+	HerokuAgentSocket string
 }
 
 func (c *Client) Get(isStarterPlan bool, path string, v interface{}) error {
@@ -112,6 +115,12 @@ func (c *Client) NewRequest(isStarterPlan bool, method, path string) (*http.Requ
 	req, err := http.NewRequest(method, apiURL+path, rbody)
 	if err != nil {
 		return nil, err
+	}
+	// If we're talking to heroku-agent over a local Unix socket, downgrade to
+	// HTTP; heroku-agent will establish a secure connection between itself and
+	// the Heorku API.
+	if c.HerokuAgentSocket != "" {
+		req.URL.Scheme = "http"
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Request-Id", uuid.New())
