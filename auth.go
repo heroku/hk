@@ -13,6 +13,52 @@ import (
 	"github.com/heroku/hk/term"
 )
 
+var cmdAuthorize = &Command{
+	Run:      runAuthorize,
+	Usage:    "authorize",
+	Category: "hk",
+	Short:    "procure a temporary privileged token" + extra,
+	Long: `
+Have heroku-agent procure and store a temporary privileged token
+that will bypass any requirement for a second authentication factor.
+
+Example:
+
+    $ hk authorize
+    Enter email: user@test.com
+	Enter two-factor auth code: 
+    Authorization successful.
+`,
+}
+
+func runAuthorize(cmd *Command, args []string) {
+	if len(args) != 0 {
+		cmd.PrintUsage()
+		os.Exit(2)
+	}
+
+	if os.Getenv("HEROKU_AGENT_SOCK") == "" {
+		printFatal("Authorize must be used with heroku-agent; please set " +
+			"HEROKU_AGENT_SOCK")
+	}
+
+	var twoFactorCode string
+	fmt.Printf("Enter two-factor auth code: ")
+	if _, err := fmt.Scanln(&twoFactorCode); err != nil {
+		printFatal("reading two-factor auth code: " + err.Error())
+	}
+
+	client.AdditionalHeaders.Set("Heroku-Two-Factor-Code", twoFactorCode)
+
+	// No-op: GET /apps with max=0. heroku-agent will detect that a two-factor
+	// code was included and attempt to procure a temporary token. This token
+	// will then be re-used automatically on subsequent requests.
+	_, err := client.AppList(&heroku.ListRange{Field: "name", Max: 0})
+	must(err)
+
+	fmt.Println("Authorization successful.")
+}
+
 var cmdCreds = &Command{
 	Run:      runCreds,
 	Usage:    "creds",

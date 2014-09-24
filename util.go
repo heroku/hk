@@ -108,7 +108,10 @@ func fileExists(path string) (bool, error) {
 func must(err error) {
 	if err != nil {
 		if herror, ok := err.(heroku.Error); ok {
-			if herror.Id == "unauthorized" {
+			switch herror.Id {
+			case "two_factor":
+				printFatal(err.Error() + " Authorize with `hk authorize`.")
+			case "unauthorized":
 				printFatal(err.Error() + " Log in with `hk login`.")
 			}
 		}
