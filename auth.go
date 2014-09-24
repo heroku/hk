@@ -50,7 +50,9 @@ func runAuthorize(cmd *Command, args []string) {
 
 	client.AdditionalHeaders.Set("Heroku-Two-Factor-Code", twoFactorCode)
 
-	// no-op: GET /apps with max=0
+	// No-op: GET /apps with max=0. heroku-agent will detect that a two-factor
+	// code was included and attempt to procure a temporary token. This token
+	// will then be re-used automatically on subsequent requests.
 	_, err := client.AppList(&heroku.ListRange{Field: "name", Max: 0})
 	must(err)
 
