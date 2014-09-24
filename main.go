@@ -84,6 +84,7 @@ func (c *Command) ShortExtra() string {
 
 // Running `hk help` will list commands in this order.
 var commands = []*Command{
+	cmdAuthorize,
 	cmdCreate,
 	cmdApps,
 	cmdDynos,
