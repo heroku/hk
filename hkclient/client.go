@@ -55,7 +55,7 @@ func New(nrc *NetRc, agent string) (*Clients, error) {
 		Debug:     debug,
 	}
 
-	tr := http.DefaultTransport.(*http.Transport)
+	tr := &http.Transport{}
 	ste.Client.HTTP = &http.Client{Transport: tr}
 	ste.PgClient.HTTP = &http.Client{Transport: tr}
 
