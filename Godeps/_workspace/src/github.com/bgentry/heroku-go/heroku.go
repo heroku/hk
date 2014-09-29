@@ -152,7 +152,7 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	if ctype != "" {
 		req.Header.Set("Content-Type", ctype)
 	}
-	req.SetBasicAuth(c.Username, c.Password)
+	req.SetBasicAuth("", c.Password)
 	for k, v := range c.AdditionalHeaders {
 		req.Header[k] = v
 	}

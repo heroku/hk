@@ -129,7 +129,7 @@ func (c *Client) NewRequest(isStarterPlan bool, method, path string) (*http.Requ
 		useragent = DefaultUserAgent
 	}
 	req.Header.Set("User-Agent", useragent)
-	req.SetBasicAuth(c.Username, c.Password)
+	req.SetBasicAuth("", c.Password)
 	for k, v := range c.AdditionalHeaders {
 		req.Header[k] = v
 	}

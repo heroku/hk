@@ -92,7 +92,7 @@ func execPlugin(path string, args []string) error {
 	}
 
 	hkuser, hkpass := getCreds(apiURL)
-	u.User = url.UserPassword(hkuser, hkpass)
+	u.User = url.UserPassword("", hkpass)
 	hkapp, _ := app()
 	env := []string{
 		"HEROKU_API_URL=" + u.String(),
