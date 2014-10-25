@@ -21,20 +21,20 @@ const (
 )
 
 func gitHost() string {
-	if herokuGitHost := os.Getenv("HEROKU_GIT_HOST"); herokuGitHost != "" {
-		return herokuGitHost
+	if s := os.Getenv("HEROKU_GIT_HOST"); s != "" {
+		return s
 	}
-	if herokuHost := os.Getenv("HEROKU_HOST"); herokuHost != "" {
-		return herokuHost
+	if s := os.Getenv("HEROKU_HOST"); s != "" {
+		return s
 	}
 	return "heroku.com"
 }
 
 func gitHostRegex() string {
-	if herokuGitHostRegex := os.Getenv("HEROKU_GIT_HOST_REGEX"); herokuGitHostRegex != "" {
-		return herokuGitHostRegex
+	if s := os.Getenv("HEROKU_GIT_HOST_REGEX"); s != "" {
+		return s
 	}
-	return strings.Replace(gitHost(), ".", "\\.", -1)
+	return strings.Replace(gitHost(), ".", `\.`, -1)
 }
 
 func gitURLRegex() (*regexp.Regexp, error) {
@@ -94,13 +94,11 @@ func gitRemotes() (map[string]string, error) {
 
 func appNameFromGitURL(remote string) string {
 	regex, err := gitURLRegex()
-
 	if err != nil {
 		return ""
 	}
 
 	matches := regex.FindStringSubmatch(remote)
-
 	if matches == nil {
 		return ""
 	}
@@ -110,7 +108,6 @@ func appNameFromGitURL(remote string) string {
 	for i, name := range names[0:] {
 		named_matches[name] = matches[i]
 	}
-
 	return named_matches["app_name"]
 }
 
