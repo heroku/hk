@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"os/exec"
+	"regexp"
 	"strings"
 	"syscall"
 )
@@ -20,17 +21,24 @@ const (
 )
 
 func gitHost() string {
-	if herokuGitHost := os.Getenv("HEROKU_GIT_HOST"); herokuGitHost != "" {
-		return herokuGitHost
+	if s := os.Getenv("HEROKU_GIT_HOST"); s != "" {
+		return s
 	}
-	if herokuHost := os.Getenv("HEROKU_HOST"); herokuHost != "" {
-		return herokuHost
+	if s := os.Getenv("HEROKU_HOST"); s != "" {
+		return s
 	}
 	return "heroku.com"
 }
 
-func gitURLPre() string {
-	return "git@" + gitHost() + ":"
+func gitHostRegex() string {
+	if s := os.Getenv("HEROKU_GIT_HOST_REGEX"); s != "" {
+		return s
+	}
+	return strings.Replace(gitHost(), ".", `\.`, -1)
+}
+
+func gitURLRegex() (*regexp.Regexp, error) {
+	return regexp.Compile("git@" + gitHostRegex() + ":(?P<app_name>.*)" + gitURLSuf)
 }
 
 func gitDescribe(rels []*Release) error {
@@ -85,10 +93,22 @@ func gitRemotes() (map[string]string, error) {
 }
 
 func appNameFromGitURL(remote string) string {
-	if !strings.HasPrefix(remote, gitURLPre()) || !strings.HasSuffix(remote, gitURLSuf) {
+	regex, err := gitURLRegex()
+	if err != nil {
 		return ""
 	}
-	return remote[len(gitURLPre()) : len(remote)-len(gitURLSuf)]
+
+	matches := regex.FindStringSubmatch(remote)
+	if matches == nil {
+		return ""
+	}
+
+	names := regex.SubexpNames()
+	named_matches := make(map[string]string)
+	for i, name := range names[0:] {
+		named_matches[name] = matches[i]
+	}
+	return named_matches["app_name"]
 }
 
 func parseGitRemoteOutput(b []byte) (results map[string]string, err error) {
