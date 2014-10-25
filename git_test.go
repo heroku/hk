@@ -25,18 +25,20 @@ func TestGitHost(t *testing.T) {
 	}
 }
 
-func testAppNameFromGitURL(t *testing.T) {
+func TestAppNameFromGitURL(t *testing.T) {
 
-	os.Setenv("HEROKU_GIT_HOST", "heroku\\.com(\\..*)")
+	os.Setenv("HEROKU_GIT_HOST", `heroku\.com(\..*)`)
+	defer os.Setenv("HEROKU_GIT_HOST", "")
 
-	if res := appNameFromGitURL("git@heroku.com.company_name:myapp.git"); res != "company_name" {
-		t.Errorf("expected company_name, got %s", res)
+	if res := appNameFromGitURL("git@heroku.com.company_name:myapp.git"); res != "myapp" {
+		t.Errorf("expected myapp, got %s", res)
 	}
 
-	os.Setenv("HEROKU_GIT_HOST_REGEX", "heroku(\\..*)\\.com")
+	os.Setenv("HEROKU_GIT_HOST_REGEX", `heroku(\..*)\.com`)
+	defer os.Setenv("HEROKU_GIT_HOST_REGEX", "")
 
-	if res := appNameFromGitURL("git@heroku.account.com:myapp.git"); res != "account" {
-		t.Errorf("expected account, got %s", res)
+	if res := appNameFromGitURL("git@heroku.account.com:myapp.git"); res != "myapp" {
+		t.Errorf("expected myapp, got %s", res)
 	}
 
 }
