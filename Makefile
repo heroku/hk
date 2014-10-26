@@ -1,7 +1,7 @@
 .PHONY: default build
 
 default: build
-	./gonpm ${COMMAND}
+	./hk ${COMMAND}
 
 build:
-	go build
+	go build -o hk
