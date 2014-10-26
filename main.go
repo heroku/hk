@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dickeyxxx/gonpm/cli"
-	"github.com/dickeyxxx/gonpm/plugins"
+	"github.com/heroku/hk/cli"
+	"github.com/heroku/hk/plugins"
 )
 
 var topics []*cli.Topic = []*cli.Topic{
@@ -17,7 +17,7 @@ var topics []*cli.Topic = []*cli.Topic{
 func main() {
 	defer handlePanic()
 	plugins.Setup()
-	for _, plugin := range plugins.ListPlugins() {
+	for _, plugin := range plugins.Plugins() {
 		topics = append(topics, plugin.Topic)
 	}
 	topicName, command, args := parse(os.Args[1:])

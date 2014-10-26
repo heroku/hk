@@ -2,17 +2,15 @@ package plugins
 
 import (
 	"os"
-	"os/exec"
 	"strings"
 
-	"github.com/dickeyxxx/gonpm/cli"
+	"github.com/dickeyxxx/gode"
+	"github.com/heroku/hk/cli"
 )
 
 type Plugin struct {
+	*gode.Package
 	*cli.Topic
-	Version  string `json:"version"`
-	From     string `json:"from"`
-	Resolved string `json:"resolved"`
 }
 
 func pluginRun(name string) func(command string, args ...string) {
@@ -21,28 +19,43 @@ func pluginRun(name string) func(command string, args ...string) {
 			"app": "dickey-xxx",
 			"token": "` + os.Getenv("HEROKU_API_KEY") + `"
 		}`
-		runNode(`require('` + name + `').run("` + command + `", [], {}, ` + context + `)`)
+		script := `require('` + name + `').run("` + command + `", [], {}, ` + context + `)`
+		cmd := node.RunScript(script)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		must(cmd.Run())
 	}
 }
 
 func pluginShortHelp(name string) string {
 	script := `console.log(require('` + name + `').shortHelp)`
-	output, err := exec.Command(nodePath, "-e", script).Output()
+	output, err := node.RunScript(script).Output()
 	must(err)
 	return strings.TrimSpace(string(output))
 }
 
 func pluginHelp(name string) func(command string, args ...string) {
 	return func(command string, args ...string) {
-		runNode(`require('` + name + `').help()`)
+		script := `require('` + name + `').help()`
+		cmd := node.RunScript(script)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		must(cmd.Run())
 	}
 }
 
-func runNode(script string) {
-	cmd := exec.Command(nodePath, "-e", script)
-	cmd.Stdout = cli.Stdout
-	cmd.Stderr = cli.Stderr
-	if err := cmd.Run(); err != nil {
-		panic(err)
+func Plugins() []*Plugin {
+	var plugins []*Plugin
+	packages, err := node.Packages()
+	must(err)
+	for _, pkg := range packages {
+		plugin := &Plugin{
+			Package: &pkg,
+			Topic: &cli.Topic{
+				Name: pkg.Name,
+			},
+		}
+		plugins = append(plugins, plugin)
 	}
+	return plugins
 }

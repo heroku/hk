@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/dickeyxxx/gonpm/cli"
+	"github.com/heroku/hk/cli"
 )
 
 func help(command string, args ...string) {

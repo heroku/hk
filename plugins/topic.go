@@ -1,18 +1,11 @@
 package plugins
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/dickeyxxx/gonpm/cli"
+	"github.com/dickeyxxx/gode"
+	"github.com/heroku/hk/cli"
 )
 
-func init() {
-	os.Setenv("NODE_PATH", filepath.Join(cli.AppDir, "lib", "node_modules"))
-	os.Setenv("NPM_CONFIG_GLOBAL", "true")
-	os.Setenv("NPM_CONFIG_PREFIX", cli.AppDir)
-	os.Setenv("NPM_CONFIG_SPINNER", "false")
-}
+var node = gode.NewClient(cli.AppDir)
 
 var Topic = &cli.Topic{
 	Name:      "plugins",
