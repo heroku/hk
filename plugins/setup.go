@@ -7,6 +7,12 @@ func Setup() {
 		return
 	}
 	cli.Stderrf("Setting up plugins... ")
-	node.Setup()
+	must(node.Setup())
 	cli.Stderrln("done")
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

@@ -10,26 +10,21 @@ import (
 	"github.com/heroku/hk/plugins"
 )
 
-var topics []*cli.Topic = []*cli.Topic{
+var topics = cli.NewTopicSet(
 	plugins.Topic,
-}
+)
 
 func main() {
 	defer handlePanic()
 	plugins.Setup()
-	for _, plugin := range plugins.Plugins() {
-		topics = append(topics, plugin.Topic)
+	for _, topic := range plugins.PluginTopics() {
+		topics.AddTopic(topic)
 	}
-	topicName, command, args := parse(os.Args[1:])
-	topic := topicByName(topicName)
-	if topic == nil {
-		help(command, args...)
-		cli.Exit(2)
+	topic, command, args, flags := parse(os.Args[1:])
+	if command == nil {
+		help(os.Args[1:])
 	}
-	cli.Logf("Running %s:%s %s\n", topicName, command, args)
-	before := time.Now()
-	topic.Run(command, args...)
-	cli.Logf("Finished in %s\n", (time.Since(before)))
+	runCommand(topic, command, args, flags)
 }
 
 func handlePanic() {
@@ -38,32 +33,35 @@ func handlePanic() {
 		case int:
 			// This is for when we stub out ctx.Exit
 			panic(e)
-		default:
-			cli.Logf("ERROR: %s\n%s", e, debug.Stack())
-			cli.Stderrln("ERROR:", e)
-			cli.Exit(1)
 		}
+		if e == "help" {
+			help(os.Args[1:])
+		}
+		cli.Logf("ERROR: %s\n%s", e, debug.Stack())
+		cli.Stderrln("ERROR:", e)
+		cli.Exit(1)
 	}
 }
 
-func parse(input []string) (topic, command string, args []string) {
+func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags map[string]string) {
+	cli.Logf("Running %s:%s %s\n", topic, command, args, flags)
+	before := time.Now()
+	command.Run(args, flags)
+	cli.Logf("Finished in %s\n", (time.Since(before)))
+}
+
+func parse(input []string) (topic *cli.Topic, command *cli.Command, args []string, flags map[string]string) {
 	if len(input) == 0 {
 		return
 	}
 	tc := strings.SplitN(input[0], ":", 2)
-	topic = tc[0]
-	if len(tc) == 2 {
-		command = tc[1]
-	}
-	args = input[1:]
-	return topic, command, args
-}
-
-func topicByName(name string) *cli.Topic {
-	for _, topic := range topics {
-		if name == topic.Name {
-			return topic
+	topic = topics[tc[0]]
+	if topic != nil {
+		command = topic.Commands[""]
+		if len(tc) == 2 {
+			command = topic.Commands[tc[1]]
 		}
 	}
-	return nil
+	args = input[1:]
+	return topic, command, args, flags
 }

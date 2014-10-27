@@ -9,8 +9,7 @@ import (
 )
 
 type Plugin struct {
-	*gode.Package
-	*cli.Topic
+	gode.Package
 }
 
 func pluginRun(name string) func(command string, args ...string) {
@@ -44,18 +43,32 @@ func pluginHelp(name string) func(command string, args ...string) {
 	}
 }
 
-func Plugins() []*Plugin {
-	var plugins []*Plugin
+func topicFromPackage(pkg gode.Package) *cli.Topic {
+	return &cli.Topic{
+		Name: pkg.Name,
+	}
+}
+
+func Plugins() (plugins []*Plugin) {
 	packages, err := node.Packages()
 	must(err)
 	for _, pkg := range packages {
-		plugin := &Plugin{
-			Package: &pkg,
-			Topic: &cli.Topic{
-				Name: pkg.Name,
-			},
-		}
-		plugins = append(plugins, plugin)
+		plugins = append(plugins, pluginFromPackage(pkg))
 	}
 	return plugins
+}
+
+func pluginFromPackage(pkg gode.Package) *Plugin {
+	return &Plugin{
+		Package: pkg,
+	}
+}
+
+func PluginTopics() (topics []*cli.Topic) {
+	packages, err := node.Packages()
+	must(err)
+	for _, pkg := range packages {
+		topics = append(topics, topicFromPackage(pkg))
+	}
+	return topics
 }
