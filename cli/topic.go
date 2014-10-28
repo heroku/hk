@@ -6,10 +6,11 @@ type Topic struct {
 	Name      string
 	ShortHelp string
 	Help      string
-	Commands  map[string]*Command
+	Commands  []*Command
 }
 
 type Command struct {
+	Name      string
 	Signature string
 	ShortHelp string
 	Help      string
@@ -43,4 +44,13 @@ func (topics TopicSet) AddTopic(topic *Topic) {
 			dest.Commands[name] = cmd
 		}
 	}
+}
+
+func (t *Topic) GetCommand(name string) (command *Command) {
+	for _, command := range t.Commands {
+		if name == command.Name {
+			return command
+		}
+	}
+	return nil
 }

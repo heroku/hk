@@ -11,8 +11,10 @@ var cmdList = &cli.Command{
   $ heroku plugins`,
 
 	Run: func(args []string, flags map[string]string) {
-		for _, plugin := range Plugins() {
-			cli.Stdoutln(plugin.Package.Name, plugin.Version)
+		packages, err := node.Packages()
+		must(err)
+		for _, pkg := range packages {
+			cli.Stdoutln(pkg.Name, pkg.Version)
 		}
 	},
 }

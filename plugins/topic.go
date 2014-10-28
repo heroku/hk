@@ -15,8 +15,8 @@ var Topic = &cli.Topic{
   Example:
   $ heroku plugins:install dickeyxxx/heroku-production-check`,
 
-	Commands: map[string]*cli.Command{
-		"":        cmdList,
-		"install": cmdInstall,
+	Commands: []*cli.Command{
+		cmdList,
+		cmdInstall,
 	},
 }

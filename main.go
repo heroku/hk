@@ -52,9 +52,9 @@ func parse(input []string) (topic *cli.Topic, command *cli.Command, args []strin
 	tc := strings.SplitN(input[0], ":", 2)
 	topic = topics[tc[0]]
 	if topic != nil {
-		command = topic.Commands[""]
+		command = topic.GetCommand("")
 		if len(tc) == 2 {
-			command = topic.Commands[tc[1]]
+			command = topic.GetCommand(tc[1])
 		}
 	}
 	args = input[1:]

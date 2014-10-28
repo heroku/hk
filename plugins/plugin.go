@@ -3,89 +3,56 @@ package plugins
 import (
 	"encoding/json"
 	"os"
-	"strings"
 
-	"github.com/dickeyxxx/gode"
 	"github.com/heroku/hk/cli"
 )
 
-type Plugin struct {
-	gode.Package
+func runFn(module, topic, command string) func(args []string, flags map[string]string) {
+	return func(args []string, flags map[string]string) {
+		script := `
+		require('` + module + `')
+		.topics.filter(function (topic) {
+			return topic.name == '` + topic + `'
+		})[0]
+		.commands.filter(function (command) {
+			return command.name == '` + command + `'
+		})[0]
+		.run([], {}, {
+			"app": "dickey-xxx",
+			"token": "` + os.Getenv("HEROKU_API_KEY") + `"
+		})`
+
+		cmd := node.RunScript(script)
+		cmd.Stdout = cli.Stdout
+		cmd.Stderr = cli.Stderr
+		must(cmd.Run())
+	}
 }
 
-func (p *Plugin) Topics() (topics []*cli.Topic) {
-	script := `
-	var commands = require('` + p.Name + `').commands
-	console.log(JSON.stringify(commands))`
-	var response map[string]map[string]*cli.Command
+func getPackageTopics(name string) []*cli.Topic {
+	script := `console.log(JSON.stringify(require('` + name + `')))`
 	cmd := node.RunScript(script)
 	cmd.Stderr = cli.Stderr
 	output, err := cmd.StdoutPipe()
 	must(err)
 	must(cmd.Start())
+	var response map[string][]*cli.Topic
 	must(json.NewDecoder(output).Decode(&response))
 	must(cmd.Wait())
-	for topicName, topic := range response {
-		topic := &cli.Topic{Name: topicName, Commands: topic}
-		for name, command := range topic.Commands {
-			command.Run = runFn(p.Name, topic.Name, name)
+	topics := response["topics"]
+	for _, topic := range topics {
+		for _, command := range topic.Commands {
+			command.Run = runFn(name, topic.Name, command.Name)
 		}
-		topics = append(topics, topic)
 	}
 	return topics
 }
 
-func runFn(module, topic, command string) func(args []string, flags map[string]string) {
-	return func(args []string, flags map[string]string) {
-		context := `{
-			"app": "dickey-xxx",
-			"token": "` + os.Getenv("HEROKU_API_KEY") + `"
-		}`
-		script := `
-		var commands = require('` + module + `').commands
-		commands['` + topic + `']['` + command + `'].run([], {}, ` + context + `)`
-		cmd := node.RunScript(script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		must(cmd.Run())
-	}
-}
-
-func pluginShortHelp(name string) string {
-	script := `console.log(require('` + name + `').shortHelp)`
-	output, err := node.RunScript(script).Output()
-	must(err)
-	return strings.TrimSpace(string(output))
-}
-
-func pluginHelp(name string) func(command string, args ...string) {
-	return func(command string, args ...string) {
-		script := `require('` + name + `').help()`
-		cmd := node.RunScript(script)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		must(cmd.Run())
-	}
-}
-
-func Plugins() (plugins []*Plugin) {
+func PluginTopics() (topics []*cli.Topic) {
 	packages, err := node.Packages()
 	must(err)
 	for _, pkg := range packages {
-		plugins = append(plugins, pluginFromPackage(pkg))
-	}
-	return plugins
-}
-
-func pluginFromPackage(pkg gode.Package) *Plugin {
-	return &Plugin{
-		Package: pkg,
-	}
-}
-
-func PluginTopics() (topics []*cli.Topic) {
-	for _, plugin := range Plugins() {
-		topics = append(topics, plugin.Topics()...)
+		topics = append(topics, getPackageTopics(pkg.Name)...)
 	}
 	return topics
 }
