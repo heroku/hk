@@ -5,7 +5,7 @@ import "github.com/heroku/hk/cli"
 var cmdInstall = &cli.Command{
 	Name:      "install",
 	Signature: "plugins:install [plugin]",
-	ShortHelp: "ShortHlp",
+	ShortHelp: "Installs a plugin into the CLI",
 	Help: `Install a Heroku plugin
 
   Example:
