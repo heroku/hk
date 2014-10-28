@@ -10,13 +10,13 @@ type Topic struct {
 }
 
 type Command struct {
-	Name       string
-	Signature  string
-	ShortHelp  string
-	Help       string
-	NeedsApp   bool
-	NeedsToken bool
-	Run        func(ctx *Context, args []string, flags map[string]string)
+	Name      string
+	Signature string
+	ShortHelp string
+	Help      string
+	NeedsApp  bool
+	NeedsAuth bool
+	Run       func(ctx *Context)
 }
 
 func (t *Topic) String() string {
@@ -41,9 +41,9 @@ func (topics TopicSet) AddTopic(topic *Topic) {
 		return
 	}
 	dest := topics[topic.Name]
-	for name, cmd := range topic.Commands {
-		if dest.Commands[name] == nil {
-			dest.Commands[name] = cmd
+	for _, cmd := range topic.Commands {
+		if dest.GetCommand(cmd.Name) == nil {
+			dest.Commands = append(dest.Commands, cmd)
 		}
 	}
 }

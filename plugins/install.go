@@ -11,12 +11,13 @@ var cmdInstall = &cli.Command{
   Example:
   $ heroku plugins:install dickeyxxx/heroku-production-status`,
 
-	Run: func(ctx *cli.Context, args []string, flags map[string]string) {
-		if len(args) == 0 {
+	Run: func(ctx *cli.Context) {
+		if len(ctx.Args) == 0 {
 			panic("help")
 		}
-		name := args[0]
-		cli.Errf("Installing plugin %s...\n", name)
+		name := ctx.Args[0]
+		cli.Errf("Installing plugin %s... ", name)
 		must(node.InstallPackage(name))
+		cli.Errln("done")
 	},
 }

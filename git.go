@@ -106,7 +106,7 @@ func appFromGitRemote(remote string) (string, error) {
 	for _, v := range remotes {
 		return v, nil
 	}
-	return "", fmt.Errorf("No app found")
+	return "", nil
 }
 
 func isNotFound(err error) bool {

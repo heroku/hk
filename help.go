@@ -16,7 +16,10 @@ func help(args []string) {
 	case command != nil:
 		cli.Errf("USAGE: %s %s\n\n", os.Args[0], command.Signature)
 		cli.Errln(command.Help)
-		printTopicCommandsHelp(topic)
+		if command.Name == "" {
+			// This is a root command so show the other commands in the topic
+			printTopicCommandsHelp(topic)
+		}
 	case topic != nil:
 		cli.Errf("USAGE: %s %s:COMMAND [--app APP] [command-specific-options]\n\n", os.Args[0], topic.Name)
 		cli.Errln(topic.Help)

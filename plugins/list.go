@@ -10,7 +10,7 @@ var cmdList = &cli.Command{
   Example:
   $ heroku plugins`,
 
-	Run: func(ctx *cli.Context, args []string, flags map[string]string) {
+	Run: func(ctx *cli.Context) {
 		packages, err := node.Packages()
 		must(err)
 		for _, pkg := range packages {

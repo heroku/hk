@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/bgentry/go-netrc/netrc"
+	"github.com/heroku/hk/apps"
 	"github.com/heroku/hk/cli"
 	"github.com/heroku/hk/plugins"
 )
 
 var topics = cli.NewTopicSet(
+	apps.Apps,
 	plugins.Topic,
 )
 
@@ -41,24 +43,28 @@ func handlePanic() {
 }
 
 func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags map[string]string) {
-	ctx := &cli.Context{}
+	ctx := &cli.Context{
+		Args:  args,
+		Flags: flags,
+	}
 	if command.NeedsApp {
 		app, err := app()
 		if err != nil {
-			cli.Errln(err)
+			panic(err)
+		}
+		if app == "" {
+			cli.Errln(" !    No app specified.")
+			cli.Errln(" !    Run this command from an app folder or specify which app to use with --app APP.")
 			os.Exit(3)
 		}
 		ctx.App = app
 	}
-	if command.NeedsToken {
-		ctx.Token = apiToken()
-		if ctx.Token == "" {
-			panic("error reading netrc")
-		}
+	if command.NeedsAuth {
+		ctx.Auth.Username, ctx.Auth.Password = auth()
 	}
-	cli.Logf("Running %s:%s %s\n", topic, command, args, flags)
+	cli.Logf("Running %s:%s\n", topic, command)
 	before := time.Now()
-	command.Run(ctx, args, flags)
+	command.Run(ctx)
 	cli.Logf("Finished in %s\n", (time.Since(before)))
 }
 
@@ -85,11 +91,11 @@ func app() (string, error) {
 	return appFromGitRemote(remoteFromGitConfig())
 }
 
-func apiToken() string {
+func auth() (user, password string) {
 	netrc, err := netrc.ParseFile(filepath.Join(cli.HomeDir, ".netrc"))
 	if err != nil {
-		return ""
+		panic(err)
 	}
-	m := netrc.FindMachine("api.heroku.com")
-	return m.Password
+	auth := netrc.FindMachine("api.heroku.com")
+	return auth.Login, auth.Password
 }

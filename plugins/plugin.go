@@ -7,8 +7,8 @@ import (
 	"github.com/heroku/hk/cli"
 )
 
-func runFn(module, topic, command string) func(ctx *cli.Context, args []string, flags map[string]string) {
-	return func(ctx *cli.Context, args []string, flags map[string]string) {
+func runFn(module, topic, command string) func(ctx *cli.Context) {
+	return func(ctx *cli.Context) {
 		ctxJson, err := json.Marshal(ctx)
 		must(err)
 		script := fmt.Sprintf(`
@@ -19,7 +19,7 @@ func runFn(module, topic, command string) func(ctx *cli.Context, args []string, 
 		.commands.filter(function (command) {
 			return command.name == '%s'
 		})[0]
-		.run(%s, [], {})`, module, topic, command, ctxJson)
+		.run(%s)`, module, topic, command, ctxJson)
 
 		cmd := node.RunScript(script)
 		cmd.Stdout = cli.Stdout
