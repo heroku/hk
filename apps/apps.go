@@ -21,24 +21,13 @@ var cmdApps = &cli.Command{
 		client := heroku.Client{Password: ctx.Auth.Password}
 		apps, err := client.AppList(nil)
 		must(err)
-		ownedApps := filterApps(apps, func(app heroku.App) bool {
+		owned := filterApps(apps, func(app heroku.App) bool {
 			return app.Owner.Email == ctx.Auth.Username
 		})
-		collaboratedApps := filterApps(apps, func(app heroku.App) bool {
+		collaborated := filterApps(apps, func(app heroku.App) bool {
 			return app.Owner.Email != ctx.Auth.Username
 		})
-		cli.Println("=== My Apps")
-		for _, app := range ownedApps {
-			cli.Println(app.Name)
-		}
-		cli.Println()
-		if len(collaboratedApps) > 0 {
-			cli.Println("=== Collaborated Apps")
-			for _, app := range collaboratedApps {
-				cli.Printf("%-30s %s\n", app.Name, app.Owner.Email)
-			}
-			cli.Println()
-		}
+		printApps(owned, collaborated)
 	},
 }
 
@@ -50,6 +39,22 @@ func filterApps(from []heroku.App, fn func(heroku.App) bool) []heroku.App {
 		}
 	}
 	return to
+}
+
+func printApps(owned []heroku.App, collaborated []heroku.App) {
+	printApps(owned, collaborated)
+	cli.Println("=== My Apps")
+	for _, app := range owned {
+		cli.Println(app.Name)
+	}
+	cli.Println()
+	if len(collaborated) > 0 {
+		cli.Println("=== Collaborated Apps")
+		for _, app := range collaborated {
+			cli.Printf("%-30s %s\n", app.Name, app.Owner.Email)
+		}
+		cli.Println()
+	}
 }
 
 func must(err error) {
