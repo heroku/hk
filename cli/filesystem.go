@@ -1,6 +1,12 @@
 package cli
 
-import "os/user"
+import (
+	"os/user"
+	"path/filepath"
+)
+
+var HomeDir = homeDir()
+var AppDir = filepath.Join(HomeDir, ".gonpm")
 
 func homeDir() string {
 	user, err := user.Current()

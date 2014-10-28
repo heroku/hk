@@ -2,25 +2,24 @@ package plugins
 
 import (
 	"encoding/json"
-	"os"
+	"fmt"
 
 	"github.com/heroku/hk/cli"
 )
 
-func runFn(module, topic, command string) func(args []string, flags map[string]string) {
-	return func(args []string, flags map[string]string) {
-		script := `
-		require('` + module + `')
+func runFn(module, topic, command string) func(ctx *cli.Context, args []string, flags map[string]string) {
+	return func(ctx *cli.Context, args []string, flags map[string]string) {
+		ctxJson, err := json.Marshal(ctx)
+		must(err)
+		script := fmt.Sprintf(`
+		require('%s')
 		.topics.filter(function (topic) {
-			return topic.name == '` + topic + `'
+			return topic.name == '%s'
 		})[0]
 		.commands.filter(function (command) {
-			return command.name == '` + command + `'
+			return command.name == '%s'
 		})[0]
-		.run([], {}, {
-			"app": "dickey-xxx",
-			"token": "` + os.Getenv("HEROKU_API_KEY") + `"
-		})`
+		.run(%s, [], {})`, module, topic, command, ctxJson)
 
 		cmd := node.RunScript(script)
 		cmd.Stdout = cli.Stdout

@@ -10,11 +10,13 @@ type Topic struct {
 }
 
 type Command struct {
-	Name      string
-	Signature string
-	ShortHelp string
-	Help      string
-	Run       func(args []string, flags map[string]string)
+	Name       string
+	Signature  string
+	ShortHelp  string
+	Help       string
+	NeedsApp   bool
+	NeedsToken bool
+	Run        func(ctx *Context, args []string, flags map[string]string)
 }
 
 func (t *Topic) String() string {

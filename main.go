@@ -2,10 +2,12 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"runtime/debug"
 	"strings"
 	"time"
 
+	"github.com/bgentry/go-netrc/netrc"
 	"github.com/heroku/hk/cli"
 	"github.com/heroku/hk/plugins"
 )
@@ -33,15 +35,30 @@ func handlePanic() {
 			help(os.Args[1:])
 		}
 		cli.Logf("ERROR: %s\n%s", e, debug.Stack())
-		cli.Stderrln("ERROR:", e)
+		cli.Errln("ERROR:", e)
 		cli.Exit(1)
 	}
 }
 
 func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags map[string]string) {
+	ctx := &cli.Context{}
+	if command.NeedsApp {
+		app, err := app()
+		if err != nil {
+			cli.Errln(err)
+			os.Exit(3)
+		}
+		ctx.App = app
+	}
+	if command.NeedsToken {
+		ctx.Token = apiToken()
+		if ctx.Token == "" {
+			panic("error reading netrc")
+		}
+	}
 	cli.Logf("Running %s:%s %s\n", topic, command, args, flags)
 	before := time.Now()
-	command.Run(args, flags)
+	command.Run(ctx, args, flags)
 	cli.Logf("Finished in %s\n", (time.Since(before)))
 }
 
@@ -59,4 +76,20 @@ func parse(input []string) (topic *cli.Topic, command *cli.Command, args []strin
 	}
 	args = input[1:]
 	return topic, command, args, flags
+}
+
+func app() (string, error) {
+	if app := os.Getenv("HEROKU_APP"); app != "" {
+		return app, nil
+	}
+	return appFromGitRemote(remoteFromGitConfig())
+}
+
+func apiToken() string {
+	netrc, err := netrc.ParseFile(filepath.Join(cli.HomeDir, ".netrc"))
+	if err != nil {
+		return ""
+	}
+	m := netrc.FindMachine("api.heroku.com")
+	return m.Password
 }
