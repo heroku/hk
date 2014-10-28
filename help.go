@@ -25,7 +25,7 @@ func help(args []string) {
 		cli.Stderrf("USAGE: %s COMMAND [--app APP] [command-specific-options]\n\n", os.Args[0])
 		cli.Stderrf("Help topics, type \"%s help TOPIC\" for more details:\n\n", os.Args[0])
 		for _, topic := range topics {
-			cli.Stderrf("  %-30s# %s\n", topic.Name, topic.ShortHelp)
+			cli.Stderrf("  %s %-30s# %s\n", os.Args[0], topic.Name, topic.ShortHelp)
 		}
 	}
 	os.Exit(2)
@@ -35,7 +35,7 @@ func printTopicCommandsHelp(topic *cli.Topic) {
 	if len(topic.Commands) > 0 {
 		cli.Stderrf("\nCommands for %s, type \"%s help %s:COMMAND\" for more details:\n\n", topic.Name, os.Args[0], topic.Name)
 		for _, command := range topic.Commands {
-			cli.Stderrf("  %-30s# %s\n", command.Signature, command.ShortHelp)
+			cli.Stderrf("  %s %-30s# %s\n", os.Args[0], command.Signature, command.ShortHelp)
 		}
 	}
 }

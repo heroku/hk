@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"encoding/json"
 	"os"
 	"strings"
 
@@ -12,13 +13,37 @@ type Plugin struct {
 	gode.Package
 }
 
-func pluginRun(name string) func(command string, args ...string) {
-	return func(command string, args ...string) {
+func (p *Plugin) Topics() (topics []*cli.Topic) {
+	script := `
+	var commands = require('` + p.Name + `').commands
+	console.log(JSON.stringify(commands))`
+	var response map[string]map[string]*cli.Command
+	cmd := node.RunScript(script)
+	cmd.Stderr = cli.Stderr
+	output, err := cmd.StdoutPipe()
+	must(err)
+	must(cmd.Start())
+	must(json.NewDecoder(output).Decode(&response))
+	must(cmd.Wait())
+	for topicName, topic := range response {
+		topic := &cli.Topic{Name: topicName, Commands: topic}
+		for name, command := range topic.Commands {
+			command.Run = runFn(p.Name, topic.Name, name)
+		}
+		topics = append(topics, topic)
+	}
+	return topics
+}
+
+func runFn(module, topic, command string) func(args []string, flags map[string]string) {
+	return func(args []string, flags map[string]string) {
 		context := `{
 			"app": "dickey-xxx",
 			"token": "` + os.Getenv("HEROKU_API_KEY") + `"
 		}`
-		script := `require('` + name + `').run("` + command + `", [], {}, ` + context + `)`
+		script := `
+		var commands = require('` + module + `').commands
+		commands['` + topic + `']['` + command + `'].run([], {}, ` + context + `)`
 		cmd := node.RunScript(script)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -43,12 +68,6 @@ func pluginHelp(name string) func(command string, args ...string) {
 	}
 }
 
-func topicFromPackage(pkg gode.Package) *cli.Topic {
-	return &cli.Topic{
-		Name: pkg.Name,
-	}
-}
-
 func Plugins() (plugins []*Plugin) {
 	packages, err := node.Packages()
 	must(err)
@@ -65,10 +84,8 @@ func pluginFromPackage(pkg gode.Package) *Plugin {
 }
 
 func PluginTopics() (topics []*cli.Topic) {
-	packages, err := node.Packages()
-	must(err)
-	for _, pkg := range packages {
-		topics = append(topics, topicFromPackage(pkg))
+	for _, plugin := range Plugins() {
+		topics = append(topics, plugin.Topics()...)
 	}
 	return topics
 }

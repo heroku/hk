@@ -20,6 +20,10 @@ func (t *Topic) String() string {
 	return t.Name
 }
 
+func (c *Command) String() string {
+	return c.Signature
+}
+
 func NewTopicSet(topics ...*Topic) TopicSet {
 	set := TopicSet{}
 	for _, topic := range topics {
