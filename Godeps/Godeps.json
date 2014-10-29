@@ -1,0 +1,27 @@
+{
+	"ImportPath": "github.com/heroku/hk",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go-uuid/uuid",
+			"Comment": "null-12",
+			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
+		},
+		{
+			"ImportPath": "github.com/bgentry/go-netrc/netrc",
+			"Rev": "9fd32a8b3d3d3f9d43c341bfe098430e07609480"
+		},
+		{
+			"ImportPath": "github.com/bgentry/heroku-go",
+			"Rev": "79471b3acc7a331d461bf07de216c45357f143c6"
+		},
+		{
+			"ImportPath": "github.com/dickeyxxx/gode",
+			"Rev": "5232d2c2bf37d550af7b8623d9fd788d481645b4"
+		},
+		{
+			"ImportPath": "github.com/pivotal-golang/bytefmt",
+			"Rev": "0d39b0b9580b8af2d0ff539bb44e1daa644602bb"
+		}
+	]
+}
