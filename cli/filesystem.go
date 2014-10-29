@@ -6,7 +6,7 @@ import (
 )
 
 var HomeDir = homeDir()
-var AppDir = filepath.Join(HomeDir, ".gonpm")
+var AppDir = filepath.Join(HomeDir, ".hk")
 
 func homeDir() string {
 	user, err := user.Current()

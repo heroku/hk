@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var logger = newLogger(AppDir + "/gonpm.log")
+var logger = newLogger(AppDir + "/hk.log")
 var Stdout io.Writer = os.Stdout
 var Stderr io.Writer = os.Stderr
 var exitFn = os.Exit

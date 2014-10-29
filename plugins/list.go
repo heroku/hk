@@ -3,7 +3,6 @@ package plugins
 import "github.com/heroku/hk/cli"
 
 var cmdList = &cli.Command{
-	Signature: "plugins",
 	ShortHelp: "Lists the installed plugins",
 	Help: `Lists installed plugins
 

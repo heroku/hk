@@ -13,13 +13,14 @@ func help(args []string) {
 	}
 	topic, command, _, _ := parse(args)
 	switch {
-	case command != nil:
-		cli.Errf("USAGE: %s %s\n\n", os.Args[0], command.Signature)
+	case command != nil && command.Name == "":
+		cli.Errf("USAGE: %s %s\n\n", os.Args[0], topic.Name)
 		cli.Errln(command.Help)
-		if command.Name == "" {
-			// This is a root command so show the other commands in the topic
-			printTopicCommandsHelp(topic)
-		}
+		// This is a root command so show the other commands in the topic
+		printTopicCommandsHelp(topic)
+	case command != nil:
+		cli.Errf("USAGE: %s %s:%s\n\n", os.Args[0], topic.Name, command.Name)
+		cli.Errln(command.Help)
 	case topic != nil:
 		cli.Errf("USAGE: %s %s:COMMAND [--app APP] [command-specific-options]\n\n", os.Args[0], topic.Name)
 		cli.Errln(topic.Help)
@@ -38,7 +39,11 @@ func printTopicCommandsHelp(topic *cli.Topic) {
 	if len(topic.Commands) > 0 {
 		cli.Errf("\nCommands for %s, type \"%s help %s:COMMAND\" for more details:\n\n", topic.Name, os.Args[0], topic.Name)
 		for _, command := range topic.Commands {
-			cli.Errf("  %s %-30s# %s\n", os.Args[0], command.Signature, command.ShortHelp)
+			if command.Name == "" {
+				cli.Errf("  %s %s                               # %s\n", os.Args[0], topic.Name, command.ShortHelp)
+			} else {
+				cli.Errf("  %s %s:%-30s# %s\n", os.Args[0], topic.Name, command.Name, command.ShortHelp)
+			}
 		}
 	}
 }

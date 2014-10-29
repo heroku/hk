@@ -11,7 +11,6 @@ type Topic struct {
 
 type Command struct {
 	Name      string
-	Signature string
 	ShortHelp string
 	Help      string
 	NeedsApp  bool
@@ -24,7 +23,7 @@ func (t *Topic) String() string {
 }
 
 func (c *Command) String() string {
-	return c.Signature
+	return c.Name
 }
 
 func NewTopicSet(topics ...*Topic) TopicSet {

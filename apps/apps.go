@@ -10,11 +10,11 @@ var Apps = &cli.Topic{
 	ShortHelp: "manage your heroku apps",
 	Commands: []*cli.Command{
 		cmdApps,
+		cmdInfo,
 	},
 }
 
 var cmdApps = &cli.Command{
-	Signature: "apps",
 	ShortHelp: "lists your heroku apps",
 	NeedsAuth: true,
 	Run: func(ctx *cli.Context) {
@@ -42,7 +42,6 @@ func filterApps(from []heroku.App, fn func(heroku.App) bool) []heroku.App {
 }
 
 func printApps(owned []heroku.App, collaborated []heroku.App) {
-	printApps(owned, collaborated)
 	cli.Println("=== My Apps")
 	for _, app := range owned {
 		cli.Println(app.Name)
