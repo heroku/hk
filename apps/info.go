@@ -6,21 +6,37 @@ import (
 	"github.com/pivotal-golang/bytefmt"
 )
 
+var Info = &cli.Topic{
+	Name:      "info",
+	ShortHelp: "show detailed app information",
+	Hidden:    true,
+	Commands: []*cli.Command{
+		{
+			ShortHelp: "show detailed app information",
+			NeedsApp:  true,
+			NeedsAuth: true,
+			Run:       info,
+		},
+	},
+}
+
 var cmdInfo = &cli.Command{
 	Name:      "info",
 	ShortHelp: "show detailed app information",
 	NeedsApp:  true,
 	NeedsAuth: true,
-	Run: func(ctx *cli.Context) {
-		client := heroku.Client{Password: ctx.Auth.Password}
-		cli.Printf("=== %s\n", ctx.App)
-		addons := getAddons(client, ctx.App)
-		collaborators := getCollaborators(client, ctx.App)
-		app := getAppInfo(client, ctx.App)
-		printAddons(<-addons)
-		printCollaborators(<-collaborators)
-		printApp(<-app)
-	},
+	Run:       info,
+}
+
+func info(ctx *cli.Context) {
+	client := heroku.Client{Password: ctx.Auth.Password}
+	cli.Printf("=== %s\n", ctx.App)
+	addons := getAddons(client, ctx.App)
+	collaborators := getCollaborators(client, ctx.App)
+	app := getAppInfo(client, ctx.App)
+	printAddons(<-addons)
+	printCollaborators(<-collaborators)
+	printApp(<-app)
 }
 
 func getAppInfo(client heroku.Client, app string) <-chan heroku.App {

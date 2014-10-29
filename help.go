@@ -28,7 +28,7 @@ func help(args []string) {
 	default:
 		cli.Errf("USAGE: %s COMMAND [--app APP] [command-specific-options]\n\n", os.Args[0])
 		cli.Errf("Help topics, type \"%s help TOPIC\" for more details:\n\n", os.Args[0])
-		for _, topic := range topics {
+		for _, topic := range nonHiddenTopics(topics) {
 			cli.Errf("  %s %-30s# %s\n", os.Args[0], topic.Name, topic.ShortHelp)
 		}
 	}
@@ -38,7 +38,7 @@ func help(args []string) {
 func printTopicCommandsHelp(topic *cli.Topic) {
 	if len(topic.Commands) > 0 {
 		cli.Errf("\nCommands for %s, type \"%s help %s:COMMAND\" for more details:\n\n", topic.Name, os.Args[0], topic.Name)
-		for _, command := range topic.Commands {
+		for _, command := range nonHiddenCommands(topic.Commands) {
 			if command.Name == "" {
 				cli.Errf("  %s %s                               # %s\n", os.Args[0], topic.Name, command.ShortHelp)
 			} else {
@@ -46,4 +46,24 @@ func printTopicCommandsHelp(topic *cli.Topic) {
 			}
 		}
 	}
+}
+
+func nonHiddenTopics(from cli.TopicSet) []*cli.Topic {
+	to := make([]*cli.Topic, 0, len(from))
+	for _, topic := range from {
+		if !topic.Hidden {
+			to = append(to, topic)
+		}
+	}
+	return to
+}
+
+func nonHiddenCommands(from []*cli.Command) []*cli.Command {
+	to := make([]*cli.Command, 0, len(from))
+	for _, command := range from {
+		if !command.Hidden {
+			to = append(to, command)
+		}
+	}
+	return to
 }

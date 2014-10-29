@@ -6,6 +6,7 @@ type Topic struct {
 	Name      string
 	ShortHelp string
 	Help      string
+	Hidden    bool
 	Commands  []*Command
 }
 
@@ -13,6 +14,7 @@ type Command struct {
 	Name      string
 	ShortHelp string
 	Help      string
+	Hidden    bool
 	NeedsApp  bool
 	NeedsAuth bool
 	Run       func(ctx *Context)

@@ -15,7 +15,8 @@ import (
 
 var topics = cli.NewTopicSet(
 	apps.Apps,
-	plugins.Topic,
+	apps.Info,
+	plugins.Plugins,
 )
 
 func main() {
