@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -27,7 +28,7 @@ func main() {
 	}
 	topic, command, args, flags := parse(os.Args[1:])
 	if command == nil {
-		help(os.Args[1:])
+		help()
 	}
 	runCommand(topic, command, args, flags)
 }
@@ -35,7 +36,7 @@ func main() {
 func handlePanic() {
 	if e := recover(); e != nil {
 		if e == "help" {
-			help(os.Args[1:])
+			help()
 		}
 		cli.Logf("ERROR: %s\n%s", e, debug.Stack())
 		cli.Errln("ERROR:", e)
@@ -43,7 +44,7 @@ func handlePanic() {
 	}
 }
 
-func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags map[string]string) {
+func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags *flag.FlagSet) {
 	ctx := &cli.Context{
 		Args:  args,
 		Flags: flags,
@@ -69,7 +70,7 @@ func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags map
 	cli.Logf("Finished in %s\n", (time.Since(before)))
 }
 
-func parse(input []string) (topic *cli.Topic, command *cli.Command, args []string, flags map[string]string) {
+func parse(input []string) (topic *cli.Topic, command *cli.Command, args []string, flags *flag.FlagSet) {
 	if len(input) == 0 {
 		return
 	}
@@ -81,8 +82,7 @@ func parse(input []string) (topic *cli.Topic, command *cli.Command, args []strin
 			command = topic.GetCommand(tc[1])
 		}
 	}
-	args = input[1:]
-	return topic, command, args, flags
+	return topic, command, input[1:], flags
 }
 
 func app() (string, error) {

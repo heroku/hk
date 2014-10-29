@@ -6,10 +6,10 @@ import (
 	"github.com/heroku/hk/cli"
 )
 
-func help(args []string) {
+func help() {
+	args := os.Args[1:]
 	if len(args) > 0 && args[0] == "help" {
-		help(args[1:])
-		return
+		args = args[1:]
 	}
 	topic, command, _, _ := parse(args)
 	switch {
