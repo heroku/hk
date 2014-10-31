@@ -56,7 +56,7 @@ func main() {
 func handlePanic() {
 	if e := recover(); e != nil {
 		cli.Errln("ERROR:", e)
-		cli.Logln(debug.Stack())
+		cli.Logln(string(debug.Stack()))
 		cli.Exit(1)
 	}
 }

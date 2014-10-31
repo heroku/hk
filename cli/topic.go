@@ -1,11 +1,17 @@
 package cli
 
+import "strings"
+
 type Topic struct {
 	Name      string
 	ShortHelp string
 	Help      string
 	Hidden    bool
 	Commands  []*Command
+}
+
+func (t *Topic) String() string {
+	return t.Name
 }
 
 type Command struct {
@@ -20,21 +26,6 @@ type Command struct {
 	Run       func(ctx *Context) `json:"-"`
 }
 
-type Arg struct {
-	Name     string
-	Optional bool
-}
-
-type Flag struct {
-	Name    string
-	Char    rune
-	Default string
-}
-
-func (t *Topic) String() string {
-	return t.Name
-}
-
 func (c *Command) String() string {
 	return c.Name
 }
@@ -46,4 +37,22 @@ func (t *Topic) GetCommand(name string) (command *Command) {
 		}
 	}
 	return nil
+}
+
+type Arg struct {
+	Name     string
+	Optional bool
+}
+
+func (a *Arg) String() string {
+	if a.Optional {
+		return "[" + strings.ToUpper(a.Name) + "]"
+	}
+	return strings.ToUpper(a.Name)
+}
+
+type Flag struct {
+	Name    string
+	Char    rune
+	Default string
 }

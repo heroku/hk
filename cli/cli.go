@@ -59,6 +59,7 @@ func (cli *Cli) parseCmd(cmd string) (topic *Topic, command *Command) {
 }
 
 func parseArgs(command *Command, args []string) (result map[string]string, appName string, err error) {
+	result = map[string]string{}
 	numArgs := 0
 	parseFlags := true
 	for i := 0; i < len(args); i++ {
