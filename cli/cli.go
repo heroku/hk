@@ -42,10 +42,7 @@ func (cli *Cli) Parse(args []string) (ctx *Context, err error) {
 		return ctx, HelpErr
 	}
 	ctx.Args, ctx.App, err = parseArgs(ctx.Command, args[1:])
-	if err != nil {
-		return ctx, err
-	}
-	return ctx, nil
+	return ctx, err
 }
 
 func (cli *Cli) parseCmd(cmd string) (topic *Topic, command *Command) {
