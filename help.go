@@ -87,3 +87,9 @@ func nonHiddenCommands(from []*cli.Command) []*cli.Command {
 	}
 	return to
 }
+
+func AppNeededWarning() {
+	cli.Errln(" !    No app specified.")
+	cli.Errln(" !    Run this command from an app folder or specify which app to use with --app APP.")
+	os.Exit(3)
+}

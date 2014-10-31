@@ -35,11 +35,11 @@ func (cli *Cli) AddTopic(topic *Topic) {
 func (cli *Cli) Parse(args []string) (ctx *Context, err error) {
 	ctx = &Context{}
 	if len(args) == 0 {
-		return ctx, nil
+		return ctx, HelpErr
 	}
 	ctx.Topic, ctx.Command = cli.parseCmd(args[0])
 	if ctx.Command == nil {
-		return ctx, nil
+		return ctx, HelpErr
 	}
 	ctx.Args, ctx.App, err = parseArgs(ctx.Command, args[1:])
 	if err != nil {

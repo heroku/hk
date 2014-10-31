@@ -33,17 +33,15 @@ func main() {
 		cli.Errf("USAGE: %s %s\n", os.Args[0], commandSignature(ctx.Topic, ctx.Command))
 		os.Exit(2)
 	}
-	if ctx.Command == nil {
-		help()
-	}
 	if ctx.Command.NeedsApp {
 		if ctx.App == "" {
 			ctx.App = app()
 		}
+		if app := os.Getenv("HEROKU_APP"); app != "" {
+			ctx.App = app
+		}
 		if ctx.App == "" {
-			cli.Errln(" !    No app specified.")
-			cli.Errln(" !    Run this command from an app folder or specify which app to use with --app APP.")
-			os.Exit(3)
+			AppNeededWarning()
 		}
 	}
 	if ctx.Command.NeedsAuth {
@@ -57,16 +55,13 @@ func main() {
 
 func handlePanic() {
 	if e := recover(); e != nil {
-		cli.Logf("ERROR: %s\n%s", e, debug.Stack())
 		cli.Errln("ERROR:", e)
+		cli.Logln(debug.Stack())
 		cli.Exit(1)
 	}
 }
 
 func app() string {
-	if app := os.Getenv("HEROKU_APP"); app != "" {
-		return app
-	}
 	app, err := appFromGitRemote(remoteFromGitConfig())
 	if err != nil {
 		panic(err)
