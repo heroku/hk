@@ -1,12 +1,11 @@
 package cli
 
-import "flag"
-
 type Context struct {
-	App   string        `json:"app"`
-	Args  []string      `json:"args"`
-	Flags *flag.FlagSet `json:"flags"`
-	Auth  struct {
+	Topic   *Topic            `json:"topic"`
+	Command *Command          `json:"command"`
+	App     string            `json:"app"`
+	Args    map[string]string `json:"args"`
+	Auth    struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	} `json:"auth"`

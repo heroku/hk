@@ -1,11 +1,9 @@
 package main
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 	"runtime/debug"
-	"strings"
 	"time"
 
 	"github.com/bgentry/go-netrc/netrc"
@@ -14,7 +12,7 @@ import (
 	"github.com/heroku/hk/plugins"
 )
 
-var topics = cli.NewTopicSet(
+var Cli = cli.NewCli(
 	apps.Apps,
 	apps.Info,
 	plugins.Plugins,
@@ -24,72 +22,56 @@ func main() {
 	defer handlePanic()
 	plugins.Setup()
 	for _, topic := range plugins.PluginTopics() {
-		topics.AddTopic(topic)
+		Cli.AddTopic(topic)
 	}
-	topic, command, args, flags := parse(os.Args[1:])
-	if command == nil {
+	ctx, err := Cli.Parse(os.Args[1:])
+	if err != nil {
+		if err == cli.HelpErr {
+			help()
+		}
+		cli.Errln(err)
+		cli.Errf("USAGE: %s %s\n", os.Args[0], commandSignature(ctx.Topic, ctx.Command))
+		os.Exit(2)
+	}
+	if ctx.Command == nil {
 		help()
 	}
-	runCommand(topic, command, args, flags)
+	if ctx.Command.NeedsApp {
+		if ctx.App == "" {
+			ctx.App = app()
+		}
+		if ctx.App == "" {
+			cli.Errln(" !    No app specified.")
+			cli.Errln(" !    Run this command from an app folder or specify which app to use with --app APP.")
+			os.Exit(3)
+		}
+	}
+	if ctx.Command.NeedsAuth {
+		ctx.Auth.Username, ctx.Auth.Password = auth()
+	}
+	cli.Logf("Running %s\n", ctx)
+	before := time.Now()
+	ctx.Command.Run(ctx)
+	cli.Logf("Finished in %s\n", (time.Since(before)))
 }
 
 func handlePanic() {
 	if e := recover(); e != nil {
-		if e == "help" {
-			help()
-		}
 		cli.Logf("ERROR: %s\n%s", e, debug.Stack())
 		cli.Errln("ERROR:", e)
 		cli.Exit(1)
 	}
 }
 
-func runCommand(topic *cli.Topic, command *cli.Command, args []string, flags *flag.FlagSet) {
-	ctx := &cli.Context{
-		Args:  args,
-		Flags: flags,
-	}
-	if command.NeedsApp {
-		app, err := app()
-		if err != nil {
-			panic(err)
-		}
-		if app == "" {
-			cli.Errln(" !    No app specified.")
-			cli.Errln(" !    Run this command from an app folder or specify which app to use with --app APP.")
-			os.Exit(3)
-		}
-		ctx.App = app
-	}
-	if command.NeedsAuth {
-		ctx.Auth.Username, ctx.Auth.Password = auth()
-	}
-	cli.Logf("Running %s:%s\n", topic, command)
-	before := time.Now()
-	command.Run(ctx)
-	cli.Logf("Finished in %s\n", (time.Since(before)))
-}
-
-func parse(input []string) (topic *cli.Topic, command *cli.Command, args []string, flags *flag.FlagSet) {
-	if len(input) == 0 {
-		return
-	}
-	tc := strings.SplitN(input[0], ":", 2)
-	topic = topics[tc[0]]
-	if topic != nil {
-		command = topic.GetCommand("")
-		if len(tc) == 2 {
-			command = topic.GetCommand(tc[1])
-		}
-	}
-	return topic, command, input[1:], flags
-}
-
-func app() (string, error) {
+func app() string {
 	if app := os.Getenv("HEROKU_APP"); app != "" {
-		return app, nil
+		return app
 	}
-	return appFromGitRemote(remoteFromGitConfig())
+	app, err := appFromGitRemote(remoteFromGitConfig())
+	if err != nil {
+		panic(err)
+	}
+	return app
 }
 
 func auth() (user, password string) {
