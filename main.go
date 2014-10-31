@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"time"
 
@@ -70,10 +71,17 @@ func app() string {
 }
 
 func auth() (user, password string) {
-	netrc, err := netrc.ParseFile(filepath.Join(cli.HomeDir, ".netrc"))
+	netrc, err := netrc.ParseFile(netrcPath())
 	if err != nil {
 		panic(err)
 	}
 	auth := netrc.FindMachine("api.heroku.com")
 	return auth.Login, auth.Password
+}
+
+func netrcPath() string {
+	if runtime.GOOS == "windows" {
+		return filepath.Join(cli.HomeDir, "_netrc")
+	}
+	return filepath.Join(cli.HomeDir, ".netrc")
 }
