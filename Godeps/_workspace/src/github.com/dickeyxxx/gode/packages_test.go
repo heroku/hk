@@ -2,12 +2,13 @@ package gode
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 )
 
 func TestPackages(t *testing.T) {
 	c := setup()
-	must(os.RemoveAll(c.ModulesPath))
+	must(os.RemoveAll(filepath.Join(c.RootPath, "lib")))
 	must(c.InstallPackage("request"))
 	packages, err := c.Packages()
 	must(err)
@@ -21,7 +22,7 @@ func TestPackages(t *testing.T) {
 
 func TestPackagesGithubPackage(t *testing.T) {
 	c := setup()
-	must(os.RemoveAll(c.ModulesPath))
+	must(os.RemoveAll(filepath.Join(c.RootPath, "lib")))
 	must(c.InstallPackage("dickeyxxx/heroku-production-check"))
 	packages, err := c.Packages()
 	must(err)

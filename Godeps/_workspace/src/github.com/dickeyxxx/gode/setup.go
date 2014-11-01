@@ -7,22 +7,33 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 // IsSetup returns true if node is setup in the client's RootPath directory
 func (c *Client) IsSetup() bool {
 	// TODO: better check if it is setup
-	exists, _ := fileExists(c.NodePath)
+	exists, _ := fileExists(c.nodePath())
 	return exists
 }
 
 // Setup downloads and sets up node in the client's RootPath directory
 func (c *Client) Setup() error {
-	err := os.MkdirAll(c.RootPath, 0777)
+	if c.IsSetup() {
+		return nil
+	}
+	if runtime.GOOS == "windows" {
+		return c.setupWindows()
+	}
+	return c.setupUnix()
+}
+
+func (c *Client) setupUnix() error {
+	err := os.MkdirAll(filepath.Join(c.RootPath, "node_modules"), 0777)
 	if err != nil {
 		return err
 	}
-	resp, err := http.Get(c.NodeURL)
+	resp, err := http.Get(c.nodeURL())
 	if err != nil {
 		return err
 	}
@@ -31,45 +42,54 @@ func (c *Client) Setup() error {
 	if err != nil {
 		return err
 	}
-	return extractArchive(tar.NewReader(uncompressed), c.RootPath)
+	return extractTar(tar.NewReader(uncompressed), c.RootPath)
 }
 
-func extractArchive(archive *tar.Reader, rootPath string) error {
-	for {
-		hdr, err := archive.Next()
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		path := filepath.Join(rootPath, hdr.Name)
-		switch {
-		case hdr.FileInfo().IsDir():
-			if err := os.Mkdir(path, hdr.FileInfo().Mode()); err != nil {
-				return err
-			}
-		case hdr.Linkname != "":
-			if err := os.Symlink(hdr.Linkname, path); err != nil {
-				return err
-			}
-		default:
-			if err := extractFile(archive, hdr, path); err != nil {
-				return err
-			}
-		}
+func (c *Client) setupWindows() error {
+	err := downloadFile(c.nodePath(), c.nodeURL())
+	if err != nil {
+		return err
 	}
+	return c.downloadNpm()
 }
 
-func extractFile(archive *tar.Reader, hdr *tar.Header, path string) error {
+func downloadFile(path, url string) error {
+	err := os.MkdirAll(filepath.Dir(path), 0777)
+	if err != nil {
+		return err
+	}
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
 	defer file.Close()
-	_, err = io.Copy(file, archive)
 	if err != nil {
 		return err
 	}
-	return os.Chmod(path, hdr.FileInfo().Mode())
+	_, err = io.Copy(file, resp.Body)
+	return err
+}
+
+func (c *Client) downloadNpm() error {
+	modulesDir := filepath.Join(c.RootPath, c.nodeBase(), "lib", "node_modules")
+	zipfile := filepath.Join(modulesDir, "npm.zip")
+	err := os.MkdirAll(modulesDir, 0777)
+	if err != nil {
+		return err
+	}
+	err = downloadFile(zipfile, "https://github.com/npm/npm/archive/v2.1.6.zip")
+	if err != nil {
+		return err
+	}
+	err = extractZip(zipfile, modulesDir)
+	if err != nil {
+		return err
+	}
+	err = os.Remove(zipfile)
+	if err != nil {
+		return err
+	}
+	return os.Rename(filepath.Join(modulesDir, "npm-2.1.6"), filepath.Join(modulesDir, "npm"))
 }

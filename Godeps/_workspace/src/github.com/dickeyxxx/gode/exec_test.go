@@ -4,11 +4,9 @@ import "fmt"
 
 func ExampleClient_RunScript() {
 	c := NewClient("tmp")
-	if !c.IsSetup() {
-		err := c.Setup()
-		if err != nil {
-			panic(err)
-		}
+	err := c.Setup()
+	if err != nil {
+		panic(err)
 	}
 	output, err := c.RunScript(`console.log("hello world!")`).CombinedOutput()
 	if err != nil {

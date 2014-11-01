@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 // Package represents an npm package.
@@ -14,7 +15,10 @@ type Package struct {
 
 // Packages returns a list of npm packages installed.
 func (c *Client) Packages() ([]Package, error) {
-	cmd := c.execNpm("list", "--json", "--depth=0")
+	cmd, err := c.execNpm("list", "--json", "--depth=0")
+	if err != nil {
+		return nil, err
+	}
 	var response map[string]map[string]Package
 	output, err := cmd.StdoutPipe()
 	if err != nil {
@@ -32,7 +36,7 @@ func (c *Client) Packages() ([]Package, error) {
 	if err != nil {
 		return nil, err
 	}
-	var packages []Package
+	packages := make([]Package, 0, len(response["dependencies"]))
 	for name, p := range response["dependencies"] {
 		p.Name = name
 		packages = append(packages, p)
@@ -42,15 +46,26 @@ func (c *Client) Packages() ([]Package, error) {
 
 // InstallPackage installs an npm package.
 func (c *Client) InstallPackage(name string) error {
-	cmd := c.execNpm("install", name)
-	if err := cmd.Run(); err != nil {
+	cmd, err := c.execNpm("install", name)
+	if err != nil {
 		return err
 	}
-	return nil
+	return cmd.Run()
 }
 
-func (c *Client) execNpm(args ...string) *exec.Cmd {
-	cmd := exec.Command(c.NpmPath, args...)
+func (c *Client) execNpm(args ...string) (*exec.Cmd, error) {
+	nodePath, err := filepath.Rel(c.RootPath, c.nodePath())
+	if err != nil {
+		return nil, err
+	}
+	npmPath, err := filepath.Rel(c.RootPath, c.npmPath())
+	if err != nil {
+		return nil, err
+	}
+	args = append([]string{npmPath}, args...)
+	cmd := exec.Command(nodePath, args...)
+	cmd.Dir = c.RootPath
+	cmd.Env = append(os.Environ(), "NPM_CONFIG_SPIN=false")
 	cmd.Stderr = os.Stderr
-	return cmd
+	return cmd, nil
 }

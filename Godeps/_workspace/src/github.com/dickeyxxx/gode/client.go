@@ -1,7 +1,6 @@
 package gode
 
 import (
-	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -13,51 +12,52 @@ const DefaultNodeVersion = "v0.10.32"
 // Client is the interface between Node and Go.
 // It also setups up the Node environment if needed.
 type Client struct {
-	RootPath    string
-	NodePath    string
-	NpmPath     string
-	ModulesPath string
-	Version     string
-	NodeURL     string
+	RootPath string
+	Version  string
 }
 
 // NewClient creates a new Client at the specified rootPath
 // The Node installation can then be setup here with client.Setup()
 func NewClient(rootPath string) *Client {
 	client := &Client{
-		RootPath:    rootPath,
-		NodePath:    filepath.Join(rootPath, nodeBase(DefaultNodeVersion), "bin", "node"),
-		NpmPath:     filepath.Join(rootPath, nodeBase(DefaultNodeVersion), "bin", "npm"),
-		ModulesPath: filepath.Join(rootPath, "lib", "node_modules"),
-		Version:     DefaultNodeVersion,
-		NodeURL:     nodeURL(DefaultNodeVersion),
+		RootPath: rootPath,
+		Version:  DefaultNodeVersion,
 	}
-	os.Setenv("NODE_PATH", client.ModulesPath)
-	os.Setenv("NPM_CONFIG_GLOBAL", "true")
-	os.Setenv("NPM_CONFIG_PREFIX", client.RootPath)
-	os.Setenv("NPM_CONFIG_SPIN", "false")
 
 	return client
 }
 
-func nodeBase(version string) string {
+func (c *Client) nodeBase() string {
 	switch {
 	case runtime.GOARCH == "386":
-		return "node-" + version + "-" + runtime.GOOS + "-x86"
+		return "node-" + c.Version + "-" + runtime.GOOS + "-x86"
 	default:
-		return "node-" + version + "-" + runtime.GOOS + "-x64"
+		return "node-" + c.Version + "-" + runtime.GOOS + "-x64"
 	}
 }
 
-func nodeURL(version string) string {
+func (c *Client) nodeURL() string {
 	switch {
 	case runtime.GOOS == "windows" && runtime.GOARCH == "386":
-		return "http://nodejs.org/dist/" + version + "/node.exe"
+		return "http://nodejs.org/dist/" + c.Version + "/node.exe"
 	case runtime.GOOS == "windows" && runtime.GOARCH == "amd64":
-		return "http://nodejs.org/dist/" + version + "/x64/node.exe"
+		return "http://nodejs.org/dist/" + c.Version + "/x64/node.exe"
 	case runtime.GOARCH == "386":
-		return "http://nodejs.org/dist/" + version + "/" + nodeBase(version) + ".tar.gz"
+		return "http://nodejs.org/dist/" + c.Version + "/" + c.nodeBase() + ".tar.gz"
 	default:
-		return "http://nodejs.org/dist/" + version + "/" + nodeBase(version) + ".tar.gz"
+		return "http://nodejs.org/dist/" + c.Version + "/" + c.nodeBase() + ".tar.gz"
 	}
+}
+
+func (c *Client) nodePath() string {
+	switch {
+	case runtime.GOOS == "windows":
+		return filepath.Join(c.RootPath, c.nodeBase(), "bin", "node.exe")
+	default:
+		return filepath.Join(c.RootPath, c.nodeBase(), "bin", "node")
+	}
+}
+
+func (c *Client) npmPath() string {
+	return filepath.Join(c.RootPath, c.nodeBase(), "lib", "node_modules", "npm", "cli.js")
 }
