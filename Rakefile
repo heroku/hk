@@ -43,12 +43,9 @@ task :deploy => :build do
     upload_string(bucket, from, to + ".sha1", content_type: 'text/plain', cache_control: cache_control)
     puts "done"
   end
-  version_path = "hk/#{CHANNEL}/VERSION"
   puts 'setting manifest'
-  puts JSON.dump(manifest)
-  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json')
-  puts "setting #{version_path} to #{VERSION}"
-  upload_string(bucket, VERSION, version_path, content_type: 'text/plain')
+  p manifest
+  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=86400")
 end
 
 def build(os, arch, path)
