@@ -9,9 +9,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
-	"syscall"
 
 	"github.com/heroku/hk/cli"
 )
@@ -20,6 +20,9 @@ var hkPath = filepath.Join(cli.AppDir, "hk")
 
 func updateIfNeeded() {
 	// TODO: update plugins
+	if !updateNeeded() {
+		return
+	}
 	manifest := getUpdateManifest()
 	if manifest.Version == Version {
 		return
@@ -30,20 +33,18 @@ func updateIfNeeded() {
 	}
 	cli.Errf("Updating to %s... ", manifest.Version)
 	build := manifest.Builds[runtime.GOOS][runtime.GOARCH]
-	tmp, err := downloadHk(build.Url)
-	if err != nil {
-		panic(err)
-	}
-	if fileSha1(tmp) != build.Sha1 {
-		panic("SHA mismatch")
-	}
-	if err := os.Rename(tmp, hkPath); err != nil {
-		panic(err)
-	}
+	update(build.Url, build.Sha1)
 	cli.Errln("done")
-	if err := syscall.Exec(hkPath, os.Args, os.Environ()); err != nil {
-		panic(err)
+	execHk()
+	os.Exit(0)
+}
+
+func updateNeeded() bool {
+	if Version == "dev" {
+		return false
 	}
+	// TODO: only update once in a while
+	return true
 }
 
 type manifest struct {
@@ -70,6 +71,19 @@ func updatable() bool {
 		cli.Errln(err)
 	}
 	return path == hkPath
+}
+
+func update(url, sha1 string) {
+	tmp, err := downloadHk(url)
+	if err != nil {
+		panic(err)
+	}
+	if fileSha1(tmp) != sha1 {
+		panic("SHA mismatch")
+	}
+	if err := os.Rename(tmp, hkPath); err != nil {
+		panic(err)
+	}
 }
 
 func downloadHk(url string) (string, error) {
@@ -103,4 +117,14 @@ func fileSha1(path string) string {
 		panic(err)
 	}
 	return fmt.Sprintf("%x", sha1.Sum(data))
+}
+
+func execHk() {
+	cmd := exec.Command(hkPath, os.Args[1:]...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
 }
