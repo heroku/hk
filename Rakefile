@@ -1,7 +1,7 @@
 require 'digest'
 require 'aws-sdk'
 
-BUCKET_NAME = 'dickeyxxx_dev'
+BUCKET_NAME = 'heroku-cli'
 
 TARGETS = [
   {os: 'darwin', arch: 'amd64'},
@@ -23,21 +23,13 @@ task :build do
     path = "./dist/hk_#{target[:os]}_#{target[:arch]}"
     puts "building #{path}..."
     build(target[:os], target[:arch], path)
+    gzip(path)
   end
 end
 
-task :gzip => :build do
-  TARGETS.each do |target|
-    path = "./dist/hk_#{target[:os]}_#{target[:arch]}"
-    puts "gzipping #{path}..."
-    system("gzip --keep -f #{path}")
-    write_digest("#{path}.gz")
-  end
-end
-
-task :deploy => :gzip do
+task :deploy => :build do
   case BRANCH
-  when 'gonpm'
+  when 'dirty'
     deploy('gonpm')
   when 'dev'
     deploy('dev')
@@ -52,17 +44,18 @@ def deploy(channel)
   puts "deploying #{VERSION} to #{channel}..."
   bucket = get_s3_bucket
   TARGETS.each do |target|
-    filename = "hk_#{target[:os]}_#{target[:arch]}.gz"
+    filename = "hk_#{target[:os]}_#{target[:arch]}"
     local_path = "./dist/#{filename}"
     remote_path = "hk/#{channel}/#{VERSION}/#{filename}"
     remote_url = "#{BUCKET_NAME}.s3.amazonaws.com/#{remote_path}"
     puts "uploading #{local_path} to #{remote_url}"
-    upload_file(bucket, local_path, remote_path)
-    upload_file(bucket, local_path + ".sha1", remote_path + ".sha1")
+    upload_file(bucket, local_path, remote_path, content_type: 'application/octet-stream')
+    upload_file(bucket, local_path + '.gz', remote_path + '.gz', content_type: 'application/gzip', content_encoding: 'gzip')
+    upload_string(bucket, sha_digest(local_path), remote_path + ".sha1", content_type: 'text/plain')
   end
   version_path = "hk/#{channel}/VERSION"
   puts "setting #{version_path} to #{VERSION}"
-  upload_string(bucket, VERSION, version_path)
+  upload_string(bucket, VERSION, version_path, content_type: 'text/plain')
 end
 
 def build(os, arch, path)
@@ -71,24 +64,27 @@ def build(os, arch, path)
   system("GOOS=#{os} GOARCH=#{arch} go build #{args}")
 end
 
-def write_digest(path)
-  digest = Digest::SHA1.file(path).hexdigest
-  File.open(path + '.sha1', 'w') { |f| f.write(digest) }
+def gzip(path)
+  system("gzip --keep -f #{path}")
+end
+
+def sha_digest(path)
+  Digest::SHA1.file(path).hexdigest
 end
 
 def get_s3_bucket
-  s3 = AWS::S3.new
+  s3 = AWS::S3.new(region: 'us-west-2', access_key_id: ENV['HEROKU_RELEASE_ACCESS'], secret_access_key: ENV['HEROKU_RELEASE_SECRET'])
   s3.buckets[BUCKET_NAME]
 end
 
-def upload_file(bucket, local, remote)
+def upload_file(bucket, local, remote, opts={})
   obj = bucket.objects[remote]
-  obj.write(Pathname.new(local))
+  obj.write(Pathname.new(local), opts)
   obj.acl = :public_read
 end
 
-def upload_string(bucket, s, remote)
+def upload_string(bucket, s, remote, opts={})
   obj = bucket.objects[remote]
-  obj.write(s)
+  obj.write(s, opts)
   obj.acl = :public_read
 end
