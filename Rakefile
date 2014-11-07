@@ -96,7 +96,8 @@ def manifest
   @manifest = {
     deployed_at: Time.now,
     version: VERSION,
-    channel: CHANNEL
+    channel: CHANNEL,
+    builds: {}
   }
   TARGETS.each do |target|
     @manifest[:builds][target[:os]] ||= {}
