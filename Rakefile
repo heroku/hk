@@ -38,7 +38,7 @@ end
 task :deploy => :gzip do
   case BRANCH
   when 'gonpm'
-    next
+    deploy('gonpm')
   when 'dev'
     deploy('dev')
   when 'release'
