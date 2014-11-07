@@ -46,6 +46,7 @@ task :deploy => :build do
   puts 'setting manifest:'
   p manifest
   upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=1200")
+  puts "deployed #{VERSION}"
 end
 
 def build(os, arch, path)
