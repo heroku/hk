@@ -32,6 +32,8 @@ staging	git@heroku.com:myapp-staging.git (fetch)
 staging	git@heroku.com:myapp-staging.git (push)
 origin	git@github.com:heroku/hk.git (fetch)
 origin	git@github.com:heroku/hk.git (push)
+exciting	https://git.heroku.com/amazing.git (fetch)
+exciting	https://git.heroku.com/amazing.git (push)
 `
 
 func TestParseGitRemoteOutput(t *testing.T) {
@@ -41,8 +43,9 @@ func TestParseGitRemoteOutput(t *testing.T) {
 	}
 
 	expected := map[string]string{
-		"heroku":  "myapp",
-		"staging": "myapp-staging",
+		"heroku":   "myapp",
+		"staging":  "myapp-staging",
+		"exciting": "amazing",
 	}
 
 	if len(results) != len(expected) {

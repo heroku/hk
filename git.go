@@ -7,17 +7,22 @@ import (
 	"os/exec"
 	"strings"
 	"syscall"
+
+	"github.com/bgentry/heroku-go"
 )
 
 import "fmt"
 import "os"
 
-var _ = fmt.Print
-var _ = os.Stdout
+var alwaysUseHTTPGit bool
 
 const (
 	gitURLSuf = ".git"
 )
+
+func init() {
+	alwaysUseHTTPGit = os.Getenv("HEROKU_HTTP_GIT_ALWAYS") == "1"
+}
 
 func gitHost() string {
 	if herokuGitHost := os.Getenv("HEROKU_GIT_HOST"); herokuGitHost != "" {
@@ -29,8 +34,19 @@ func gitHost() string {
 	return "heroku.com"
 }
 
-func gitURLPre() string {
+func httpGitHost() string {
+	if herokuHTTPGitHost := os.Getenv("HEROKU_HTTP_GIT_HOST"); herokuHTTPGitHost != "" {
+		return herokuHTTPGitHost
+	}
+	return "git." + gitHost()
+}
+
+func sshGitURLPre() string {
 	return "git@" + gitHost() + ":"
+}
+
+func httpGitURLPre() string {
+	return "https://" + httpGitHost() + "/"
 }
 
 func gitDescribe(rels []*Release) error {
@@ -85,10 +101,19 @@ func gitRemotes() (map[string]string, error) {
 }
 
 func appNameFromGitURL(remote string) string {
-	if !strings.HasPrefix(remote, gitURLPre()) || !strings.HasSuffix(remote, gitURLSuf) {
+	if !strings.HasSuffix(remote, gitURLSuf) {
 		return ""
 	}
-	return remote[len(gitURLPre()) : len(remote)-len(gitURLSuf)]
+
+	if strings.HasPrefix(remote, sshGitURLPre()) {
+		return remote[len(sshGitURLPre()) : len(remote)-len(gitURLSuf)]
+	}
+
+	if strings.HasPrefix(remote, httpGitURLPre()) {
+		return remote[len(httpGitURLPre()) : len(remote)-len(gitURLSuf)]
+	}
+
+	return ""
 }
 
 func parseGitRemoteOutput(b []byte) (results map[string]string, err error) {
@@ -174,4 +199,14 @@ func isNotFound(err error) bool {
 		}
 	}
 	return false
+}
+
+func addGitRemote(app *heroku.OrganizationApp, useHTTPGit bool) {
+	url := app.GitURL
+
+	if alwaysUseHTTPGit || useHTTPGit {
+		url = httpGitURLPre() + app.Name + gitURLSuf
+	}
+
+	exec.Command("git", "remote", "add", "heroku", url).Run()
 }
