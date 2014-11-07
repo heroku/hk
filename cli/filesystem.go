@@ -6,7 +6,7 @@ import (
 )
 
 var HomeDir = homeDir()
-var AppDir = filepath.Join(HomeDir, ".hk")
+var AppDir = filepath.Join(HomeDir, ".heroku")
 
 func homeDir() string {
 	user, err := user.Current()

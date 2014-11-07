@@ -16,7 +16,7 @@ import (
 	"github.com/heroku/hk/cli"
 )
 
-var hkPath = filepath.Join(cli.AppDir, "hk")
+var hkPath = filepath.Join(cli.AppDir, "bin", "hk")
 
 func updateIfNeeded() {
 	// TODO: update plugins
