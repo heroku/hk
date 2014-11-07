@@ -13,7 +13,8 @@ TARGETS = [
 
 VERSION = `./version.sh`.chomp
 dirty = `git status 2> /dev/null | tail -n1`.chomp != 'nothing to commit, working directory clean'
-BRANCH = dirty ? 'dirty' : `git rev-parse --abbrev-ref HEAD`.chomp
+CHANNEL = dirty ? 'dirty' : `git rev-parse --abbrev-ref HEAD`.chomp
+CLOUDFRONT_HOST = 'd1gvo455cekpjp.cloudfront.net'
 
 puts "hk: #{VERSION}"
 
@@ -28,33 +29,24 @@ task :build do
 end
 
 task :deploy => :build do
-  case BRANCH
-  when 'dirty'
-    deploy('gonpm')
-  when 'dev'
-    deploy('dev')
-  when 'release'
-    deploy('release')
-  else
-    puts 'not on deployable branch (dev/release) current branch is: ' + BRANCH
-  end
-end
-
-def deploy(channel)
-  puts "deploying #{VERSION} to #{channel}..."
+  #abort 'branch is dirty' if CHANNEL == 'dirty'
+  #abort 'not on a channel branch (gonpm/dev/release)' if %w(gonpm dev release).contains?(CHANNNEL)
+  puts "deploying #{VERSION} to #{BUCKET_NAME}.s3.amazonaws.com/hk/#{CHANNEL}..."
   bucket = get_s3_bucket
+  puts 'setting manifest'
+  cache_control = "public,max-age=31536000"
   TARGETS.each do |target|
-    filename = "hk_#{target[:os]}_#{target[:arch]}"
-    local_path = "./dist/#{filename}"
-    remote_path = "hk/#{channel}/#{VERSION}/#{filename}"
-    remote_url = "#{BUCKET_NAME}.s3.amazonaws.com/#{remote_path}"
-    puts "uploading #{local_path} to #{remote_url}"
-    upload_file(bucket, local_path, remote_path, content_type: 'application/octet-stream')
-    upload_file(bucket, local_path + '.gz', remote_path + '.gz', content_type: 'application/gzip', content_encoding: 'gzip')
-    upload_string(bucket, sha_digest(local_path), remote_path + ".sha1", content_type: 'text/plain')
+    from = "./dist/#{filename(target[:os], target[:arch])}"
+    to = remote_path(target[:os], target[:arch])
+    print "uploading #{to}..."
+    upload_file(bucket, from, to, content_type: 'binary/octet-stream', cache_control: cache_control)
+    upload_file(bucket, from + '.gz', to + '.gz', content_type: 'binary/octet-stream', content_encoding: 'gzip', cache_control: cache_control)
+    upload_string(bucket, from, to + ".sha1", content_type: 'text/plain', cache_control: cache_control)
+    puts "done"
   end
-  version_path = "hk/#{channel}/VERSION"
+  version_path = "hk/#{CHANNEL}/VERSION"
   puts "setting #{version_path} to #{VERSION}"
+  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json')
   upload_string(bucket, VERSION, version_path, content_type: 'text/plain')
 end
 
@@ -87,4 +79,32 @@ def upload_string(bucket, s, remote, opts={})
   obj = bucket.objects[remote]
   obj.write(s, opts)
   obj.acl = :public_read
+end
+
+def filename(os, arch)
+  "hk_#{os}_#{arch}"
+end
+
+def remote_path(os, arch)
+  "hk/#{CHANNEL}/#{VERSION}/#{filename(os, arch)}"
+end
+
+def remote_url(os, arch)
+  "https://#{CLOUDFRONT_HOST}/#{remote_path(os, arch)}"
+end
+
+def manifest
+  manifest = {
+    deployed_at: Time.now,
+    version: VERSION,
+    channel: CHANNEL
+  }
+  TARGETS.each do |target|
+    manifest[target[:os]] ||= {}
+    manifest[target[:os]][target[:arch]] = {
+      url: remote_url(target[:os], target[:arch]),
+      sha1: sha_digest("dist/hk_#{target[:os]}_#{target[:arch]}")
+    }
+  end
+  manifest
 end
