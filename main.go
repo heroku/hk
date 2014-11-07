@@ -14,15 +14,18 @@ import (
 )
 
 var Version string = "dev"
+var BuiltAt string
 
 var Cli = cli.NewCli(
 	apps.Apps,
 	apps.Info,
 	plugins.Plugins,
+	version,
 )
 
 func main() {
 	defer handlePanic()
+	checkIfOutOfDate()
 	plugins.Setup()
 	for _, topic := range plugins.PluginTopics() {
 		Cli.AddTopic(topic)

@@ -2,7 +2,9 @@ package main
 
 import (
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/heroku/hk/cli"
 )
@@ -13,7 +15,6 @@ func help() {
 		args = args[1:]
 	}
 	ctx, _ := Cli.Parse(args)
-	cli.Errln("hk version:", Version)
 	switch {
 	case ctx.Topic == nil:
 		cli.Errf("USAGE: heroku COMMAND [--app APP] [command-specific-options]\n\n")
@@ -93,4 +94,14 @@ func AppNeededWarning() {
 	cli.Errln(" !    No app specified.")
 	cli.Errln(" !    Run this command from an app folder or specify which app to use with --app APP.")
 	os.Exit(3)
+}
+
+func checkIfOutOfDate() {
+	i, err := strconv.ParseInt(BuiltAt, 10, 0)
+	if err != nil {
+		return
+	}
+	if time.Unix(i, 0).AddDate(0, 0, 30).Before(time.Now()) {
+		cli.Errln("Warning: This CLI is over 30 days old and likely out of date.")
+	}
 }
