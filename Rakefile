@@ -29,11 +29,10 @@ task :build do
 end
 
 task :deploy => :build do
-  #abort 'branch is dirty' if CHANNEL == 'dirty'
-  #abort 'not on a channel branch (gonpm/dev/release)' if %w(gonpm dev release).contains?(CHANNNEL)
+  abort 'branch is dirty' if CHANNEL == 'dirty'
+  abort 'not on a channel branch (gonpm/dev/release)' if %w(gonpm dev release).contains?(CHANNNEL)
   puts "deploying #{VERSION} to #{BUCKET_NAME}.s3.amazonaws.com/hk/#{CHANNEL}..."
   bucket = get_s3_bucket
-  puts 'setting manifest'
   cache_control = "public,max-age=31536000"
   TARGETS.each do |target|
     from = "./dist/#{filename(target[:os], target[:arch])}"
@@ -45,8 +44,10 @@ task :deploy => :build do
     puts "done"
   end
   version_path = "hk/#{CHANNEL}/VERSION"
-  puts "setting #{version_path} to #{VERSION}"
+  puts 'setting manifest'
+  puts JSON.dump(manifest)
   upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json')
+  puts "setting #{version_path} to #{VERSION}"
   upload_string(bucket, VERSION, version_path, content_type: 'text/plain')
 end
 
@@ -94,17 +95,18 @@ def remote_url(os, arch)
 end
 
 def manifest
-  manifest = {
+  return @manifest if @manifest
+  @manifest = {
     deployed_at: Time.now,
     version: VERSION,
     channel: CHANNEL
   }
   TARGETS.each do |target|
-    manifest[target[:os]] ||= {}
-    manifest[target[:os]][target[:arch]] = {
+    @manifest[target[:os]] ||= {}
+    @manifest[target[:os]][target[:arch]] = {
       url: remote_url(target[:os], target[:arch]),
       sha1: sha_digest("dist/hk_#{target[:os]}_#{target[:arch]}")
     }
   end
-  manifest
+  @manifest
 end
