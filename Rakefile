@@ -43,7 +43,7 @@ task :deploy => :build do
     upload_string(bucket, from, to + ".sha1", content_type: 'text/plain', cache_control: cache_control)
     puts "done"
   end
-  puts 'setting manifest'
+  puts 'setting manifest:'
   p manifest
   upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=86400")
 end
