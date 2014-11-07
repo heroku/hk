@@ -13,24 +13,25 @@ func help() {
 		args = args[1:]
 	}
 	ctx, _ := Cli.Parse(args)
+	cli.Errln("hk version:", Version)
 	switch {
 	case ctx.Topic == nil:
-		cli.Errf("USAGE: %s COMMAND [--app APP] [command-specific-options]\n\n", os.Args[0])
-		cli.Errf("Help topics, type \"%s help TOPIC\" for more details:\n\n", os.Args[0])
+		cli.Errf("USAGE: heroku COMMAND [--app APP] [command-specific-options]\n\n")
+		cli.Errf("Help topics, type \"heroku help TOPIC\" for more details:\n\n")
 		for _, topic := range nonHiddenTopics(Cli.Topics) {
-			cli.Errf("  %s %-30s# %s\n", os.Args[0], topic.Name, topic.ShortHelp)
+			cli.Errf("  heroku %-30s# %s\n", topic.Name, topic.ShortHelp)
 		}
 	case ctx.Command == nil:
-		cli.Errf("USAGE: %s %s:COMMAND [--app APP] [command-specific-options]\n\n", os.Args[0], ctx.Topic.Name)
+		cli.Errf("USAGE: heroku %s:COMMAND [--app APP] [command-specific-options]\n\n", ctx.Topic.Name)
 		cli.Errln(ctx.Topic.Help)
 		printTopicCommandsHelp(ctx.Topic)
 	case ctx.Command.Name == "":
-		cli.Errf("USAGE: %s %s\n\n", os.Args[0], commandSignature(ctx.Topic, ctx.Command))
+		cli.Errf("USAGE: heroku %s\n\n", commandSignature(ctx.Topic, ctx.Command))
 		cli.Errln(ctx.Command.Help)
 		// This is a root command so show the other commands in the topic
 		printTopicCommandsHelp(ctx.Topic)
 	default:
-		cli.Errf("USAGE: %s %s\n\n", os.Args[0], commandSignature(ctx.Topic, ctx.Command))
+		cli.Errf("USAGE: heroku %s\n\n", commandSignature(ctx.Topic, ctx.Command))
 		cli.Errln(ctx.Command.Help)
 	}
 	os.Exit(2)
@@ -38,9 +39,9 @@ func help() {
 
 func printTopicCommandsHelp(topic *cli.Topic) {
 	if len(topic.Commands) > 0 {
-		cli.Errf("\nCommands for %s, type \"%s help %s:COMMAND\" for more details:\n\n", topic.Name, os.Args[0], topic.Name)
+		cli.Errf("\nCommands for %s, type \"heroku help %s:COMMAND\" for more details:\n\n", topic.Name, topic.Name)
 		for _, command := range nonHiddenCommands(topic.Commands) {
-			cli.Errf("  %s %-30s # %s\n", os.Args[0], commandSignature(topic, command), command.ShortHelp)
+			cli.Errf(" heroku %-30s # %s\n", commandSignature(topic, command), command.ShortHelp)
 		}
 	}
 }

@@ -13,6 +13,8 @@ import (
 	"github.com/heroku/hk/plugins"
 )
 
+var Version string = "dev"
+
 var Cli = cli.NewCli(
 	apps.Apps,
 	apps.Info,

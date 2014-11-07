@@ -1,8 +1,2 @@
 hk
-hk_darwin_386
-hk_darwin_amd64
-hk_linux_386
-hk_linux_amd64
-hk_linux_arm
-hk_windows_386.exe
-hk_windows_amd64.exe
+dist
