@@ -14,7 +14,6 @@ TARGETS = [
 ENV['AWS_ACCESS_KEY_ID'] = ENV['HEROKU_RELEASE_ACCESS']
 ENV['AWS_SECRET_ACCESS_KEY'] = ENV['HEROKU_RELEASE_SECRET']
 
-NOW = Time.now
 VERSION = `./version.sh`.chomp
 dirty = `git status 2> /dev/null | tail -n1`.chomp != 'nothing to commit, working directory clean'
 CHANNEL = dirty ? 'dirty' : `git rev-parse --abbrev-ref HEAD`.chomp
@@ -50,7 +49,7 @@ task :deploy => :build do
 end
 
 def build(os, arch, path)
-  ldflags = "-X main.Version #{VERSION} -X main.BuiltAt #{NOW.to_i}"
+  ldflags = "-X main.Version #{VERSION}"
   args = "-o #{path} -ldflags \"#{ldflags}\""
   system("GOOS=#{os} GOARCH=#{arch} go build #{args}")
 end
@@ -95,13 +94,13 @@ end
 def manifest
   return @manifest if @manifest
   @manifest = {
-    deployed_at: NOW,
+    deployed_at: Time.now,
     version: VERSION,
     channel: CHANNEL
   }
   TARGETS.each do |target|
-    @manifest[target[:os]] ||= {}
-    @manifest[target[:os]][target[:arch]] = {
+    @manifest[:builds][target[:os]] ||= {}
+    @manifest[:builds][target[:os]][target[:arch]] = {
       url: remote_url(target[:os], target[:arch]),
       sha1: sha_digest("dist/hk_#{target[:os]}_#{target[:arch]}")
     }
