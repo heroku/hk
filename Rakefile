@@ -22,7 +22,7 @@ task :build do
   FileUtils.mkdir_p 'dist'
   TARGETS.each do |target|
     path = "./dist/hk_#{target[:os]}_#{target[:arch]}"
-    puts "building #{path}..."
+    puts "building #{path}"
     build(target[:os], target[:arch], path)
     gzip(path)
   end
@@ -37,11 +37,10 @@ task :deploy => :build do
   TARGETS.each do |target|
     from = "./dist/#{filename(target[:os], target[:arch])}"
     to = remote_path(target[:os], target[:arch])
-    print "uploading #{to}..."
+    puts "upload #{to}"
     upload_file(bucket, from, to, content_type: 'binary/octet-stream', cache_control: cache_control)
     upload_file(bucket, from + '.gz', to + '.gz', content_type: 'binary/octet-stream', content_encoding: 'gzip', cache_control: cache_control)
     upload_string(bucket, from, to + ".sha1", content_type: 'text/plain', cache_control: cache_control)
-    puts "done"
   end
   puts 'setting manifest:'
   p manifest
