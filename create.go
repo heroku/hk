@@ -2,14 +2,13 @@ package main
 
 import (
 	"log"
-	"os/exec"
 
 	"github.com/bgentry/heroku-go"
 )
 
 var cmdCreate = &Command{
 	Run:      runCreate,
-	Usage:    "create [-r <region>] [-o <org>] [<name>]",
+	Usage:    "create [-r <region>] [-o <org>] [--http-git] [<name>]",
 	Category: "app",
 	Short:    "create an app",
 	Long: `
@@ -34,10 +33,12 @@ Examples:
 
 var flagRegion string
 var flagOrgName string
+var flagHTTPGit bool
 
 func init() {
 	cmdCreate.Flag.StringVarP(&flagRegion, "region", "r", "", "region name")
 	cmdCreate.Flag.StringVarP(&flagOrgName, "org", "o", "", "organization name")
+	cmdCreate.Flag.BoolVar(&flagHTTPGit, "http-git", false, "use http git remote")
 }
 
 func runCreate(cmd *Command, args []string) {
@@ -62,7 +63,8 @@ func runCreate(cmd *Command, args []string) {
 
 	app, err := client.OrganizationAppCreate(&opts)
 	must(err)
-	exec.Command("git", "remote", "add", "heroku", app.GitURL).Run()
+
+	addGitRemote(app, flagHTTPGit)
 
 	if app.Organization != nil {
 		log.Printf("Created %s in the %s org.", app.Name, app.Organization.Name)
