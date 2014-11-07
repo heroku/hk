@@ -30,7 +30,7 @@ end
 
 task :deploy => :build do
   abort 'branch is dirty' if CHANNEL == 'dirty'
-  abort 'not on a channel branch (gonpm/dev/release)' if %w(gonpm dev release).contains?(CHANNEL)
+  abort 'not on a channel branch (gonpm/dev/release)' if %w(gonpm dev release).include?(CHANNEL)
   puts "deploying #{VERSION} to #{BUCKET_NAME}.s3.amazonaws.com/hk/#{CHANNEL}..."
   bucket = get_s3_bucket
   cache_control = "public,max-age=31536000"
