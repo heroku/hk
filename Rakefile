@@ -18,7 +18,6 @@ VERSION = `./version.sh`.chomp
 dirty = `git status 2> /dev/null | tail -n1`.chomp != 'nothing to commit, working directory clean'
 CHANNEL = dirty ? 'dirty' : `git rev-parse --abbrev-ref HEAD`.chomp
 CLOUDFRONT_HOST = 'd1gvo455cekpjp.cloudfront.net'
-CLOUDFRONT_ID = 'EHF9FOCUJYVZ'
 
 puts "hk: #{VERSION}"
 
@@ -47,7 +46,6 @@ task :deploy => :build do
     upload_string(bucket, from, to + ".sha1", content_type: 'text/plain', cache_control: cache_control)
   end
   set_manifest(bucket)
-  invalidate_manifest
 end
 
 def build(os, arch, path)
@@ -113,20 +111,6 @@ end
 def set_manifest(bucket)
   puts 'setting manifest:'
   p manifest
-  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=1200")
+  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=600")
   puts "deployed #{VERSION}"
-end
-
-def cloudfront
-  @cloudfront ||= AWS::CloudFront.new.client
-end
-
-def invalidate_manifest
-  cloudfront.create_invalidation(
-    distribution_id: CLOUDFRONT_ID,
-    invalidation_batch: {
-      paths: {quantity: 1, items: ["/hk/#{CHANNEL}/manifest.json"]},
-      caller_reference: CHANNEL+VERSION
-    }
-  )
 end
