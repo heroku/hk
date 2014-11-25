@@ -25,6 +25,10 @@ func gitURLPre() string {
 	return "git@" + gitHost() + ":"
 }
 
+func gitHTTPSURLPre() string {
+	return "https://git.heroku.com/"
+}
+
 func gitRemotes() (map[string]string, error) {
 	b, err := exec.Command("git", "remote", "-v").Output()
 	if err != nil {
@@ -35,10 +39,14 @@ func gitRemotes() (map[string]string, error) {
 }
 
 func appNameFromGitURL(remote string) string {
-	if !strings.HasPrefix(remote, gitURLPre()) || !strings.HasSuffix(remote, ".git") {
+	switch {
+	case strings.HasPrefix(remote, gitHTTPSURLPre()) && strings.HasSuffix(remote, ".git"):
+		return remote[len(gitHTTPSURLPre()) : len(remote)-len(".git")]
+	case strings.HasPrefix(remote, gitURLPre()) && strings.HasSuffix(remote, ".git"):
+		return remote[len(gitURLPre()) : len(remote)-len(".git")]
+	default:
 		return ""
 	}
-	return remote[len(gitURLPre()) : len(remote)-len(".git")]
 }
 
 func parseGitRemoteOutput(b []byte) (results map[string]string, err error) {
