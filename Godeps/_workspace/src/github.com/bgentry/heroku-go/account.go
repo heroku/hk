@@ -1,3 +1,5 @@
+// THIS FILE SHOULD NOT SHOW UP IN THE PR DIFF
+
 // WARNING: This code is auto-generated from the Heroku Platform API JSON Schema
 // by a Ruby script (gen/gen.rb). Changes should be made to the generation
 // script rather than the generated files.
