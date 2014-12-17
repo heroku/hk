@@ -1,20 +1,18 @@
-package plugins
+package main
 
-import "github.com/heroku/hk/cli"
-
-var cmdInstall = &cli.Command{
+var cmdInstall = &Command{
 	Name:      "install",
-	Args:      []*cli.Arg{{Name: "name"}},
+	Args:      []*Arg{{Name: "name"}},
 	ShortHelp: "Installs a plugin into the CLI",
 	Help: `Install a Heroku plugin
 
   Example:
   $ heroku plugins:install dickeyxxx/heroku-production-status`,
 
-	Run: func(ctx *cli.Context) {
+	Run: func(ctx *Context) {
 		name := ctx.Args["name"]
-		cli.Errf("Installing plugin %s... ", name)
+		Errf("Installing plugin %s... ", name)
 		must(node.InstallPackage(name))
-		cli.Errln("done")
+		Errln("done")
 	},
 }

@@ -1,4 +1,4 @@
-package cli
+package main
 
 import "strings"
 
@@ -15,6 +15,7 @@ func (t *Topic) String() string {
 }
 
 type Command struct {
+	Topic     string
 	Name      string
 	ShortHelp string
 	Help      string

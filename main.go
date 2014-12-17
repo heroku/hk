@@ -8,34 +8,38 @@ import (
 	"time"
 
 	"github.com/bgentry/go-netrc/netrc"
-	"github.com/heroku/hk/apps"
-	"github.com/heroku/hk/cli"
-	"github.com/heroku/hk/plugins"
 )
 
 var Version string = "dev"
 
-var Cli = cli.NewCli(
-	apps.Apps,
-	apps.Info,
-	plugins.Plugins,
-	version,
-)
+var cli = &Cli{}
+
+func init() {
+	cli.Topics = map[string]*Topic{
+		"commands": commands,
+		"version":  version,
+		"plugins":  plugins,
+	}
+}
 
 func main() {
 	defer handlePanic()
 	updateIfNeeded()
-	plugins.Setup()
-	for _, topic := range plugins.PluginTopics() {
-		Cli.AddTopic(topic)
+	if !node.IsSetup() {
+		Err("setting up plugins... ")
+		must(node.Setup())
+		Errln("done")
 	}
-	ctx, err := Cli.Parse(os.Args[1:])
+	for _, command := range PluginCommands() {
+		cli.AddCommand(command)
+	}
+	ctx, err := cli.Parse(os.Args[1:])
 	if err != nil {
-		if err == cli.HelpErr {
+		if err == HelpErr {
 			help()
 		}
-		cli.Errln(err)
-		cli.Errf("USAGE: %s %s\n", os.Args[0], commandSignature(ctx.Topic, ctx.Command))
+		Errln(err)
+		Errf("USAGE: %s %s\n", os.Args[0], commandSignature(ctx.Topic, ctx.Command))
 		os.Exit(2)
 	}
 	if ctx.Command.NeedsApp {
@@ -52,17 +56,17 @@ func main() {
 	if ctx.Command.NeedsAuth {
 		ctx.Auth.Username, ctx.Auth.Password = auth()
 	}
-	cli.Logf("Running %s\n", ctx)
+	Logf("Running %s\n", ctx)
 	before := time.Now()
 	ctx.Command.Run(ctx)
-	cli.Logf("Finished in %s\n", (time.Since(before)))
+	Logf("Finished in %s\n", (time.Since(before)))
 }
 
 func handlePanic() {
 	if e := recover(); e != nil {
-		cli.Errln("ERROR:", e)
-		cli.Logln(string(debug.Stack()))
-		cli.Exit(1)
+		Errln("ERROR:", e)
+		Logln(string(debug.Stack()))
+		Exit(1)
 	}
 }
 
@@ -85,7 +89,7 @@ func auth() (user, password string) {
 
 func netrcPath() string {
 	if runtime.GOOS == "windows" {
-		return filepath.Join(cli.HomeDir, "_netrc")
+		return filepath.Join(HomeDir, "_netrc")
 	}
-	return filepath.Join(cli.HomeDir, ".netrc")
+	return filepath.Join(HomeDir, ".netrc")
 }

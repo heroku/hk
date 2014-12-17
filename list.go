@@ -1,19 +1,17 @@
-package plugins
+package main
 
-import "github.com/heroku/hk/cli"
-
-var cmdList = &cli.Command{
+var cmdList = &Command{
 	ShortHelp: "Lists the installed plugins",
 	Help: `Lists installed plugins
 
   Example:
   $ heroku plugins`,
 
-	Run: func(ctx *cli.Context) {
+	Run: func(ctx *Context) {
 		packages, err := node.Packages()
 		must(err)
 		for _, pkg := range packages {
-			cli.Println(pkg.Name, pkg.Version)
+			Println(pkg.Name, pkg.Version)
 		}
 	},
 }

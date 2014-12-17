@@ -22,7 +22,7 @@ CLOUDFRONT_HOST = 'd1gvo455cekpjp.cloudfront.net'
 
 puts "hk: #{VERSION}"
 
-desc "build"
+desc "build hk"
 task :build do
   FileUtils.mkdir_p 'dist'
   TARGETS.each do |target|
@@ -33,7 +33,7 @@ task :build do
   end
 end
 
-desc "deploy"
+desc "deploy hk"
 task :deploy => :build do
   abort 'branch is dirty' if CHANNEL == 'dirty'
   abort "#{CHANNEL} not a channel branch (dev/release)" unless %w(dev release).include?(CHANNEL)
@@ -115,6 +115,6 @@ end
 def set_manifest(bucket)
   puts 'setting manifest:'
   p manifest
-  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=600")
+  upload_string(bucket, JSON.dump(manifest), "hk/#{CHANNEL}/manifest.json", content_type: 'application/json', cache_control: "public,max-age=300")
   puts "deployed #{VERSION}"
 end

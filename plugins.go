@@ -1,13 +1,12 @@
-package plugins
+package main
 
 import (
 	"github.com/dickeyxxx/gode"
-	"github.com/heroku/hk/cli"
 )
 
-var node = gode.NewClient(cli.AppDir)
+var node = gode.NewClient(AppDir)
 
-var Plugins = &cli.Topic{
+var plugins = &Topic{
 	Name:      "plugins",
 	ShortHelp: "manage plugins",
 	Help: `Manage the Heroku CLI Plugins
@@ -15,7 +14,7 @@ var Plugins = &cli.Topic{
   Example:
   $ heroku plugins:install dickeyxxx/heroku-production-check`,
 
-	Commands: []*cli.Command{
+	Commands: []*Command{
 		cmdList,
 		cmdInstall,
 	},

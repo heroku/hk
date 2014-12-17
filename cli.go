@@ -1,4 +1,4 @@
-package cli
+package main
 
 import (
 	"errors"
@@ -11,24 +11,14 @@ type Cli struct {
 	Topics map[string]*Topic
 }
 
-func NewCli(topics ...*Topic) *Cli {
-	cli := &Cli{map[string]*Topic{}}
-	for _, topic := range topics {
-		cli.AddTopic(topic)
-	}
-	return cli
-}
-
-func (cli *Cli) AddTopic(topic *Topic) {
-	if cli.Topics[topic.Name] == nil {
-		cli.Topics[topic.Name] = topic
+func (cli *Cli) AddCommand(cmd *Command) {
+	if cli.Topics[cmd.Topic] == nil {
+		cli.Topics[cmd.Topic] = &Topic{Name: cmd.Topic}
 		return
 	}
-	dest := cli.Topics[topic.Name]
-	for _, cmd := range topic.Commands {
-		if dest.GetCommand(cmd.Name) == nil {
-			dest.Commands = append(dest.Commands, cmd)
-		}
+	dest := cli.Topics[cmd.Topic]
+	if dest.GetCommand(cmd.Name) == nil {
+		dest.Commands = append(dest.Commands, cmd)
 	}
 }
 

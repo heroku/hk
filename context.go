@@ -1,4 +1,4 @@
-package cli
+package main
 
 type Context struct {
 	Topic   *Topic            `json:"topic"`

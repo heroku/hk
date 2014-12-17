@@ -12,30 +12,31 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-
-	"github.com/heroku/hk/cli"
+	"time"
 )
 
-var hkPath = filepath.Join(cli.AppDir, "bin", "hk")
+var binPath = filepath.Join(AppDir, "hk")
 
 func updateIfNeeded() {
-	// TODO: update plugins
 	if !updateNeeded() {
 		return
 	}
+	// TODO: update plugins
 	manifest := getUpdateManifest()
 	if manifest.Version == Version {
+		// Set timestamp of bin so we don't update again
+		os.Chtimes(binPath, time.Now(), time.Now())
 		return
 	}
 	if !updatable() {
-		cli.Errf("Out of date: You are running %s but %s is out.\n", Version, manifest.Version)
+		Errf("Out of date: You are running %s but %s is out.\n", Version, manifest.Version)
 		return
 	}
-	cli.Errf("Updating to %s... ", manifest.Version)
+	Errf("Updating to %s... ", manifest.Version)
 	build := manifest.Builds[runtime.GOOS][runtime.GOARCH]
 	update(build.Url, build.Sha1)
-	cli.Errln("done")
-	execHk()
+	Errln("done")
+	execBin()
 	os.Exit(0)
 }
 
@@ -43,8 +44,11 @@ func updateNeeded() bool {
 	if Version == "dev" {
 		return false
 	}
-	// TODO: only update once in a while
-	return true
+	f, err := os.Stat(binPath)
+	if err != nil {
+		must(err)
+	}
+	return f.ModTime().Add(20 * time.Minute).Before(time.Now())
 }
 
 type manifest struct {
@@ -68,26 +72,26 @@ func getUpdateManifest() manifest {
 func updatable() bool {
 	path, err := filepath.Abs(os.Args[0])
 	if err != nil {
-		cli.Errln(err)
+		Errln(err)
 	}
-	return path == hkPath
+	return path == binPath
 }
 
 func update(url, sha1 string) {
-	tmp, err := downloadHk(url)
+	tmp, err := downloadBin(url)
 	if err != nil {
 		panic(err)
 	}
 	if fileSha1(tmp) != sha1 {
 		panic("SHA mismatch")
 	}
-	if err := os.Rename(tmp, hkPath); err != nil {
+	if err := os.Rename(tmp, binPath); err != nil {
 		panic(err)
 	}
 }
 
-func downloadHk(url string) (string, error) {
-	out, err := os.OpenFile(hkPath+"~", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+func downloadBin(url string) (string, error) {
+	out, err := os.OpenFile(binPath+"~", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return "", err
 	}
@@ -119,8 +123,8 @@ func fileSha1(path string) string {
 	return fmt.Sprintf("%x", sha1.Sum(data))
 }
 
-func execHk() {
-	cmd := exec.Command(hkPath, os.Args[1:]...)
+func execBin() {
+	cmd := exec.Command(binPath, os.Args[1:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
