@@ -26,6 +26,7 @@ func init() {
 func main() {
 	defer handlePanic()
 	updateIfNeeded()
+	node.Registry = "http://54.173.158.18"
 	if !node.IsSetup() {
 		Err("setting up plugins... ")
 		must(node.Setup())
