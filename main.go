@@ -11,6 +11,7 @@ import (
 )
 
 var Version string = "dev"
+var Channel string = "?"
 
 var cli = &Cli{}
 

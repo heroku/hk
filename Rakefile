@@ -52,7 +52,7 @@ task :deploy => :build do
 end
 
 def build(os, arch, path)
-  ldflags = "-X main.Version #{VERSION}"
+  ldflags = "-X main.Version #{VERSION} -X main.Channel #{CHANNEL}"
   args = "-o #{path} -ldflags \"#{ldflags}\""
   system("GOOS=#{os} GOARCH=#{arch} go build #{args}")
 end

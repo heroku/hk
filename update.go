@@ -59,8 +59,7 @@ type manifest struct {
 }
 
 func getUpdateManifest() manifest {
-	channel := "dev"
-	res, err := http.Get("https://d1gvo455cekpjp.cloudfront.net/hk/" + channel + "/manifest.json")
+	res, err := http.Get("https://d1gvo455cekpjp.cloudfront.net/hk/" + Channel + "/manifest.json")
 	if err != nil {
 		panic(err)
 	}
