@@ -464,7 +464,7 @@ hk regions                                                        # list regions
 hk release-info [-a <app>] <version>                              # show release info
 hk releases [-a <app>] [-n <limit>] [<version>...]                # list releases
 hk rename <oldname> <newname>                                     # rename an app
-hk restart [-a <app>] [<type or name>]                            # restart dynos
+hk restart [-a <app>] [<type or name>]                            # restart dynos (or stop a dyno started with 'hk run')
 hk rollback [-a <app>] <version>                                  # roll back to a previous release
 hk run [-s <size>] [-d] <command> [<argument>...]                 # run a process in a dyno
 hk scale [-a <app>] <type>=[<qty>]:[<size>]...                    # change dyno quantities and sizes
