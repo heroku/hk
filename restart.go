@@ -11,9 +11,10 @@ var cmdRestart = &Command{
 	Usage:    "restart [<type or name>]",
 	NeedsApp: true,
 	Category: "dyno",
-	Short:    "restart dynos",
+	Short:    "restart dynos (or stop a dyno started with 'hk run')",
 	Long: `
-Restart all app dynos, all dynos of a specific type, or a single dyno.
+Restart all app dynos, all dynos of a specific type, or a single dyno. If used
+on a dyno started using 'hk run' this will effectively stop it.
 
 Examples:
 
