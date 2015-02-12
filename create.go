@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/heroku-go"
 )
 
 var cmdCreate = &Command{

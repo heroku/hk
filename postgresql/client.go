@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/heroku/hk/Godeps/_workspace/src/code.google.com/p/go-uuid/uuid"
 )
 
 const (

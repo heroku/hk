@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bgentry/go-netrc/netrc"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/go-netrc/netrc"
 )
 
 type NetRc struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bgentry/speakeasy"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/speakeasy"
 )
 
 func main() {

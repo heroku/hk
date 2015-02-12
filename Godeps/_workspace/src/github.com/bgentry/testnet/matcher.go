@@ -1,7 +1,7 @@
 package testnet
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"strings"

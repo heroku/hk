@@ -3,7 +3,7 @@ package s3util
 import (
 	"bytes"
 	"encoding/xml"
-	"github.com/kr/s3"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/s3"
 	"io"
 	"net/http"
 	"net/url"

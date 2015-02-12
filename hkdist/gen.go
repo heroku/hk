@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/kr/binarydist"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/binarydist"
 )
 
 func gen(args []string) {

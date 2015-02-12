@@ -11,7 +11,7 @@ package s3util
 // TODO(kr): parse error responses; return structured data
 
 import (
-	"github.com/kr/s3"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/s3"
 	"net/http"
 )
 

@@ -10,7 +10,7 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/heroku-go"
 )
 
 var releaseCount int
