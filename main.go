@@ -8,13 +8,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/bgentry/heroku-go"
-	flag "github.com/bgentry/pflag"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/heroku-go"
+	flag "github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/pflag"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/mgutz/ansi"
 	"github.com/heroku/hk/hkclient"
 	"github.com/heroku/hk/postgresql"
 	"github.com/heroku/hk/rollbar"
 	"github.com/heroku/hk/term"
-	"github.com/mgutz/ansi"
 )
 
 var (

@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bmizerany/pq"
-	"github.com/gorilla/mux"
-	"github.com/kr/secureheader"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bmizerany/pq"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/secureheader"
 )
 
 const (

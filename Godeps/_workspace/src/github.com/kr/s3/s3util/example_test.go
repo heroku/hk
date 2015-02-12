@@ -1,7 +1,7 @@
 package s3util_test
 
 import (
-	"github.com/kr/s3/s3util"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/s3/s3util"
 	"io"
 	"os"
 )

@@ -31,7 +31,7 @@ package update
 import (
 	"compress/gzip"
 	"fmt"
-	"bitbucket.org/kardianos/osext"
+	"github.com/heroku/hk/Godeps/_workspace/src/bitbucket.org/kardianos/osext"
 	"io"
 	"io/ioutil"
 	"net/http"

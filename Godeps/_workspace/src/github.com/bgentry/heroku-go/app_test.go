@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bgentry/testnet"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/testnet"
 )
 
 //

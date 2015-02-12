@@ -1,7 +1,7 @@
 package secureheader_test
 
 import (
-	"github.com/kr/secureheader"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/secureheader"
 	"net/http"
 )
 

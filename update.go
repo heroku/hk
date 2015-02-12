@@ -17,9 +17,9 @@ import (
 	"runtime"
 	"time"
 
-	"bitbucket.org/kardianos/osext"
-	"github.com/inconshreveable/go-update"
-	"github.com/kr/binarydist"
+	"github.com/heroku/hk/Godeps/_workspace/src/bitbucket.org/kardianos/osext"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/inconshreveable/go-update"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/binarydist"
 )
 
 var cmdUpdate = &Command{

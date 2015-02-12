@@ -18,8 +18,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bgentry/go-netrc/netrc"
-	"github.com/bgentry/heroku-go"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/go-netrc/netrc"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/heroku-go"
 )
 
 const numgen = 20

@@ -30,7 +30,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kr/s3"
+	"github.com/heroku/hk/Godeps/_workspace/src/github.com/kr/s3"
 )
 
 var (
