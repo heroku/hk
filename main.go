@@ -189,7 +189,7 @@ func initClients() {
 
 	client = suite.Client
 	pgclient = suite.PgClient
-
+	apiURL = suite.ApiURL
 }
 
 func main() {

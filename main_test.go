@@ -95,6 +95,10 @@ func TestHerokuAPIURL(t *testing.T) {
 		t.Errorf("expected client.URL to be %q, got %q", newURL, client.URL)
 	}
 
+	if apiURL != newURL {
+		t.Errorf("expected apiURL to be %q, got %q", newURL, apiURL)
+	}
+
 	// cleanup
 	os.Setenv("HEROKU_API_URL", "")
 }
