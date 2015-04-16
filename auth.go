@@ -140,7 +140,7 @@ func runLogin(cmd *Command, args []string) {
 		printFatal(err.Error())
 	}
 
-	hostname, token, err := attemptLogin(email, password, "")
+	address, token, err := attemptLogin(email, password, "")
 	if err != nil {
 		if herror, ok := err.(heroku.Error); ok && herror.Id == "two_factor" {
 			// 2FA requested, attempt 2FA login
@@ -149,7 +149,7 @@ func runLogin(cmd *Command, args []string) {
 			if _, err := fmt.Scanln(&twoFactorCode); err != nil {
 				printFatal("reading two-factor auth code: " + err.Error())
 			}
-			hostname, token, err = attemptLogin(email, password, twoFactorCode)
+			address, token, err = attemptLogin(email, password, twoFactorCode)
 			must(err)
 		} else {
 			must(err)
@@ -161,7 +161,7 @@ func runLogin(cmd *Command, args []string) {
 		printFatal("loading netrc: " + err.Error())
 	}
 
-	err = nrc.SaveCreds(hostname, email, token)
+	err = nrc.SaveCreds(address, email, token)
 	if err != nil {
 		printFatal("saving new token: " + err.Error())
 	}
@@ -202,7 +202,7 @@ func attemptLogin(username, password, twoFactorCode string) (hostname, token str
 	if auth.AccessToken == nil {
 		return "", "", fmt.Errorf("access token missing from Heroku API login response")
 	}
-	return strings.Split(req.Host, ":")[0], auth.AccessToken.Token, nil
+	return req.Host, auth.AccessToken.Token, nil
 }
 
 var cmdLogout = &Command{

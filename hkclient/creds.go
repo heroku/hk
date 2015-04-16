@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/heroku/hk/Godeps/_workspace/src/github.com/bgentry/go-netrc/netrc"
 )
@@ -53,10 +54,11 @@ func (nrc *NetRc) GetCreds(apiURL *url.URL) (user, pass string, err error) {
 	return m.Login, m.Password, nil
 }
 
-func (nrc *NetRc) SaveCreds(host, user, pass string) error {
+func (nrc *NetRc) SaveCreds(address, user, pass string) error {
+	host := strings.Split(address, ":")[0]
 	m := nrc.FindMachine(host)
 	if m == nil || m.IsDefault() {
-		m = nrc.NewMachine(host, user, pass, "")
+		m = nrc.NewMachine(address, user, pass, "")
 	}
 	m.UpdateLogin(user)
 	m.UpdatePassword(pass)
