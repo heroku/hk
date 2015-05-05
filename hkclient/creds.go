@@ -53,10 +53,10 @@ func (nrc *NetRc) GetCreds(apiURL *url.URL) (user, pass string, err error) {
 	return m.Login, m.Password, nil
 }
 
-func (nrc *NetRc) SaveCreds(host, user, pass string) error {
-	m := nrc.FindMachine(host)
+func (nrc *NetRc) SaveCreds(address, user, pass string) error {
+	m := nrc.FindMachine(address)
 	if m == nil || m.IsDefault() {
-		m = nrc.NewMachine(host, user, pass, "")
+		m = nrc.NewMachine(address, user, pass, "")
 	}
 	m.UpdateLogin(user)
 	m.UpdatePassword(pass)
