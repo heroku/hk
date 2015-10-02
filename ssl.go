@@ -162,7 +162,7 @@ var cmdSSLCertRollback = &Command{
 	Usage:    "ssl-cert-rollback",
 	NeedsApp: true,
 	Category: "ssl",
-	Short:    "add a new ssl cert",
+	Short:    "rollback ssl cert to the previous version",
 	Long: `
 Rolls back an SSL endpoint's certificate to the previous version.
 
