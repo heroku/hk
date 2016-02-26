@@ -16,7 +16,7 @@ correct form. If successful, it prints the corresponding app name.
 Otherwise, it prints an error message to stderr and exits with a
 nonzero status.
 
-To suppress the error message, run 'hk app 2>/dev/null'.
+To suppress the error message, run 'hk which-app 2>/dev/null'.
 `,
 }
 
