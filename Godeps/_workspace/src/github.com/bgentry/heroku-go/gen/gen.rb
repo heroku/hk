@@ -69,16 +69,18 @@ import (
     <%-         end %>
   <%- hasCustomType = !schemas[key]["properties"].nil? %>
   func (c *Client) <%= func_name + "(" + func_args.join(', ') %>) <%= return_values %> {
+    <%- method = link['method'].downcase.capitalize %>
     <%- case link["rel"] %>
     <%- when "create" %>
       <%- if !required.empty? %>
         <%= Erubis::Eruby.new(LINK_PARAMS_TEMPLATE).result({modelname: key, link: link, required: required, optional: optional}).strip %>
       <%- end %>
       var <%= variablecase(key + '-res') %> <%= titlecase(key) %>
-      return &<%= variablecase(key + '-res') %>, c.Post(&<%= variablecase(key + '-res') %>, <%= path %>, <%= postval %>)
+      <%- puts link if key =~ /org/ %>
+      return &<%= variablecase(key + '-res') %>, c.<%= method %>(&<%= variablecase(key + '-res') %>, <%= path %>, <%= postval %>)
     <%- when "self" %>
       var <%= variablecase(key) %> <%= hasCustomType ? titlecase(key) : "map[string]string" %>
-      return <%= "&" if hasCustomType%><%= variablecase(key) %>, c.Get(&<%= variablecase(key) %>, <%= path %>)
+      return <%= "&" if hasCustomType%><%= variablecase(key) %>, c.<%= method %>(&<%= variablecase(key) %>, <%= path %>)
     <%- when "destroy", "empty" %>
       return c.Delete(<%= path %>)
     <%- when "update" %>
@@ -87,10 +89,10 @@ import (
       <%- end %>
       <%- if link["title"].include?("Batch") %>
         var <%= variablecase(key + 's-res') %> []<%= titlecase(key) %>
-        return <%= variablecase(key + 's-res') %>, c.Patch(&<%= variablecase(key + 's-res') %>, <%= path %>, <%= postval %>)
+        return <%= variablecase(key + 's-res') %>, c.<%= method %>(&<%= variablecase(key + 's-res') %>, <%= path %>, <%= postval %>)
       <%- else %>
         var <%= variablecase(key + '-res') %> <%= hasCustomType ? titlecase(key) : "map[string]string" %>
-        return <%= "&" if hasCustomType%><%= variablecase(key + '-res') %>, c.Patch(&<%= variablecase(key + '-res') %>, <%= path %>, <%= postval %>)
+        return <%= "&" if hasCustomType%><%= variablecase(key + '-res') %>, c.<%= method %>(&<%= variablecase(key + '-res') %>, <%= path %>, <%= postval %>)
       <%- end %>
     <%- when "instances" %>
       req, err := c.NewRequest("GET", <%= path %>, nil)
