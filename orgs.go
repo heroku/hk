@@ -36,13 +36,20 @@ func printOrgsList(w io.Writer, orgs []heroku.Organization) {
 
 // Returns true if the app is in an org, and false otherwise.
 func isAppInOrg(app *heroku.OrganizationApp) bool {
-	return app.Organization != nil
+	return app != nil && app.Organization != nil
 }
 
 // This function uses must(err), so the program will exit if an error is
 // encountered.
 func mustGetOrgApp(appname string) *heroku.OrganizationApp {
 	app, err := client.OrganizationAppInfo(appname)
-	must(err)
+	if err != nil {
+		// the organization app info endpoint responds with a 404 if
+		e, ok := err.(heroku.Error)
+		if ok && e.Id == "not_found" {
+			return nil
+		}
+		must(err)
+	}
 	return app
 }
