@@ -31,6 +31,9 @@ func gitHost() string {
 	if herokuHost := os.Getenv("HEROKU_HOST"); herokuHost != "" {
 		return herokuHost
 	}
+	if herokuGitConfigHost := hostFromGitConfig(); herokuGitConfigHost != "" {
+		return herokuGitConfigHost
+	}
 	return "heroku.com"
 }
 
@@ -150,6 +153,14 @@ func gitConfigBool(name string) bool {
 
 func remoteFromGitConfig() string {
 	b, err := exec.Command("git", "config", "heroku.remote").Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(b))
+}
+
+func hostFromGitConfig() string {
+	b, err := exec.Command("git", "config", "heroku.host").Output()
 	if err != nil {
 		return ""
 	}
